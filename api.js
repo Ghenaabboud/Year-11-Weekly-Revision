@@ -49,20 +49,20 @@
     ]
   };
   function demoSubs() {
-    let s = store("y11rev_demo_subs");
+    let s = store("y11rev_demo_subs2");
     if (!s) {
-      const mk = (id, week, ts, words, flag) => ({ id, week, ts, auto: 14, autoMax: 24, words, flag: flag || "", answers: {} });
+      const mk = (id, week, ts, words, flag, integFlag, integ) => ({ id, week, ts, auto: 14, autoMax: 22, words, flag: flag || "", answers: {}, integFlag: integFlag || "", integ: integ || { left: 0, awayMin: 0, paste: 0, activeMin: 38 } });
       s = [
         mk("D1001","w1","2026-10-22T18:10:00+04:00",412),
         mk("D1002","w1","2026-10-24T21:40:00+04:00",388),
         mk("D1004","w1","2026-10-25T22:55:00+04:00",96,"Very short or repeated answers"),
         mk("D1006","w1","2026-10-26T16:00:00+04:00",351),
-        mk("D1008","w1","2026-10-23T19:05:00+04:00",440),
-        mk("D2001","w1","2026-10-21T17:30:00+04:00",405),
+        mk("D1008","w1","2026-10-23T19:05:00+04:00",440,"","left the page 7 times, 14 min away from the page",{ left: 7, awayMin: 14, paste: 4, activeMin: 22 }),
+        mk("D2001","w1","2026-10-21T17:30:00+04:00",405,"","only 6 min on the pack",{ left: 0, awayMin: 0, paste: 0, activeMin: 6 }),
         mk("D2003","w1","2026-10-25T20:15:00+04:00",377),
         mk("D2004","w1","2026-10-24T12:00:00+04:00",420)
       ];
-      store("y11rev_demo_subs", s);
+      store("y11rev_demo_subs2", s);
     }
     return s;
   }
@@ -86,8 +86,9 @@
     async submit(payload) {
       if (DEMO) {
         const s = demoSubs().filter(x => !(x.id === payload.id && x.week === payload.week));
-        s.push({ ...payload, ts: new Date().toISOString() });
-        store("y11rev_demo_subs", s);
+        const I = payload.integ || {};
+        s.push({ ...payload, ts: new Date().toISOString(), integ: { left: I.left || 0, awayMin: Math.round((I.away || 0) / 6) / 10, paste: I.paste || 0, activeMin: Math.round((I.active || 0) / 6) / 10 } });
+        store("y11rev_demo_subs2", s);
         return { ts: new Date().toISOString() };
       }
       return post({ action: "submit", ...payload });

@@ -119,6 +119,11 @@
   .next{list-style:none;padding:0;margin:0;display:grid;gap:8px;counter-reset:nx}
   .next li{display:grid;grid-template-columns:28px 1fr;gap:10px}
   .next li::before{counter-increment:nx;content:counter(nx);display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--green-soft);color:var(--green);font-weight:800}
+  .q-prompt,.info,.how-to,.term,.guide{-webkit-user-select:none;user-select:none}
+  .pledge{display:flex;gap:12px;align-items:flex-start;border:2px solid var(--amber);background:var(--amber-soft);border-radius:10px;padding:14px 16px;cursor:pointer}
+  .pledge input{width:20px;height:20px;margin-top:3px;accent-color:var(--green);flex:none}
+  .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:20;max-width:min(560px,calc(100% - 32px));background:var(--ink);color:var(--paper);border-radius:10px;padding:12px 16px;font-size:15px;box-shadow:0 6px 24px rgba(0,0,0,.25)}
+  .watch{font-size:13px;color:var(--muted);display:flex;gap:6px;align-items:center}
 </style>
 </head>
 <body>
@@ -130,6 +135,7 @@
 </div></header>
 <div id="stickyMount"></div>
 <main class="wrap wider" id="app"></main>
+<div class="toast" id="toast" role="status" hidden></div>
 
 <script src="config.js"></script>
 <script src="weeks.js"></script>
@@ -242,7 +248,7 @@ function renderLogin(msg){
           <div><button class="btn" id="loginBtn">Sign in</button></div>
         </form>
         <div class="rules"><b>The rules</b>
-          <ul><li>Every question must be answered before you can submit.</li><li>Written answers need a minimum number of words.</li><li>If a pack is not submitted by the deadline, an email goes home to your parents.</li></ul>
+          <ul><li>Every question must be answered before you can submit.</li><li>Written answers need a minimum number of words.</li><li>Pasting is turned off. The page records if you leave it to look things up, and your teacher can see this.</li><li>If a pack is not submitted by the deadline, an email goes home to your parents.</li></ul>
         </div>
       </div>
     </div>
@@ -289,7 +295,8 @@ function openWeek(w){
   const st = weekStatus(w);
   if (st.sub) return renderResult(st.sub.answers || {}, st.sub.ts);
   S.answers = ls(draftKey()) || {};
-  S.step = Object.keys(S.answers).length ? 1 : 0;
+  S.integ = Object.assign({left:0, away:0, paste:0, big:0, active:0, pledged:false}, ls(draftKey()+"_i") || {});
+  S.step = Object.keys(S.answers).length && S.integ.pledged ? 1 : 0;
   renderStep();
 }
 
@@ -304,7 +311,7 @@ function stepper(){
     return `<button class="step ${k} ${d===sq.length?"full":""}" data-step="${i}" ${S.step===i?'aria-current="step"':""}><span class="dot">${k}</span><span class="n">${d}/${sq.length}</span></button>`;
   });
   stickyMount.innerHTML = `<div class="sticky"><div class="sticky-in" role="navigation" aria-label="Pack steps">${parts.join('<span class="sep"></span>')}</div></div>`;
-  stickyMount.querySelectorAll("[data-step]").forEach(b => b.onclick = () => { S.step = Number(b.dataset.step); renderStep(); });
+  stickyMount.querySelectorAll("[data-step]").forEach(b => b.onclick = () => { S.step = S.integ.pledged ? Number(b.dataset.step) : 0; renderStep(); });
 }
 
 function renderStep(){
@@ -328,6 +335,7 @@ function renderStart(){
           <li>Work somewhere quiet. Treat it like a real exam.</li>
           <li>Do the parts in order: A, then B, C and D. Use the buttons at the top to move between them.</li>
           <li>Your answers save on this device as you type. You can close the page and continue later on the same device.</li>
+          <li>Answer on your own, from what you know and your class notes. Pasting is turned off, and the page records each time you leave it and for how long.</li>
           <li>When everything is answered, go to <b>Submit</b>. You can only submit once.</li>
         </ul>
       </div>
@@ -346,10 +354,15 @@ function renderStart(){
     <details class="terms" open><summary>Command terms: what the bold word in each question asks you to do</summary>
       <div class="termlist">${Object.entries(TERMS).map(([t,d])=>`<b>${t[0].toUpperCase()+t.slice(1)}</b><span>${d}</span>`).join("")}</div>
     </details>
-    <div class="navrow"><span class="saved"></span><button class="btn" id="go">Start with criterion A →</button></div>
+    <label class="pledge" for="pledge"><input type="checkbox" id="pledge" ${S.integ.pledged?"checked":""}><span><b>My promise.</b> I will answer these questions myself. I will not copy answers, search online, use AI or ask someone else to answer for me.</span></label>
+    <div class="navrow"><span class="saved" id="pledgeMsg"></span><button class="btn" id="go">Start with criterion A →</button></div>
   </div>`;
   document.getElementById("back").onclick = renderWeeks;
-  document.getElementById("go").onclick = () => { S.step = 1; renderStep(); };
+  document.getElementById("pledge").onchange = e => { S.integ.pledged = e.target.checked; saveInteg(); };
+  document.getElementById("go").onclick = () => {
+    if (!S.integ.pledged){ document.getElementById("pledgeMsg").innerHTML = '<span class="err">Tick the promise box to start.</span>'; return; }
+    S.step = 1; renderStep();
+  };
 }
 
 function qHTML(q, L){
@@ -392,7 +405,11 @@ function onInput(e){
   const q = items(S.week).find(x => x.id===id); if (!q) return;
   if (q.type==="mcq") S.answers[id] = Number(el.value);
   else if (q.type==="match"||q.type==="numtable"){ const arr = S.answers[id] || []; arr[Number(el.dataset.i)] = el.value; S.answers[id] = arr; }
-  else S.answers[id] = el.value;
+  else {
+    const before = String(S.answers[id] || "").length;
+    if (q.type === "text" && el.value.length - before > 60) { S.integ.big++; saveInteg(); toast("A large block of text appeared at once. This has been recorded."); }
+    S.answers[id] = el.value;
+  }
   ls(draftKey(), S.answers);
   document.getElementById("box_"+id)?.classList.remove("missing");
   const sv = document.getElementById("saved"); if (sv) sv.textContent = "Saved on this device ✓";
@@ -453,12 +470,19 @@ async function doSubmit(){
   const qs = items(S.week);
   let auto = 0, autoMax = 0, wc = 0;
   qs.forEach(q => { const m = markOf(q, S.answers[q.id]); if (m!==null){ auto+=m; autoMax+=q.marks; } if (q.type==="text") wc += words(S.answers[q.id]); });
-  const payload = { id:S.student.id, week:S.week.id, answers:S.answers, auto, autoMax, words:wc, flag:effortFlag(qs), late: now() > new Date(S.week.due) };
+  const I = S.integ, reasons = [];
+  if (I.left >= 3) reasons.push(`left the page ${I.left} times`);
+  if (I.away >= 120) reasons.push(`${Math.round(I.away/60)} min away from the page`);
+  if (I.big > 0) reasons.push(`large text inserted ${I.big}×`);
+  if (I.paste >= 3) reasons.push(`${I.paste} paste attempts`);
+  if (I.active < 600) reasons.push(`only ${Math.round(I.active/60)} min on the pack`);
+  const payload = { id:S.student.id, week:S.week.id, answers:S.answers, auto, autoMax, words:wc, flag:effortFlag(qs), late: now() > new Date(S.week.due),
+    integ:{ left:I.left, away:I.away, paste:I.paste, big:I.big, active:I.active }, integFlag: reasons.join(", ") };
   try {
     const r = await API.submit(payload);
     const ts = r.ts || new Date().toISOString();
     S.student.submissions = (S.student.submissions||[]).filter(s=>s.week!==S.week.id).concat([{week:S.week.id, ts, auto, autoMax, answers:S.answers}]);
-    try { localStorage.removeItem(draftKey()); } catch(e){}
+    try { localStorage.removeItem(draftKey()); localStorage.removeItem(draftKey()+"_i"); } catch(e){}
     renderResult(S.answers, ts, true);
   } catch(err){
     document.getElementById("subErr").textContent = "Your pack was not submitted: " + err.message + ". Check your internet connection and try again. Your answers are still saved on this device.";
@@ -498,6 +522,35 @@ function renderResult(ans, ts, fresh){
   document.getElementById("back").onclick = renderWeeks;
   window.scrollTo(0,0);
 }
+
+/* ---------- fair-work checks (only while a pack is open) ---------- */
+function saveInteg(){ if (S.student && S.week) ls(draftKey()+"_i", S.integ); }
+let toastTimer = null;
+function toast(msg){ const t = document.getElementById("toast"); t.textContent = msg; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, 6000); }
+const working = () => S.mode === "week" && S.integ;
+["paste","drop"].forEach(ev => document.addEventListener(ev, e => {
+  if (!working()) return;
+  e.preventDefault(); S.integ.paste++; saveInteg();
+  toast("Pasting is turned off. Type your answer in your own words.");
+}, true));
+["copy","cut"].forEach(ev => document.addEventListener(ev, e => {
+  if (!working()) return;
+  e.preventDefault(); toast("Copying is turned off while you work on a pack.");
+}, true));
+document.addEventListener("contextmenu", e => { if (working() && !e.target.closest("textarea, input")) e.preventDefault(); });
+let awayStart = null;
+function goneAway(){ if (working() && awayStart === null) awayStart = Date.now(); }
+function cameBack(){
+  if (awayStart === null || document.hidden || !document.hasFocus()) return;
+  const secs = Math.round((Date.now() - awayStart) / 1000); awayStart = null;
+  if (!working() || secs < 2) return;
+  S.integ.left++; S.integ.away += secs; saveInteg();
+  toast(`You left this page (${S.integ.left} time${S.integ.left>1?"s":""} so far). Your teacher can see how often you leave and for how long.`);
+}
+document.addEventListener("visibilitychange", () => document.hidden ? goneAway() : cameBack());
+window.addEventListener("blur", goneAway);
+window.addEventListener("focus", cameBack);
+setInterval(() => { if (working() && !document.hidden && document.hasFocus()) { S.integ.active += 5; saveInteg(); } }, 5000);
 
 app.addEventListener("input", onInput);
 app.addEventListener("change", onInput);
