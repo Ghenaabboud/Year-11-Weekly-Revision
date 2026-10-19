@@ -84,7 +84,7 @@ window.REVISION_WEEKS = [
     crit: "B", name: "Inquiring and designing",
     items: [
       { type: "info",
-        html: "<p>A sports drink company claims its new drink has <b>“zero added sugar”</b>. You are a food-safety investigator. You have three brands of sports drink (X, Y and Z), Benedict's solution, test tubes, a boiling water bath and a stopwatch.</p><p>You plan to add Benedict's solution to each drink, heat it, and time how long it takes for the first colour change from blue. A faster colour change means more reducing sugar.</p>" },
+        html: "<p>A sports drink company claims its new drink has <b>“zero added sugar”</b>. You are a food-safety investigator. You have three brands of sports drink (X, Y and Z), Benedict's solution, test tubes, a boiling water bath and a stopwatch.</p><p>You plan to add Benedict's solution to each drink, heat it, and time how long it takes for the first colour change from blue. A faster colour change means more reducing sugar.</p><figure class='fig'><img src='images/w1-sports-drinks-benedicts.jpg' alt='Sports drinks X, Y and Z are each mixed with Benedict&#39;s solution in a test tube, heated in a boiling water bath, and timed until the first colour change from blue. Example times: X 0:45, Y 1:30, Z 3:15.' loading='lazy'><figcaption>Figure 1: The planned method.</figcaption></figure>" },
 
       { id: "w1b1", type: "text", marks: 2, minWords: 12,
         prompt: "<b>Formulate</b> a research question for this investigation.",

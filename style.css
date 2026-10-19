@@ -79,4 +79,8 @@ a{color:var(--blue)}
 .tbl th,.tbl td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
 .tbl th{background:var(--green-soft);font-weight:700;font-size:14px}
 
+.fig{margin:12px 0 4px}
+.fig img{display:block;width:100%;max-width:100%;height:auto;border-radius:8px;border:1px solid var(--line);background:#fff}
+.fig figcaption{font-size:13px;color:var(--muted);margin-top:6px}
+
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
