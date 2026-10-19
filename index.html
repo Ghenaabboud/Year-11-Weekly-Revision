@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Year 11 Biology Weekly Revision</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="style.css">
+<style>
+  h1.big{font-size:clamp(30px,5.5vw,44px);font-weight:800;margin-top:6px}
+  h2.mid{font-size:22px}
+  .two{display:grid;grid-template-columns:1.1fr .9fr;gap:20px;align-items:start}
+  @media (max-width:760px){.two{grid-template-columns:1fr}}
+  .wrap.wider{max-width:960px}
+
+  /* how it works */
+  .how{list-style:none;margin:0;padding:0;display:grid;gap:10px;counter-reset:how}
+  .how li{display:grid;grid-template-columns:38px 1fr;gap:12px;align-items:start;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px}
+  .how li::before{counter-increment:how;content:counter(how);display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:var(--green);color:var(--green-ink);font:800 18px var(--f-display)}
+  .how b{display:block}
+  .how span{color:var(--muted);font-size:15px}
+  .rules{border-left:4px solid var(--red);background:var(--red-soft);border-radius:0 10px 10px 0;padding:12px 16px}
+  .rules b{color:var(--red)}
+  .rules ul{margin:6px 0 0;padding-left:18px}
+
+  /* pack list */
+  .weeklist{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:10px;background:var(--card);overflow:hidden}
+  .wk{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;padding:16px 18px;border:0;border-top:1px solid var(--line);text-align:left;background:none;cursor:pointer;width:100%}
+  .wk:first-child{border-top:0}
+  .wk:hover{background:var(--green-soft)}
+  .wk[disabled]{cursor:default;opacity:.6}.wk[disabled]:hover{background:none}
+  .wk-num{font:800 24px var(--f-display);color:var(--green);width:42px;text-align:center}
+  .wk h3{font-size:17px}
+  .wk .meta{font-size:13px;color:var(--muted)}
+  .wk .act{font-weight:700;color:var(--green);font-size:14px;white-space:nowrap}
+  @media (max-width:560px){.wk{grid-template-columns:auto 1fr}.wk .right{grid-column:2}}
+  .right{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+  @media (max-width:560px){.right{align-items:flex-start}}
+  .countdown{display:flex;gap:16px;align-items:center;flex-wrap:wrap;background:var(--card);border:2px solid var(--green);border-radius:12px;padding:16px 18px}
+  .countdown .days{font:800 40px var(--f-display);color:var(--green);line-height:1;font-variant-numeric:tabular-nums}
+  .countdown .grow{flex:1;min-width:200px}
+
+  /* stepper */
+  .sticky{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);border-bottom:1px solid var(--line)}
+  body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+  .sticky-in{max-width:960px;margin:0 auto;padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;gap:6px;align-items:center;overflow-x:auto}
+  .step{display:flex;gap:7px;align-items:center;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:4px 12px 4px 4px;cursor:pointer;white-space:nowrap;font-size:14px;color:var(--ink)}
+  .step .dot{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;font:800 13px var(--f-display);background:var(--line);color:var(--ink)}
+  .step.A .dot{background:var(--ca);color:var(--card)}.step.B .dot{background:var(--cb);color:var(--card)}.step.C .dot{background:var(--cc);color:var(--card)}.step.D .dot{background:var(--cd);color:var(--card)}
+  .step[aria-current="step"]{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)}
+  .step .n{font:500 12px var(--f-mono);color:var(--muted)}
+  .step.full .n{color:var(--green)}
+  .sep{flex:none;width:10px;height:2px;background:var(--line)}
+
+  .sec-head{display:flex;gap:14px;align-items:center}
+  .sec-head .crit{width:44px;height:44px;font-size:22px;border-radius:10px}
+  .guide{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+  .guide dt{font-weight:700;color:var(--muted);font-size:13px;text-transform:uppercase;letter-spacing:.06em;padding-top:2px}
+  .guide dd{margin:0}
+  @media (max-width:520px){.guide{grid-template-columns:1fr}.guide dd{margin-bottom:8px}}
+
+  .q{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px}
+  .q.missing{border-color:var(--red);box-shadow:0 0 0 1px var(--red)}
+  .q-top{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-bottom:8px}
+  .q-id{font:700 14px var(--f-mono);color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:1px 8px}
+  .q-marks{font:700 13px var(--f-mono);color:var(--muted);white-space:nowrap}
+  .q-prompt{margin:0 0 10px;font-size:17px}
+  .q-prompt ul{margin:6px 0 0;padding-left:20px}
+  .how-to{font-size:14px;color:var(--blue);background:var(--blue-soft);border-radius:6px;padding:6px 10px;margin:0 0 10px;display:flex;gap:8px;align-items:baseline}
+  .how-to b{white-space:nowrap}
+  .term{font-size:14px;color:var(--muted);border-top:1px dashed var(--line);margin-top:12px;padding-top:8px}
+  .term b{color:var(--ink)}
+  .info{background:var(--green-soft);border-radius:10px;padding:14px 18px}
+  .info p{margin:6px 0}
+  .info::before{content:"Read this first";display:block;font:700 12px var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--green);margin-bottom:2px}
+  .opt{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line);border-radius:8px;margin-top:8px;cursor:pointer}
+  .opt:has(input:checked){border-color:var(--green);background:var(--green-soft)}
+  .opt input{margin-top:5px;accent-color:var(--green);width:18px;height:18px}
+  textarea.input{min-height:130px;resize:vertical;line-height:1.5}
+  textarea.input.enough{border-color:var(--green)}
+  .wc{display:flex;align-items:center;gap:8px;margin-top:6px;font:500 12px var(--f-mono);color:var(--muted)}
+  .wc .bar2{flex:1;height:6px;border-radius:99px;background:var(--line);overflow:hidden}
+  .wc .bar2 i{display:block;height:100%;background:var(--amber)}
+  .wc.ok{color:var(--green)} .wc.ok .bar2 i{background:var(--green)}
+  .num{display:flex;gap:8px;align-items:center;max-width:220px}
+  .tbl select,.tbl input{width:100%;min-width:150px;border:1px solid var(--line);border-radius:6px;padding:7px 8px;background:var(--card)}
+  .navrow{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center;border-top:1px solid var(--line);padding-top:18px}
+  .saved{font-size:13px;color:var(--muted)}
+
+  details.terms{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 16px}
+  details.terms summary{cursor:pointer;font-weight:700}
+  .termlist{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin-top:10px;font-size:15px}
+  .termlist b{color:var(--green)}
+  .checklist{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+  .checklist li{display:flex;gap:10px;align-items:flex-start}
+  .checklist li::before{content:"✓";color:var(--green);font-weight:800}
+  .types{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+  .type{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:14px}
+  .type b{display:block;font-size:15px}
+
+  .sumrow{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+  .sumrow:first-child{border-top:0}
+  .todo{margin:4px 0 0;padding-left:20px;color:var(--red);font-size:14px}
+  .confirm{border:2px solid var(--green);background:var(--green-soft)}
+
+  .score{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+  .score > b{font:800 46px var(--f-display);color:var(--green);font-variant-numeric:tabular-nums}
+  .mark{font:700 13px var(--f-mono);padding:2px 8px;border-radius:6px}
+  .mark.good{background:var(--green-soft);color:var(--green)}
+  .mark.bad{background:var(--red-soft);color:var(--red)}
+  .mark.self{background:var(--blue-soft);color:var(--blue)}
+  .yours{white-space:pre-wrap;border-left:3px solid var(--line);padding:6px 12px;margin:8px 0;color:var(--muted)}
+  .model{border-left:3px solid var(--green);padding:6px 12px;margin:8px 0}
+  .model ul{margin:6px 0 0;padding-left:18px}
+  .fb{font-size:14px;color:var(--muted);margin-top:6px}
+  .next{list-style:none;padding:0;margin:0;display:grid;gap:8px;counter-reset:nx}
+  .next li{display:grid;grid-template-columns:28px 1fr;gap:10px}
+  .next li::before{counter-increment:nx;content:counter(nx);display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--green-soft);color:var(--green);font-weight:800}
+</style>
+</head>
+<body>
+<header class="bar"><div class="bar-in">
+  <div class="crest" aria-hidden="true">EIS</div>
+  <div><div class="bar-title">Year 11 Biology</div><div class="bar-sub">Weekly revision</div></div>
+  <div class="grow"></div>
+  <div class="who" id="who" hidden></div>
+</div></header>
+<div id="stickyMount"></div>
+<main class="wrap wider" id="app"></main>
+
+<script src="config.js"></script>
+<script src="weeks.js"></script>
+<script src="api.js"></script>
+<script>
+(function(){
+const W = window.REVISION_WEEKS, API = window.RevisionAPI;
+const app = document.getElementById("app"), who = document.getElementById("who"), stickyMount = document.getElementById("stickyMount");
+let S = { student:null, week:null, answers:{}, step:0, mode:"" };
+
+const TERMS = {
+  "state":"Give a short answer: a name, a value or a fact. No explanation needed.",
+  "identify":"Pick out the right answer from the possibilities, or name the feature briefly.",
+  "outline":"Give a brief summary of the main points.",
+  "describe":"Give a detailed account of what happens or what the pattern is. Use data if there is some.",
+  "explain":"Say what happens AND why it happens. Use “because” and “so”.",
+  "formulate":"Write it precisely and clearly, e.g. a research question that names both variables.",
+  "calculate":"Work out a number. Show your working and give units.",
+  "estimate":"Work out an approximate value from the data.",
+  "evaluate":"Weigh up strengths and limitations, then make a judgement.",
+  "discuss":"Give a balanced review: arguments for and against, backed by evidence, with a conclusion.",
+  "suggest":"Propose a sensible answer or solution.",
+  "predict":"Say what you expect to happen.",
+  "design":"Produce a plan or method someone else could follow.",
+  "justify":"Give reasons or evidence that support your answer."
+};
+const CRIT = {
+  A:{tests:"What you know and understand: key facts, processes and scientific words from the lessons.", tip:"Look at the marks in brackets. [3] means make three separate points."},
+  B:{tests:"How you plan an investigation: research question, hypothesis, variables, method and safety.", tip:"Always name the independent variable, the dependent variable and how you will measure it, with units."},
+  C:{tests:"How you work with data: calculate, describe patterns, spot anomalies and judge the method.", tip:"Quote numbers from the data in your answer, with units."},
+  D:{tests:"How you use science to discuss a real-world issue and its effects on people.", tip:"Answer every bullet point, look at both sides, and finish with a clear conclusion."}
+};
+const HOWTO = {
+  mcq: "Choose one answer.",
+  match: "Choose an answer from each drop-down list.",
+  num: "Type a number only. No units needed.",
+  numtable: "Type a number in each box, rounded to 1 decimal place.",
+  text: q => `Write at least ${q.minWords} words in full sentences. The bar turns green when you have written enough.`
+};
+
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const now = () => new Date();
+const fmt = d => new Date(d).toLocaleString("en-GB",{weekday:"long",day:"numeric",month:"long",hour:"numeric",minute:"2-digit",timeZone:"Asia/Dubai"});
+const fmtShort = d => new Date(d).toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short",timeZone:"Asia/Dubai"});
+const words = t => (String(t||"").trim().match(/[A-Za-z0-9°%.\-]+/g) || []).length;
+const num = v => { const n = parseFloat(String(v ?? "").replace(",", ".").trim()); return isFinite(n) ? n : null; };
+const ls = (k, v) => { try { if (v === undefined) return JSON.parse(localStorage.getItem(k) || "null"); localStorage.setItem(k, JSON.stringify(v)); } catch(e){ return null; } };
+const draftKey = () => "y11rev_draft_" + S.student.id + "_" + S.week.id;
+const items = week => week.sections.flatMap(s => s.items.filter(i => i.type !== "info").map(i => ({...i, crit:s.crit})));
+function labels(week){ const c = {}, out = {}; week.sections.forEach(s => s.items.forEach(i => { if(i.type==="info") return; c[s.crit]=(c[s.crit]||0)+1; out[i.id]=s.crit+c[s.crit]; })); return out; }
+function termsIn(html){ const found = []; (html.match(/<b>([^<]+)<\/b>/g)||[]).forEach(m => { m.replace(/<\/?b>/g,"").toLowerCase().split(/\s+and\s+/).forEach(t => { if (TERMS[t] && !found.includes(t)) found.push(t); }); }); return found; }
+
+function answered(q, a){
+  if (q.type==="mcq") return Number.isInteger(a);
+  if (q.type==="match") return Array.isArray(a) && q.rows.every((_,i)=>a[i]);
+  if (q.type==="num") return num(a)!==null;
+  if (q.type==="numtable") return Array.isArray(a) && q.rows.every((_,i)=>num(a[i])!==null);
+  if (q.type==="text") return words(a) >= q.minWords;
+  return true;
+}
+function markOf(q, a){
+  if (q.type==="mcq") return a===q.answer ? q.marks : 0;
+  if (q.type==="match") return q.rows.reduce((t,r,i)=>t+((a||[])[i]===r.answer?1:0),0);
+  if (q.type==="num"){ const n=num(a); return n!==null && n>=q.min-1e-9 && n<=q.max+1e-9 ? q.marks : 0; }
+  if (q.type==="numtable") return q.rows.reduce((t,r,i)=>{const n=num((a||[])[i]);return t+(n!==null&&Math.abs(n-r.answer)<=r.tol+1e-9?1:0);},0);
+  return null;
+}
+function weekStatus(week){
+  const sub = (S.student.submissions||[]).find(s => s.week===week.id);
+  if (sub) return new Date(sub.ts) > new Date(week.due) ? {cls:"p-late",t:"Submitted late",act:"See your marks",sub} : {cls:"p-done",t:"Submitted",act:"See your marks",sub};
+  if (now() < new Date(week.opens)) return {cls:"p-wait",t:"Opens "+fmtShort(week.opens),locked:true};
+  const started = ls("y11rev_draft_"+S.student.id+"_"+week.id);
+  if (now() <= new Date(week.due)) return {cls:"p-open",t:"To do",act: started ? "Continue →" : "Start →"};
+  return {cls:"p-miss",t:"Overdue",act:"Do it now →"};
+}
+
+/* ---------- header ---------- */
+function setWho(){
+  if (!S.student){ who.hidden = true; return; }
+  who.hidden = false;
+  who.innerHTML = `<span>${esc(S.student.first)} ${esc(S.student.last||"")}</span><button id="logout">Sign out</button>`;
+  document.getElementById("logout").onclick = () => { S = {student:null,week:null,answers:{},step:0}; ls("y11rev_last_id", ""); renderLogin(); };
+}
+
+/* ---------- 1. sign in + how it works ---------- */
+function renderLogin(msg){
+  S.mode = "login"; stickyMount.innerHTML = ""; setWho();
+  app.innerHTML = `
+  <div class="stack" style="gap:26px">
+    <div><div class="eyebrow">Year 11 Biology · Food and Digestion</div><h1 class="big">Weekly revision packs</h1>
+      <p class="lead">One short pack every week to get you ready for the MYP eAssessment. Each pack has the same four parts as the real exam: criteria A, B, C and D.</p></div>
+    ${API.demo ? `<div class="demo-flag">Demo mode with sample students. Sign in with <b>D1003</b> to try a pack.</div>` : ""}
+    <div class="two">
+      <div class="stack">
+        <h2 class="mid">How it works</h2>
+        <ol class="how">
+          <li><div><b>Sign in with your student ID</b><span>It's the code at the start of your school email, for example M1234.</span></div></li>
+          <li><div><b>Open this week's pack</b><span>A new pack opens every Monday. It takes about 40 minutes.</span></div></li>
+          <li><div><b>Work through A, B, C and D</b><span>One criterion at a time. Your answers save on this device as you type, so you can stop and come back.</span></div></li>
+          <li><div><b>Submit before Sunday 11:59 pm</b><span>You can submit each pack once, so check your answers first.</span></div></li>
+          <li><div><b>Check your marks and the model answers</b><span>Correct your answers in a different colour in your book.</span></div></li>
+        </ol>
+      </div>
+      <div class="stack">
+        <form class="panel stack" id="loginForm" novalidate>
+          <h2 class="mid">Sign in</h2>
+          <label for="sid"><b>Student ID</b></label>
+          <input class="input mono" id="sid" autocomplete="off" spellcheck="false" placeholder="M0000" required>
+          <div class="err" id="loginErr">${esc(msg||"")}</div>
+          <div><button class="btn" id="loginBtn">Sign in</button></div>
+        </form>
+        <div class="rules"><b>The rules</b>
+          <ul><li>Every question must be answered before you can submit.</li><li>Written answers need a minimum number of words.</li><li>If a pack is not submitted by the deadline, an email goes home to your parents.</li></ul>
+        </div>
+      </div>
+    </div>
+  </div>`;
+  document.getElementById("loginForm").onsubmit = async e => {
+    e.preventDefault();
+    const id = document.getElementById("sid").value.trim();
+    if (!id) { document.getElementById("loginErr").textContent = "Type your student ID first."; return; }
+    const b = document.getElementById("loginBtn"); b.disabled = true; b.textContent = "Checking…";
+    try { S.student = await API.verify(id); ls("y11rev_last_id", S.student.id); renderWeeks(); }
+    catch(err){ document.getElementById("loginErr").textContent = err.message; b.disabled=false; b.textContent="Sign in"; }
+  };
+}
+
+/* ---------- 2. list of packs ---------- */
+function renderWeeks(){
+  S.mode = "list"; stickyMount.innerHTML = ""; setWho();
+  const current = W.find(w => { const st = weekStatus(w); return st.cls==="p-open"; });
+  const overdue = W.filter(w => weekStatus(w).cls==="p-miss");
+  let banner = "";
+  if (overdue.length) banner = `<div class="countdown" style="border-color:var(--red)"><div class="days" style="color:var(--red)">${overdue.length}</div><div class="grow"><b>Overdue pack${overdue.length>1?"s":""}</b><div class="note">Submit ${overdue.length>1?"them":"it"} now. Late work still counts and stops a further email home.</div></div><button class="btn" data-w="${overdue[0].id}" style="background:var(--red);border-color:var(--red)">Do it now</button></div>`;
+  else if (current){
+    const ms = new Date(current.due) - now(), d = Math.floor(ms/864e5), h = Math.floor(ms/36e5);
+    banner = `<div class="countdown"><div class="days">${d>=1?d:h}</div><div class="grow"><b>${d>=1?(d===1?"day":"days"):(h===1?"hour":"hours")} left for this week's pack</b><div class="note">${esc(current.title)} · due ${fmt(current.due)}</div></div><button class="btn" data-w="${current.id}">${ls("y11rev_draft_"+S.student.id+"_"+current.id)?"Continue":"Start"} this week's pack</button></div>`;
+  }
+  const rows = W.map((w,i) => {
+    const st = weekStatus(w);
+    return `<button class="wk" data-w="${w.id}" ${st.locked?"disabled":""}>
+      <span class="wk-num">${i+1}</span>
+      <span><h3>${esc(w.title)}</h3><span class="meta">${esc(w.lessons)} · due ${fmtShort(w.due)}</span></span>
+      <span class="right"><span class="pill ${st.cls}">${esc(st.t)}</span>${st.act?`<span class="act">${st.act}</span>`:""}</span></button>`;
+  }).join("");
+  app.innerHTML = `<div class="stack" style="gap:20px">
+    <div><div class="eyebrow">Welcome back</div><h1 class="big" style="font-size:clamp(28px,4.5vw,36px)">Hello ${esc(S.student.first)}</h1></div>
+    ${banner}
+    <h2 class="mid">All packs</h2>
+    <div class="weeklist">${rows}</div>
+  </div>`;
+  app.querySelectorAll("[data-w]").forEach(b => b.onclick = () => openWeek(W.find(w => w.id===b.dataset.w)));
+}
+
+function openWeek(w){
+  S.week = w;
+  const st = weekStatus(w);
+  if (st.sub) return renderResult(st.sub.answers || {}, st.sub.ts);
+  S.answers = ls(draftKey()) || {};
+  S.step = Object.keys(S.answers).length ? 1 : 0;
+  renderStep();
+}
+
+/* ---------- 3. pack: steps 0 = start, 1-4 = A-D, 5 = submit ---------- */
+function steps(){ return ["start", ...S.week.sections.map(s=>s.crit), "submit"]; }
+function stepper(){
+  const qs = items(S.week), st = steps();
+  const parts = st.map((k,i) => {
+    if (k==="start") return `<button class="step" data-step="${i}" ${S.step===i?'aria-current="step"':""}><span class="dot">i</span>Start</button>`;
+    if (k==="submit") { const all = qs.every(q=>answered(q,S.answers[q.id])); return `<button class="step ${all?"full":""}" data-step="${i}" ${S.step===i?'aria-current="step"':""}><span class="dot">✓</span>Submit</button>`; }
+    const sq = qs.filter(q=>q.crit===k), d = sq.filter(q=>answered(q,S.answers[q.id])).length;
+    return `<button class="step ${k} ${d===sq.length?"full":""}" data-step="${i}" ${S.step===i?'aria-current="step"':""}><span class="dot">${k}</span><span class="n">${d}/${sq.length}</span></button>`;
+  });
+  stickyMount.innerHTML = `<div class="sticky"><div class="sticky-in" role="navigation" aria-label="Pack steps">${parts.join('<span class="sep"></span>')}</div></div>`;
+  stickyMount.querySelectorAll("[data-step]").forEach(b => b.onclick = () => { S.step = Number(b.dataset.step); renderStep(); });
+}
+
+function renderStep(){
+  S.mode = "week"; setWho(); stepper();
+  const k = steps()[S.step];
+  if (k==="start") renderStart(); else if (k==="submit") renderSubmit(); else renderSection(S.week.sections.find(s=>s.crit===k));
+  window.scrollTo(0,0);
+}
+
+function renderStart(){
+  const w = S.week;
+  app.innerHTML = `<div class="stack" style="gap:22px">
+    <div><button class="btn ghost small" id="back">← All packs</button></div>
+    <div><div class="eyebrow">${esc(w.topic)} · ${esc(w.lessons)}</div><h1 class="big" style="font-size:clamp(26px,4.5vw,36px)">${esc(w.title)}</h1>
+      <p class="lead">Due <b>${fmt(w.due)}</b>. About ${w.minutes} minutes.</p></div>
+    <div class="two">
+      <div class="stack">
+        <h2 class="mid">Before you start</h2>
+        <ul class="checklist">
+          <li>Have your notes and slides from ${esc(w.lessons)} ready.</li>
+          <li>Work somewhere quiet. Treat it like a real exam.</li>
+          <li>Do the parts in order: A, then B, C and D. Use the buttons at the top to move between them.</li>
+          <li>Your answers save on this device as you type. You can close the page and continue later on the same device.</li>
+          <li>When everything is answered, go to <b>Submit</b>. You can only submit once.</li>
+        </ul>
+      </div>
+      <div class="stack">
+        <h2 class="mid">The four parts</h2>
+        ${w.sections.map(s=>`<div class="row" style="gap:12px;align-items:flex-start;flex-wrap:nowrap"><span class="crit ${s.crit}">${s.crit}</span><div><b>${esc(s.name)}</b><div class="note">${CRIT[s.crit].tests}</div></div></div>`).join("")}
+      </div>
+    </div>
+    <h2 class="mid">Types of question</h2>
+    <div class="types">
+      <div class="type"><b>Multiple choice</b>Click one answer.</div>
+      <div class="type"><b>Drop-down table</b>Choose an answer in every row.</div>
+      <div class="type"><b>Number answer</b>Type the number only. Round to 1 decimal place when asked.</div>
+      <div class="type"><b>Written answer</b>Full sentences. A bar shows when you have written the minimum number of words.</div>
+    </div>
+    <details class="terms" open><summary>Command terms: what the bold word in each question asks you to do</summary>
+      <div class="termlist">${Object.entries(TERMS).map(([t,d])=>`<b>${t[0].toUpperCase()+t.slice(1)}</b><span>${d}</span>`).join("")}</div>
+    </details>
+    <div class="navrow"><span class="saved"></span><button class="btn" id="go">Start with criterion A →</button></div>
+  </div>`;
+  document.getElementById("back").onclick = renderWeeks;
+  document.getElementById("go").onclick = () => { S.step = 1; renderStep(); };
+}
+
+function qHTML(q, L){
+  const a = S.answers[q.id];
+  let body = "";
+  if (q.type==="mcq") body = q.options.map((o,i)=>`<label class="opt"><input type="radio" name="${q.id}" value="${i}" ${a===i?"checked":""}><span>${esc(o)}</span></label>`).join("");
+  if (q.type==="match") body = `<div class="tbl"><table><thead><tr><th>${esc(q.head[0])}</th><th>${esc(q.head[1])}</th></tr></thead><tbody>${q.rows.map((r,i)=>`<tr><td>${esc(r.label)}</td><td><select id="${q.id}_${i}" data-q="${q.id}" data-i="${i}" aria-label="${esc(r.label)}"><option value="">Choose…</option>${q.options.map(o=>`<option ${(a||[])[i]===o?"selected":""}>${esc(o)}</option>`).join("")}</select></td></tr>`).join("")}</tbody></table></div>`;
+  if (q.type==="num") body = `<div class="num"><input class="input" id="${q.id}" data-q="${q.id}" inputmode="decimal" value="${esc(a??"")}" aria-label="Your answer"><span>${esc(q.unit||"")}</span></div>`;
+  if (q.type==="numtable") body = `<div class="tbl"><table><thead><tr><th>${esc(q.head[0])}</th><th>${esc(q.head[1])}</th></tr></thead><tbody>${q.rows.map((r,i)=>`<tr><td>${esc(r.label)}</td><td><input id="${q.id}_${i}" data-q="${q.id}" data-i="${i}" inputmode="decimal" value="${esc((a||[])[i]??"")}" aria-label="${esc(r.label)}"></td></tr>`).join("")}</tbody></table></div>`;
+  if (q.type==="text") body = `<textarea class="input" id="${q.id}" data-q="${q.id}" aria-label="Your answer" placeholder="Write your answer here…"></textarea><div class="wc" id="${q.id}_wc"></div>`;
+  const how = typeof HOWTO[q.type]==="function" ? HOWTO[q.type](q) : HOWTO[q.type];
+  const terms = termsIn(q.prompt);
+  return `<div class="q" id="box_${q.id}"><div class="q-top"><span class="q-id">${L}</span><span class="q-marks">${q.marks} mark${q.marks>1?"s":""}</span></div>
+    <div class="q-prompt">${q.prompt}</div><div class="how-to"><b>How to answer:</b><span>${how}</span></div>${body}
+    ${terms.length?`<div class="term">${terms.map(t=>`<b>${t[0].toUpperCase()+t.slice(1)}</b> means: ${TERMS[t]}`).join("<br>")}</div>`:""}</div>`;
+}
+
+function renderSection(sec){
+  const L = labels(S.week), st = steps(), i = S.step;
+  const next = st[i+1], prev = st[i-1];
+  const nextLabel = next==="submit" ? "Check and submit →" : `Next: criterion ${next} →`;
+  const prevLabel = prev==="start" ? "← Start page" : `← Criterion ${prev}`;
+  app.innerHTML = `<div class="stack" style="gap:16px">
+    <div class="sec-head"><span class="crit ${sec.crit}">${sec.crit}</span><div><div class="eyebrow">Criterion ${sec.crit} · part ${i} of 4</div><h1 style="font-size:clamp(24px,4vw,32px)">${esc(sec.name)}</h1></div></div>
+    <dl class="guide"><dt>What it tests</dt><dd>${CRIT[sec.crit].tests}</dd><dt>Top tip</dt><dd>${CRIT[sec.crit].tip}</dd></dl>
+    ${sec.items.map(q => q.type==="info" ? `<div class="info">${q.html}</div>` : qHTML(q, L[q.id])).join("")}
+    <div class="navrow"><button class="btn ghost" id="prev">${prevLabel}</button><span class="saved" id="saved">Answers save automatically</span><button class="btn" id="next">${nextLabel}</button></div>
+  </div>`;
+  sec.items.filter(q=>q.type==="text").forEach(q => { document.getElementById(q.id).value = S.answers[q.id] || ""; });
+  document.getElementById("prev").onclick = () => { S.step--; renderStep(); };
+  document.getElementById("next").onclick = () => { S.step++; renderStep(); };
+  updateCounts();
+}
+
+function onInput(e){
+  if (S.mode !== "week") return;
+  const el = e.target, id = el.dataset.q || el.name;
+  if (!id) return;
+  if (e.type === "change" && (el.tagName === "TEXTAREA" || (el.tagName === "INPUT" && el.type !== "radio"))) return;
+  const q = items(S.week).find(x => x.id===id); if (!q) return;
+  if (q.type==="mcq") S.answers[id] = Number(el.value);
+  else if (q.type==="match"||q.type==="numtable"){ const arr = S.answers[id] || []; arr[Number(el.dataset.i)] = el.value; S.answers[id] = arr; }
+  else S.answers[id] = el.value;
+  ls(draftKey(), S.answers);
+  document.getElementById("box_"+id)?.classList.remove("missing");
+  const sv = document.getElementById("saved"); if (sv) sv.textContent = "Saved on this device ✓";
+  updateCounts();
+}
+function updateCounts(){
+  items(S.week).filter(q=>q.type==="text").forEach(q => {
+    const n = words(S.answers[q.id]), el = document.getElementById(q.id+"_wc"), ta = document.getElementById(q.id);
+    if (!el) return;
+    const ok = n>=q.minWords;
+    el.className = "wc" + (ok?" ok":"");
+    el.innerHTML = `<span class="bar2"><i style="width:${Math.min(100,Math.round(n/q.minWords*100))}%"></i></span><span>${n} / ${q.minWords} words${ok?" ✓":""}</span>`;
+    ta.classList.toggle("enough", ok);
+  });
+  // refresh stepper counts without re-rendering the page
+  const qs = items(S.week);
+  stickyMount.querySelectorAll(".step").forEach(b => {
+    const k = steps()[Number(b.dataset.step)];
+    if (k==="start") return;
+    if (k==="submit"){ b.classList.toggle("full", qs.every(q=>answered(q,S.answers[q.id]))); return; }
+    const sq = qs.filter(q=>q.crit===k), d = sq.filter(q=>answered(q,S.answers[q.id])).length;
+    b.classList.toggle("full", d===sq.length); const n = b.querySelector(".n"); if (n) n.textContent = d+"/"+sq.length;
+  });
+}
+
+function renderSubmit(){
+  const w = S.week, L = labels(w), qs = items(w), st = steps();
+  const todo = qs.filter(q => !answered(q, S.answers[q.id]));
+  app.innerHTML = `<div class="stack" style="gap:18px">
+    <div><div class="eyebrow">Last step</div><h1 style="font-size:clamp(24px,4vw,32px)">Check and submit</h1>
+      <p class="lead">Due ${fmt(w.due)}. ${todo.length ? "Finish the questions below, then come back here." : "Everything is answered. Read through your answers once more, then submit."}</p></div>
+    <div class="panel">${w.sections.map(s=>{
+      const sq = qs.filter(q=>q.crit===s.crit), left = sq.filter(q=>!answered(q,S.answers[q.id]));
+      return `<div class="sumrow"><div class="row" style="gap:12px;flex-wrap:nowrap;align-items:flex-start"><span class="crit ${s.crit}">${s.crit}</span><div><b>${esc(s.name)}</b>${left.length?`<ul class="todo">${left.map(q=>`<li>${L[q.id]} not finished${q.type==="text"?` (${words(S.answers[q.id])} of ${q.minWords} words)`:""}</li>`).join("")}</ul>`:`<div class="note" style="color:var(--green)">All ${sq.length} answered ✓</div>`}</div></div>
+        ${left.length?`<button class="btn small ghost" data-go="${st.indexOf(s.crit)}" data-q="${left[0].id}">Go to ${s.crit}</button>`:""}</div>`;}).join("")}</div>
+    <div id="submitArea"></div>
+    <div class="navrow"><button class="btn ghost" id="prev">← Criterion ${st[st.length-2]}</button><span></span></div>
+  </div>`;
+  document.getElementById("prev").onclick = () => { S.step--; renderStep(); };
+  app.querySelectorAll("[data-go]").forEach(b => b.onclick = () => { S.step = Number(b.dataset.go); renderStep(); const t = document.getElementById("box_"+b.dataset.q); if (t){ t.classList.add("missing"); t.scrollIntoView({block:"center"}); } });
+  const area = document.getElementById("submitArea");
+  if (todo.length){ area.innerHTML = `<div class="panel"><b>You can't submit yet.</b> ${todo.length} question${todo.length>1?"s are":" is"} not finished.</div>`; return; }
+  area.innerHTML = `<div class="panel confirm stack"><h2 class="mid">Ready to submit?</h2><p style="margin:0">Once you submit, you can't change your answers. You will see your marks and the model answers straight away.</p>
+    <div class="err" id="subErr"></div><div class="row"><button class="btn" id="yes">Submit my pack</button></div></div>`;
+  document.getElementById("yes").onclick = doSubmit;
+}
+
+function effortFlag(qs){
+  const texts = qs.filter(q=>q.type==="text").map(q=>String(S.answers[q.id]||"").trim().toLowerCase());
+  const reasons = [];
+  texts.forEach(t => { const ws = t.match(/[a-z0-9]+/g)||[]; if (ws.length>=8 && new Set(ws).size/ws.length < 0.45) reasons.push("repeated words"); });
+  const seen = new Set(); texts.forEach(t => { if (t.length>20 && seen.has(t)) reasons.push("same answer copied"); seen.add(t); });
+  return [...new Set(reasons)].join(", ");
+}
+
+async function doSubmit(){
+  const b = document.getElementById("yes"); b.disabled = true; b.textContent = "Submitting…";
+  const qs = items(S.week);
+  let auto = 0, autoMax = 0, wc = 0;
+  qs.forEach(q => { const m = markOf(q, S.answers[q.id]); if (m!==null){ auto+=m; autoMax+=q.marks; } if (q.type==="text") wc += words(S.answers[q.id]); });
+  const payload = { id:S.student.id, week:S.week.id, answers:S.answers, auto, autoMax, words:wc, flag:effortFlag(qs), late: now() > new Date(S.week.due) };
+  try {
+    const r = await API.submit(payload);
+    const ts = r.ts || new Date().toISOString();
+    S.student.submissions = (S.student.submissions||[]).filter(s=>s.week!==S.week.id).concat([{week:S.week.id, ts, auto, autoMax, answers:S.answers}]);
+    try { localStorage.removeItem(draftKey()); } catch(e){}
+    renderResult(S.answers, ts, true);
+  } catch(err){
+    document.getElementById("subErr").textContent = "Your pack was not submitted: " + err.message + ". Check your internet connection and try again. Your answers are still saved on this device.";
+    b.disabled = false; b.textContent = "Submit my pack";
+  }
+}
+
+/* ---------- 4. marks + model answers ---------- */
+function renderResult(ans, ts, fresh){
+  S.mode = "result";
+  const w = S.week, L = labels(w), qs = items(w);
+  stickyMount.innerHTML = ""; setWho();
+  let auto=0, autoMax=0, textMax=0;
+  qs.forEach(q=>{ const m=markOf(q,ans[q.id]); if(m!==null){auto+=m;autoMax+=q.marks;} else textMax+=q.marks; });
+  const late = new Date(ts) > new Date(w.due);
+  const block = q => {
+    const a = ans[q.id], m = markOf(q,a);
+    let detail = "";
+    if (q.type==="mcq") detail = `<div class="fb">Your answer: <b>${esc(Number.isInteger(a)?q.options[a]:"—")}</b>${m?"":` · Correct answer: <b>${esc(q.options[q.answer])}</b>`}</div><div class="fb">${esc(q.explain||"")}</div>`;
+    if (q.type==="match") detail = `<div class="tbl"><table><tbody>${q.rows.map((r,i)=>{const ok=(a||[])[i]===r.answer;return `<tr><td>${esc(r.label)}</td><td>${ok?"✓":"✗"} ${esc((a||[])[i]||"—")}${ok?"":` <br><span class="note">Correct: ${esc(r.answer)}</span>`}</td></tr>`;}).join("")}</tbody></table></div>`;
+    if (q.type==="num") detail = `<div class="fb">Your answer: <b>${esc(a??"—")} ${esc(q.unit||"")}</b></div><div class="fb">${esc(q.explain||"")}</div>`;
+    if (q.type==="numtable") detail = `<div class="tbl"><table><tbody>${q.rows.map((r,i)=>{const n=num((a||[])[i]);const ok=n!==null&&Math.abs(n-r.answer)<=r.tol+1e-9;return `<tr><td>${esc(r.label)}</td><td>${ok?"✓":"✗"} ${esc((a||[])[i]??"—")}${ok?"":` <br><span class="note">Correct: ${r.answer.toFixed(1)}${r.hint?". "+esc(r.hint):""}</span>`}</td></tr>`;}).join("")}</tbody></table></div>`;
+    if (q.type==="text") detail = `<div class="note">Your answer</div><div class="yours" data-yours="${q.id}"></div><div class="model"><b>Model answer</b><div>${esc(q.model)}</div><b style="display:block;margin-top:8px">Mark points: did you include these?</b><ul>${q.points.map(p=>`<li>${esc(p)}</li>`).join("")}</ul></div>`;
+    const tag = m===null ? `<span class="mark self">Your teacher marks this · ${q.marks}</span>` : `<span class="mark ${m===q.marks?"good":"bad"}">${m}/${q.marks}</span>`;
+    return `<div class="q"><div class="q-top"><span class="q-id">${L[q.id]}</span>${tag}</div><div class="q-prompt">${q.prompt}</div>${detail}</div>`;
+  };
+  app.innerHTML = `<div class="stack" style="gap:18px">
+    <div><button class="btn ghost small" id="back">← All packs</button></div>
+    <div><div class="eyebrow">${fresh?"Submitted. Well done":"Submitted"} · ${fmt(ts)}${late?" · late":""}</div><h1 style="font-size:clamp(26px,4.5vw,34px);margin-top:4px">${esc(w.title)}</h1></div>
+    <div class="two">
+      <div class="panel score"><b>${auto}/${autoMax}</b><div><b>Auto-marked questions</b><div class="note">Your teacher marks the written questions (${textMax} marks).</div></div></div>
+      <div class="panel"><b>What to do now</b><ol class="next" style="margin-top:8px"><li>Read each model answer below.</li><li>Correct your answers in a different colour in your book.</li><li>Write down one thing you need to revise before next week.</li></ol></div>
+    </div>
+    ${w.sections.map(s=>`<section class="stack" style="gap:12px"><div class="sec-head" style="margin-top:14px"><span class="crit ${s.crit}">${s.crit}</span><h2 class="mid">${esc(s.name)}</h2></div>${s.items.map(q=>q.type==="info"?`<div class="info">${q.html}</div>`:block(q)).join("")}</section>`).join("")}
+  </div>`;
+  app.querySelectorAll("[data-yours]").forEach(el => { const t = ans[el.dataset.yours]; el.textContent = t ? t : "No answer recorded."; });
+  document.getElementById("back").onclick = renderWeeks;
+  window.scrollTo(0,0);
+}
+
+app.addEventListener("input", onInput);
+app.addEventListener("change", onInput);
+
+(async () => {
+  const last = ls("y11rev_last_id");
+  if (last) { try { S.student = await API.verify(last); return renderWeeks(); } catch(e){} }
+  renderLogin();
+})();
+})();
+</script>
+</body>
+</html>
