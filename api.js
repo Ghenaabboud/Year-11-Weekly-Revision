@@ -94,10 +94,28 @@
       return post({ action: "submit", ...payload });
     },
 
+    /* Fire-and-forget progress update while a student works. */
+    progress(payload) {
+      if (DEMO) {
+        const p = (store("y11rev_demo_prog") || []).filter(x => !(x.id === payload.id && x.week === payload.week));
+        const I = payload.integ || {};
+        p.push({ ts: new Date().toISOString(), week: payload.week, id: payload.id, answered: payload.answered, total: payload.total, ...payload.sections, left: I.left || 0, awayMin: Math.round((I.away || 0) / 6) / 10, activeMin: Math.round((I.active || 0) / 6) / 10 });
+        store("y11rev_demo_prog", p);
+        return;
+      }
+      try {
+        fetch(URL_, { method: "POST", keepalive: true, headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ action: "progress", ...payload }) }).catch(() => {});
+      } catch (e) {}
+    },
+
     /* Teacher-tracker demo only. The live tracker runs inside the Google Sheet. */
     async panel(key) {
       if (DEMO) {
-        return { roster: DEMO_ROSTER, settings: DEMO_SETTINGS, submissions: demoSubs(), emails: store("y11rev_demo_emails") || [] };
+        const prog = store("y11rev_demo_prog") || [
+          { ts: new Date(Date.now() - 6 * 60000).toISOString(), week: "w2", id: "D1001", answered: 9, total: 21, A: "7/7", B: "2/4", C: "0/5", D: "0/2", left: 1, awayMin: 0.5, activeMin: 18 },
+          { ts: new Date(Date.now() - 3 * 3600000).toISOString(), week: "w2", id: "D2004", answered: 3, total: 21, A: "3/7", B: "0/4", C: "0/5", D: "0/2", left: 0, awayMin: 0, activeMin: 5 }
+        ];
+        return { roster: DEMO_ROSTER, settings: DEMO_SETTINGS, submissions: demoSubs(), emails: store("y11rev_demo_emails") || [], progress: prog };
       }
       throw new Error("The teacher tracker opens from the Google Sheet.");
     },

@@ -297,6 +297,7 @@ function openWeek(w){
   S.answers = ls(draftKey()) || {};
   S.integ = Object.assign({left:0, away:0, paste:0, big:0, active:0, pledged:false}, ls(draftKey()+"_i") || {});
   S.step = Object.keys(S.answers).length && S.integ.pledged ? 1 : 0;
+  syncProgress(true);
   renderStep();
 }
 
@@ -413,6 +414,7 @@ function onInput(e){
   ls(draftKey(), S.answers);
   document.getElementById("box_"+id)?.classList.remove("missing");
   const sv = document.getElementById("saved"); if (sv) sv.textContent = "Saved on this device ✓";
+  syncProgress(false);
   updateCounts();
 }
 function updateCounts(){
@@ -547,7 +549,25 @@ function cameBack(){
   S.integ.left++; S.integ.away += secs; saveInteg();
   toast(`You left this page (${S.integ.left} time${S.integ.left>1?"s":""} so far). Your teacher can see how often you leave and for how long.`);
 }
-document.addEventListener("visibilitychange", () => document.hidden ? goneAway() : cameBack());
+document.addEventListener("visibilitychange", () => { if (document.hidden) { goneAway(); syncProgress(true); } else cameBack(); });
+
+/* ---------- send progress to the teacher (not answers) ---------- */
+let progTimer = null, lastProg = "";
+function syncProgress(now){
+  if (!S.student || !S.week || !S.integ || S.mode === "result") return;
+  clearTimeout(progTimer);
+  const go = () => {
+    const qs = items(S.week), sections = {};
+    S.week.sections.forEach(s => { const sq = qs.filter(q => q.crit === s.crit); sections[s.crit] = sq.filter(q => answered(q, S.answers[q.id])).length + "/" + sq.length; });
+    const answeredN = qs.filter(q => answered(q, S.answers[q.id])).length;
+    const sig = answeredN + JSON.stringify(sections) + S.integ.left + "|" + Math.floor(S.integ.active / 60);
+    if (sig === lastProg && !now) return;
+    lastProg = sig;
+    API.progress({ id: S.student.id, week: S.week.id, answered: answeredN, total: qs.length, sections, integ: { left: S.integ.left, away: S.integ.away, active: S.integ.active } });
+  };
+  if (now) go(); else progTimer = setTimeout(go, 15000);
+}
+setInterval(() => { if (S.mode === "week") syncProgress(false); }, 60000);
 window.addEventListener("blur", goneAway);
 window.addEventListener("focus", cameBack);
 setInterval(() => { if (working() && !document.hidden && document.hasFocus()) { S.integ.active += 5; saveInteg(); } }, 5000);
