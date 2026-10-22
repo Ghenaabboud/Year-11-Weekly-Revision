@@ -143,6 +143,7 @@
 <script>
 (function(){
 const W = window.REVISION_WEEKS, API = window.RevisionAPI;
+const PREVIEW = /[?&]preview\b/.test(location.search);
 const app = document.getElementById("app"), who = document.getElementById("who"), stickyMount = document.getElementById("stickyMount");
 let S = { student:null, week:null, answers:{}, step:0, mode:"" };
 
@@ -206,7 +207,7 @@ function markOf(q, a){
 function weekStatus(week){
   const sub = (S.student.submissions||[]).find(s => s.week===week.id);
   if (sub) return new Date(sub.ts) > new Date(week.due) ? {cls:"p-late",t:"Submitted late",act:"See your marks",sub} : {cls:"p-done",t:"Submitted",act:"See your marks",sub};
-  if (now() < new Date(week.opens)) return {cls:"p-wait",t:"Opens "+fmtShort(week.opens),locked:true};
+  if (now() < new Date(week.opens)) return PREVIEW ? {cls:"p-open",t:"Preview (opens "+fmtShort(week.opens)+")",act:"Preview →"} : {cls:"p-wait",t:"Opens "+fmtShort(week.opens),locked:true};
   const started = ls("y11rev_draft_"+S.student.id+"_"+week.id);
   if (now() <= new Date(week.due)) return {cls:"p-open",t:"To do",act: started ? "Continue →" : "Start →"};
   return {cls:"p-miss",t:"Overdue",act:"Do it now →"};
