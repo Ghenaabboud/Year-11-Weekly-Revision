@@ -308,6 +308,27 @@ window.REVISION_WEEKS = [
   {
     crit: "D", name: "Reflecting on the impacts of science",
     items: [
+      { type: "info", guide: {
+        title: "How to reach the top level (7–8) in criterion D",
+        intro: "Criterion D questions ask you to use science to judge a real-world issue. Examiners look for four things. Build your long answer in this order.",
+        steps: [
+          { h: "Explain the science", strand: "Strand i", what: "Say how the science works and how it solves the problem. Use key words from the unit.",
+            starters: ["This works because…", "The enzyme … breaks down … into …, so …"] },
+          { h: "Discuss the implications", strand: "Strand ii", what: "Look at the issue from at least two angles: health, social, economic, environmental or ethical. Give an advantage AND a disadvantage.",
+            starters: ["One advantage is … because …", "However, a disadvantage is …", "Economically, …"] },
+          { h: "Evaluate", strand: "Strand ii", what: "Weigh the points against each other. Which matters more, for whom, and why? Use “depends on” thinking.",
+            starters: ["The benefit outweighs the cost because…", "This depends on…", "For people who … this is less useful because…"] },
+          { h: "Conclude", strand: "Strand ii", what: "Finish with a clear judgement that answers the question. Back it up with your strongest reason.",
+            starters: ["Overall, I think … because…", "The best option is … as long as…"] }
+        ],
+        ladder: [
+          { lv: "1–2", verb: "States", d: "lists facts or one side only" },
+          { lv: "3–4", verb: "Outlines", d: "gives brief points, some science" },
+          { lv: "5–6", verb: "Describes / discusses", d: "covers both sides with some detail" },
+          { lv: "7–8", verb: "Explains / evaluates", d: "explains the science, weighs both sides and justifies a conclusion" }
+        ],
+        checklist: ["Every bullet point in the question is answered", "Correct scientific words are used (strand iii)", "Both sides are covered, not just one", "A clear conclusion is given at the end"]
+      } },
       { type: "info",
         html: "<p>Many adults around the world, including in the Gulf region, are <b>lactose intolerant</b>: they make little or no lactase, the enzyme that digests lactose (milk sugar). Two solutions exist: <b>lactose-free milk</b>, made in a factory by adding lactase to milk, and <b>lactase tablets</b> taken with a meal.</p>" },
 

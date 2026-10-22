@@ -124,6 +124,30 @@
   .pledge input{width:20px;height:20px;margin-top:3px;accent-color:var(--green);flex:none}
   .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:20;max-width:min(560px,calc(100% - 32px));background:var(--ink);color:var(--paper);border-radius:10px;padding:12px 16px;font-size:15px;box-shadow:0 6px 24px rgba(0,0,0,.25)}
   .watch{font-size:13px;color:var(--muted);display:flex;gap:6px;align-items:center}
+
+  /* criterion D structure guide */
+  .dguide{border:2px solid var(--cd);border-radius:12px;background:var(--card);overflow:hidden}
+  .dguide-head{background:var(--cd);color:var(--card);padding:12px 18px}
+  .dguide-head h3{font-size:19px}
+  .dguide-head p{margin:4px 0 0;font-size:14px;opacity:.92}
+  .dsteps{list-style:none;margin:0;padding:16px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;counter-reset:ds}
+  .dsteps li{position:relative;border:1px solid var(--line);border-radius:10px;padding:14px 14px 12px;background:var(--paper);min-width:0}
+  .dsteps li::before{counter-increment:ds;content:counter(ds);display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--cd);color:var(--card);font:800 15px var(--f-display);margin-bottom:8px}
+  .dsteps li:not(:last-child)::after{content:"→";position:absolute;right:-12px;top:18px;color:var(--cd);font-weight:800;font-size:18px}
+  .dsteps b{display:block;font-family:var(--f-display);font-size:16px}
+  .dsteps .strand{font:700 11px var(--f-mono);color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+  .dsteps p{margin:6px 0;font-size:14px}
+  .dsteps .st{font-size:13px;color:var(--muted);border-top:1px dashed var(--line);padding-top:6px;margin-top:6px}
+  .dsteps .st i{display:block;color:var(--ink)}
+  .dfoot{display:grid;grid-template-columns:1.3fr 1fr;gap:16px;padding:0 16px 16px}
+  .ladder{display:flex;flex-direction:column-reverse;gap:6px}
+  .rung{display:grid;grid-template-columns:52px 1fr;gap:10px;align-items:center;font-size:14px;border-radius:8px;padding:6px 10px;background:var(--paper)}
+  .rung span{font:800 14px var(--f-mono);text-align:center;border-radius:6px;padding:3px 0;background:var(--line)}
+  .rung.top{background:var(--green-soft)} .rung.top span{background:var(--green);color:var(--green-ink)}
+  .dfoot h4{margin:0 0 8px;font-size:14px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+  .dcheck{list-style:none;margin:0;padding:0;display:grid;gap:6px;font-size:14px}
+  .dcheck li::before{content:"☐ ";color:var(--cd);font-weight:800}
+  @media (max-width:760px){.dsteps{grid-template-columns:1fr}.dsteps li:not(:last-child)::after{content:"↓";right:auto;left:50%;top:auto;bottom:-16px}.dfoot{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -188,6 +212,15 @@ const draftKey = () => "y11rev_draft_" + S.student.id + "_" + S.week.id;
 const items = week => week.sections.flatMap(s => s.items.filter(i => i.type !== "info").map(i => ({...i, crit:s.crit})));
 function labels(week){ const c = {}, out = {}; week.sections.forEach(s => s.items.forEach(i => { if(i.type==="info") return; c[s.crit]=(c[s.crit]||0)+1; out[i.id]=s.crit+c[s.crit]; })); return out; }
 function termsIn(html){ const found = []; (html.match(/<b>([^<]+)<\/b>/g)||[]).forEach(m => { m.replace(/<\/?b>/g,"").toLowerCase().split(/\s+and\s+/).forEach(t => { if (TERMS[t] && !found.includes(t)) found.push(t); }); }); return found; }
+
+
+function guideHTML(g){
+  return `<div class="dguide"><div class="dguide-head"><h3>${esc(g.title)}</h3><p>${esc(g.intro)}</p></div>
+    <ol class="dsteps">${g.steps.map(s=>`<li><span class="strand">${esc(s.strand)}</span><b>${esc(s.h)}</b><p>${esc(s.what)}</p><div class="st">Try starting with:${s.starters.map(x=>`<i>“${esc(x)}”</i>`).join("")}</div></li>`).join("")}</ol>
+    <div class="dfoot"><div><h4>How the levels are awarded</h4><div class="ladder">${g.ladder.map((r,i)=>`<div class="rung ${i===g.ladder.length-1?"top":""}"><span>${esc(r.lv)}</span><div><b>${esc(r.verb)}:</b> ${esc(r.d)}</div></div>`).join("")}</div></div>
+    <div><h4>Before you move on, check</h4><ul class="dcheck">${g.checklist.map(c=>`<li>${esc(c)}</li>`).join("")}</ul></div></div></div>`;
+}
+const infoHTML = q => q.guide ? guideHTML(q.guide) : `<div class="info">${q.html}</div>`;
 
 function answered(q, a){
   if (q.type==="mcq") return Number.isInteger(a);
@@ -390,7 +423,7 @@ function renderSection(sec){
   app.innerHTML = `<div class="stack" style="gap:16px">
     <div class="sec-head"><span class="crit ${sec.crit}">${sec.crit}</span><div><div class="eyebrow">Criterion ${sec.crit} · part ${i} of 4</div><h1 style="font-size:clamp(24px,4vw,32px)">${esc(sec.name)}</h1></div></div>
     <dl class="guide"><dt>What it tests</dt><dd>${CRIT[sec.crit].tests}</dd><dt>Top tip</dt><dd>${CRIT[sec.crit].tip}</dd></dl>
-    ${sec.items.map(q => q.type==="info" ? `<div class="info">${q.html}</div>` : qHTML(q, L[q.id])).join("")}
+    ${sec.items.map(q => q.type==="info" ? infoHTML(q) : qHTML(q, L[q.id])).join("")}
     <div class="navrow"><button class="btn ghost" id="prev">${prevLabel}</button><span class="saved" id="saved">Answers save automatically</span><button class="btn" id="next">${nextLabel}</button></div>
   </div>`;
   sec.items.filter(q=>q.type==="text").forEach(q => { document.getElementById(q.id).value = S.answers[q.id] || ""; });
@@ -519,7 +552,7 @@ function renderResult(ans, ts, fresh){
       <div class="panel score"><b>${auto}/${autoMax}</b><div><b>Auto-marked questions</b><div class="note">Your teacher marks the written questions (${textMax} marks).</div></div></div>
       <div class="panel"><b>What to do now</b><ol class="next" style="margin-top:8px"><li>Read each model answer below.</li><li>Correct your answers in a different colour in your book.</li><li>Write down one thing you need to revise before next week.</li></ol></div>
     </div>
-    ${w.sections.map(s=>`<section class="stack" style="gap:12px"><div class="sec-head" style="margin-top:14px"><span class="crit ${s.crit}">${s.crit}</span><h2 class="mid">${esc(s.name)}</h2></div>${s.items.map(q=>q.type==="info"?`<div class="info">${q.html}</div>`:block(q)).join("")}</section>`).join("")}
+    ${w.sections.map(s=>`<section class="stack" style="gap:12px"><div class="sec-head" style="margin-top:14px"><span class="crit ${s.crit}">${s.crit}</span><h2 class="mid">${esc(s.name)}</h2></div>${s.items.map(q=>q.type==="info"?infoHTML(q):block(q)).join("")}</section>`).join("")}
   </div>`;
   app.querySelectorAll("[data-yours]").forEach(el => { const t = ans[el.dataset.yours]; el.textContent = t ? t : "No answer recorded."; });
   document.getElementById("back").onclick = renderWeeks;
