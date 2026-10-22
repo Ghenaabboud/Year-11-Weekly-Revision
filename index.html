@@ -32,7 +32,23 @@
   .wk:first-child{border-top:0}
   .wk:hover{background:var(--green-soft)}
   .wk[disabled]{cursor:default;opacity:.6}.wk[disabled]:hover{background:none}
-  .wk-num{font:800 24px var(--f-display);color:var(--green);width:42px;text-align:center}
+  .wk-num{font:800 20px var(--f-display);color:var(--green);width:42px;height:42px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;flex:none}
+  .wk.done{background:var(--green-soft)} .wk.done:hover{background:var(--green-soft);filter:brightness(.98)}
+  .wk.done .wk-num{background:var(--green);border-color:var(--green);color:var(--green-ink)}
+  .wk.latedone{background:var(--amber-soft)} .wk.latedone:hover{background:var(--amber-soft)}
+  .wk.latedone .wk-num{background:var(--amber);border-color:var(--amber);color:var(--card)}
+  .badge{display:inline-flex;gap:6px;align-items:center;background:var(--green);color:var(--green-ink);font:700 13px var(--f-body);padding:5px 12px;border-radius:999px;white-space:nowrap}
+  .badge.late{background:var(--amber);color:var(--card)}
+  .wk .score{display:block;font:700 13px var(--f-mono);color:var(--green);margin-top:3px}
+  .wk.latedone .score{color:var(--amber)}
+  .pbar{display:block;width:min(220px,100%);height:8px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:8px}
+  .pbar i{display:block;height:100%;background:var(--amber)}
+  .ptext{display:block;font-size:13px;color:var(--amber);font-weight:700;margin-top:4px}
+  .allset{display:flex;gap:14px;align-items:center;background:var(--green);color:var(--green-ink);border-radius:12px;padding:14px 18px}
+  .allset .tick{font:800 30px var(--f-display);flex:none}
+  .allset .sub{font-size:14px;opacity:.92}
+  .step.full .dot{background:var(--green)!important;color:var(--green-ink)!important}
+  .step.full{border-color:var(--green);background:var(--green-soft)}
   .wk h3{font-size:17px}
   .wk .meta{font-size:13px;color:var(--muted)}
   .wk .act{font-weight:700;color:var(--green);font-size:14px;white-space:nowrap}
@@ -305,16 +321,32 @@ function renderWeeks(){
   const current = W.find(w => { const st = weekStatus(w); return st.cls==="p-open"; });
   const overdue = W.filter(w => weekStatus(w).cls==="p-miss");
   let banner = "";
-  if (overdue.length) banner = `<div class="countdown" style="border-color:var(--red)"><div class="days" style="color:var(--red)">${overdue.length}</div><div class="grow"><b>Overdue pack${overdue.length>1?"s":""}</b><div class="note">Submit ${overdue.length>1?"them":"it"} now. Late work still counts and stops a further email home.</div></div><button class="btn" data-w="${overdue[0].id}" style="background:var(--red);border-color:var(--red)">Do it now</button></div>`;
+  const doneAny = W.some(w => weekStatus(w).sub);
+  const upcoming = W.find(w => now() < new Date(w.opens));
+  if (!overdue.length && !current && doneAny) banner = `<div class="allset"><span class="tick" aria-hidden="true">✓</span><div><b>You're all caught up!</b><div class="sub">Every pack due so far is complete.${upcoming?` The next pack opens ${fmt(upcoming.opens).replace(/ at .*/,"")}.`:""}</div></div></div>`;
+  else if (overdue.length) banner = `<div class="countdown" style="border-color:var(--red)"><div class="days" style="color:var(--red)">${overdue.length}</div><div class="grow"><b>Overdue pack${overdue.length>1?"s":""}</b><div class="note">Submit ${overdue.length>1?"them":"it"} now. Late work still counts and stops a further email home.</div></div><button class="btn" data-w="${overdue[0].id}" style="background:var(--red);border-color:var(--red)">Do it now</button></div>`;
   else if (current){
     const ms = new Date(current.due) - now(), d = Math.floor(ms/864e5), h = Math.floor(ms/36e5);
     banner = `<div class="countdown"><div class="days">${d>=1?d:h}</div><div class="grow"><b>${d>=1?(d===1?"day":"days"):(h===1?"hour":"hours")} left for this week's pack</b><div class="note">${esc(current.title)} · due ${fmt(current.due)}</div></div><button class="btn" data-w="${current.id}">${ls("y11rev_draft_"+S.student.id+"_"+current.id)?"Continue":"Start"} this week's pack</button></div>`;
   }
   const rows = W.map((w,i) => {
     const st = weekStatus(w);
+    if (st.sub) {
+      const late = st.cls === "p-late";
+      return `<button class="wk ${late?"latedone":"done"}" data-w="${w.id}">
+        <span class="wk-num" aria-hidden="true">✓</span>
+        <span><h3>${esc(w.title)}</h3><span class="meta">${esc(w.lessons)} · submitted ${fmtShort(st.sub.ts)}</span>${st.sub.autoMax?`<span class="score">Auto-marked score: ${st.sub.auto}/${st.sub.autoMax}</span>`:""}</span>
+        <span class="right"><span class="badge ${late?"late":""}">✓ ${late?"Completed late":"Completed"}</span><span class="act">See your marks →</span></span></button>`;
+    }
+    let prog = "";
+    if (!st.locked) {
+      const d = ls("y11rev_draft_"+S.student.id+"_"+w.id) || {}, qs = items(w);
+      const n = qs.filter(q => answered(q, d[q.id])).length;
+      if (n > 0) prog = `<span class="pbar"><i style="width:${Math.round(n/qs.length*100)}%"></i></span><span class="ptext">In progress: ${n} of ${qs.length} answered${n===qs.length?". Ready to submit!":""}</span>`;
+    }
     return `<button class="wk" data-w="${w.id}" ${st.locked?"disabled":""}>
       <span class="wk-num">${i+1}</span>
-      <span><h3>${esc(w.title)}</h3><span class="meta">${esc(w.lessons)} · due ${fmtShort(w.due)}</span></span>
+      <span><h3>${esc(w.title)}</h3><span class="meta">${esc(w.lessons)} · due ${fmtShort(w.due)}</span>${prog}</span>
       <span class="right"><span class="pill ${st.cls}">${esc(st.t)}</span>${st.act?`<span class="act">${st.act}</span>`:""}</span></button>`;
   }).join("");
   app.innerHTML = `<div class="stack" style="gap:20px">
@@ -345,7 +377,8 @@ function stepper(){
     if (k==="start") return `<button class="step" data-step="${i}" ${S.step===i?'aria-current="step"':""}><span class="dot">i</span>Start</button>`;
     if (k==="submit") { const all = qs.every(q=>answered(q,S.answers[q.id])); return `<button class="step ${all?"full":""}" data-step="${i}" ${S.step===i?'aria-current="step"':""}><span class="dot">✓</span>Submit</button>`; }
     const sq = qs.filter(q=>q.crit===k), d = sq.filter(q=>answered(q,S.answers[q.id])).length;
-    return `<button class="step ${k} ${d===sq.length?"full":""}" data-step="${i}" ${S.step===i?'aria-current="step"':""}><span class="dot">${k}</span><span class="n">${d}/${sq.length}</span></button>`;
+    const full = d===sq.length;
+    return `<button class="step ${k} ${full?"full":""}" data-step="${i}" ${S.step===i?'aria-current="step"':""}><span class="dot">${full?"✓":k}</span><span class="n">${full?k+" done":d+"/"+sq.length}</span></button>`;
   });
   stickyMount.innerHTML = `<div class="sticky"><div class="sticky-in" role="navigation" aria-label="Pack steps">${parts.join('<span class="sep"></span>')}</div></div>`;
   stickyMount.querySelectorAll("[data-step]").forEach(b => b.onclick = () => { S.step = S.integ.pledged ? Number(b.dataset.step) : 0; renderStep(); });
@@ -469,7 +502,9 @@ function updateCounts(){
     if (k==="start") return;
     if (k==="submit"){ b.classList.toggle("full", qs.every(q=>answered(q,S.answers[q.id]))); return; }
     const sq = qs.filter(q=>q.crit===k), d = sq.filter(q=>answered(q,S.answers[q.id])).length;
-    b.classList.toggle("full", d===sq.length); const n = b.querySelector(".n"); if (n) n.textContent = d+"/"+sq.length;
+    const full = d===sq.length;
+    b.classList.toggle("full", full); const n = b.querySelector(".n"); if (n) n.textContent = full ? k+" done" : d+"/"+sq.length;
+    const dot = b.querySelector(".dot"); if (dot) dot.textContent = full ? "✓" : k;
   });
 }
 
