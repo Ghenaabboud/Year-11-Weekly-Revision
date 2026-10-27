@@ -552,13 +552,18 @@ async function doSubmit(){
   const payload = { id:S.student.id, week:S.week.id, answers:S.answers, auto, autoMax, words:wc, flag:effortFlag(qs), late: now() > new Date(S.week.due),
     integ:{ left:I.left, away:I.away, paste:I.paste, big:I.big, active:I.active }, integFlag: reasons.join(", ") };
   try {
-    const r = await API.submit(payload);
+    let r, lastErr;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try { r = await API.submit(payload); lastErr = null; break; }
+      catch (e) { lastErr = e; b.textContent = "Trying again…"; await new Promise(res => setTimeout(res, attempt * 2500)); }
+    }
+    if (lastErr) throw lastErr;
     const ts = r.ts || new Date().toISOString();
     S.student.submissions = (S.student.submissions||[]).filter(s=>s.week!==S.week.id).concat([{week:S.week.id, ts, auto, autoMax, answers:S.answers}]);
     try { localStorage.removeItem(draftKey()); localStorage.removeItem(draftKey()+"_i"); } catch(e){}
     renderResult(S.answers, ts, true);
   } catch(err){
-    document.getElementById("subErr").textContent = "Your pack was not submitted: " + err.message + ". Check your internet connection and try again. Your answers are still saved on this device.";
+    document.getElementById("subErr").textContent = "Your pack was NOT submitted (" + err.message + "). Your answers are still saved on this device. Wait a minute and press Submit again. If it still fails, tell your teacher.";
     b.disabled = false; b.textContent = "Submit my pack";
   }
 }
