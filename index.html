@@ -563,6 +563,7 @@ async function doSubmit(){
     try { localStorage.removeItem(draftKey()); localStorage.removeItem(draftKey()+"_i"); } catch(e){}
     renderResult(S.answers, ts, true);
   } catch(err){
+    try { API.progress({ id:S.student.id, week:S.week.id, answered: qs.length, total: qs.length, sections:{}, integ:{}, submitError: String(err && err.message || err) }); } catch(e){}
     document.getElementById("subErr").textContent = "Your pack was NOT submitted (" + err.message + "). Your answers are still saved on this device. Wait a minute and press Submit again. If it still fails, tell your teacher.";
     b.disabled = false; b.textContent = "Submit my pack";
   }
