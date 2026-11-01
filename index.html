@@ -206,6 +206,7 @@
 (function(){
 const W = window.REVISION_WEEKS, API = window.RevisionAPI;
 const PREVIEW = /[?&]preview\b/.test(location.search);
+const TEACHER = false; // true only in the teacher's private preview copy: unlocks every step and shows answers
 const app = document.getElementById("app"), who = document.getElementById("who"), stickyMount = document.getElementById("stickyMount");
 let S = { student:null, week:null, answers:{}, step:0, mode:"" };
 
@@ -414,11 +415,12 @@ function stepper(){
     return `<button class="step ${k} ${full?"full":""}" data-step="${i}" ${S.step===i?'aria-current="step"':""}><span class="dot">${full?"✓":k}</span><span class="n">${full?k+" done":d+"/"+sq.length}</span></button>`;
   });
   stickyMount.innerHTML = `<div class="sticky"><div class="sticky-in" role="navigation" aria-label="Pack steps">${parts.join('<span class="sep"></span>')}</div></div>`;
-  stickyMount.querySelectorAll("[data-step]").forEach(b => b.onclick = () => { S.step = S.integ.pledged ? Number(b.dataset.step) : 0; renderStep(); });
+  stickyMount.querySelectorAll("[data-step]").forEach(b => b.onclick = () => { S.step = (S.integ.pledged || TEACHER) ? Number(b.dataset.step) : 0; renderStep(); });
 }
 
 function renderStep(){
   S.mode = "week"; setWho(); stepper();
+  if (TEACHER) stickyMount.querySelector(".sticky-in").insertAdjacentHTML("beforeend", `<span class="teach-flag">Teacher view: all steps unlocked</span>`);
   const k = steps()[S.step];
   if (k==="start") renderStart(); else if (k==="submit") renderSubmit(); else if (k==="R") renderMissions(S.week.sections.find(s=>s.crit===k)); else renderSection(S.week.sections.find(s=>s.crit===k));
   window.scrollTo(0,0);
@@ -507,7 +509,7 @@ function renderSection(sec){
   app.innerHTML = `<div class="stack" style="gap:16px">
     <div class="sec-head"><span class="crit ${sec.crit}">${sec.crit}</span><div><div class="eyebrow">${sec.crit==="R"?"Revision":"Criterion "+sec.crit} · part ${i} of ${S.week.sections.length}</div><h1 style="font-size:clamp(24px,4vw,32px)">${esc(sec.name)}</h1></div></div>
     <dl class="guide"><dt>What it tests</dt><dd>${CRIT[sec.crit].tests}</dd><dt>Top tip</dt><dd>${CRIT[sec.crit].tip}</dd></dl>
-    ${sec.items.map(q => q.type==="info" ? infoHTML(q) : qHTML(q, L[q.id])).join("")}
+    ${sec.items.map(q => q.type==="info" ? infoHTML(q) : qHTML(q, L[q.id]) + (TEACHER ? `<details class="teach-ans"><summary>Show answer</summary>${detailHTML(q, q.type==="mcq" ? q.answer : q.type==="match" ? q.rows.map(r=>r.answer) : q.type==="cloze" ? q.blanks : q.type==="numtable" ? q.rows.map(r=>String(r.answer)) : q.type==="num" ? String(q.min) : "").replace(/Your answer:/g,"Answer:")}</details>` : "")).join("")}
     <div class="navrow"><button class="btn ghost" id="prev">${prevLabel}</button><span class="saved" id="saved">Answers save automatically</span><button class="btn" id="next">${nextLabel}</button></div>
   </div>`;
   sec.items.filter(q=>q.type==="text").forEach(q => { document.getElementById(q.id).value = S.answers[q.id] || ""; });
@@ -539,7 +541,7 @@ function atpScore(sec){
 }
 function renderMissions(sec){
   const ms = MS(), L = labels(S.week), list = missionList(sec), st = steps(), i = S.step;
-  const unlocked = j => j === 0 || list.slice(0, j).every(missionDone);
+  const unlocked = j => TEACHER || j === 0 || list.slice(0, j).every(missionDone);
   if (ms.cur >= list.length || !unlocked(ms.cur)) ms.cur = 0;
   const next = st[i+1], prev = st[i-1];
   const nm = k => k==="R" ? "recall missions" : "criterion " + k;
@@ -564,8 +566,9 @@ function renderMissions(sec){
   };
   const reveals = () => body.querySelectorAll("[data-reveal]").forEach(el => {
     const it = ml.items.find(x => x.key === el.dataset.reveal).it, simDone = ml.items.some(x => x.it.sim && ms.sim[x.key]);
-    if (!simDone) return;
+    if (!simDone && !TEACHER) return;
     const p = ms.pred[el.dataset.reveal], right = p === it.predict.answer;
+    if (TEACHER && p == null){ el.className = "reveal"; el.hidden = false; el.innerHTML = `<b>Answer: ${esc(it.predict.options[it.predict.answer])}.</b> ${it.predict.reveal}`; return; }
     el.className = "reveal" + (right ? "" : " miss"); el.hidden = false;
     el.innerHTML = `<b>${right ? "Your prediction was right!" : "Surprised?"}</b> ${it.predict.reveal}`;
   });
@@ -600,6 +603,13 @@ function renderMissions(sec){
       } else {
         box.innerHTML = `<span class="mtag check">Check yourself</span>${qHTML(q, L[q.id])}<div class="chkrow"><span class="note">One try only: your marks lock when you press Check.</span><button type="button" class="btn" id="chk_${q.id}" ${answered(q, S.answers[q.id]) ? "" : "disabled"}>Check</button></div>`;
         box.querySelector(".q").style.cssText = "border:0;padding:0;margin-top:8px";
+        if (TEACHER){
+          const key = q.type==="mcq" ? q.answer : q.type==="match" ? q.rows.map(r=>r.answer) : q.type==="cloze" ? q.blanks.slice() : q.type==="numtable" ? q.rows.map(r=>String(r.answer)) : null;
+          const tb = document.createElement("button"); tb.type = "button"; tb.className = "btn ghost small"; tb.textContent = "Show answer";
+          const ans = document.createElement("div"); ans.className = "teach-ans"; ans.hidden = true; ans.innerHTML = `<b>Answer key</b>${detailHTML(q, key).replace(/Your answer:/g,"Answer:")}`;
+          tb.onclick = () => { ans.hidden = !ans.hidden; tb.textContent = ans.hidden ? "Show answer" : "Hide answer"; };
+          box.querySelector(".chkrow").prepend(tb); box.append(ans);
+        }
         box.querySelector("#chk_" + q.id).onclick = () => {
           if (!answered(q, S.answers[q.id])) return;
           ms.chk[q.id] = 1; saveMS();
@@ -616,7 +626,7 @@ function renderMissions(sec){
     while (ptr < ml.items.length){
       const {it, key} = ml.items[ptr++], b = blockFor(it, key);
       if (b){ body.append(b); first = first || b; }
-      if (isGate(it) && !gateDone(it, key)) break;
+      if (!TEACHER && isGate(it) && !gateDone(it, key)) break;
     }
     if (ptr >= ml.items.length && missionDone(ml) && !body.querySelector(".mdone")){
       const last = ms.cur === list.length - 1, [g, mx] = atpScore(sec);
@@ -780,7 +790,7 @@ function renderResult(ans, ts, fresh){
 function saveInteg(){ if (S.student && S.week) ls(draftKey()+"_i", S.integ); }
 let toastTimer = null;
 function toast(msg){ const t = document.getElementById("toast"); t.textContent = msg; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, 6000); }
-const working = () => S.mode === "week" && S.integ;
+const working = () => !TEACHER && S.mode === "week" && S.integ;
 ["paste","drop"].forEach(ev => document.addEventListener(ev, e => {
   if (!working()) return;
   e.preventDefault(); S.integ.paste++; saveInteg();
