@@ -94,6 +94,12 @@
       return post({ action: "submit", ...payload });
     },
 
+    /* Backup route: same channel as progress updates (the response is not read). */
+    async submitBackup(payload) {
+      if (DEMO) return this.submit(payload);
+      await fetch(URL_, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ action: "progress", submitFallback: true, ...payload }) });
+    },
+
     /* Fire-and-forget progress update while a student works. */
     progress(payload) {
       if (DEMO) {

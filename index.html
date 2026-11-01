@@ -734,7 +734,14 @@ async function doSubmit(){
       try { r = await API.submit(payload); lastErr = null; break; }
       catch (e) { lastErr = e; b.textContent = "Trying again…"; await new Promise(res => setTimeout(res, attempt * 2500)); }
     }
-    if (lastErr) throw lastErr;
+    if (lastErr) {
+      /* the answers may have been saved even though the reply was lost, or the backup route may get through */
+      const landed = async () => { try { const st = await API.verify(S.student.id); return (st.submissions || []).find(s => s.week === S.week.id); } catch (e) { return null; } };
+      let sub = await landed();
+      if (!sub) { b.textContent = "Trying another way…"; try { await API.submitBackup({ ...payload, submitError: String(lastErr && lastErr.message || lastErr) }); } catch (e) {} await new Promise(res => setTimeout(res, 3000)); sub = await landed(); }
+      if (!sub) throw lastErr;
+      r = { ts: sub.ts };
+    }
     const ts = r.ts || new Date().toISOString();
     S.student.submissions = (S.student.submissions||[]).filter(s=>s.week!==S.week.id).concat([{week:S.week.id, ts, auto, autoMax, answers:S.answers}]);
     try { localStorage.removeItem(draftKey()); localStorage.removeItem(draftKey()+"_i"); } catch(e){}
