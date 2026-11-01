@@ -112,13 +112,23 @@
       cur = i; const c = cells[i];
       [...tabs.children].forEach((b, j) => b.setAttribute("aria-selected", j === i));
       stage.innerHTML = ""; panel.innerHTML = `<span class="note">${c.name}: ${c.sub}</span>`;
-      const svg = s("svg", { viewBox: "0 0 400 260", class: "cellsvg", role: "img", "aria-label": c.name });
-      const g = s("g"); c.draw(g); svg.append(g);
+      const narrow = (stage.clientWidth || window.innerWidth) < 600;
+      const svg = s("svg", { viewBox: narrow ? "-46 0 492 260" : "-235 0 870 260", class: "cellsvg", role: "img", "aria-label": c.name });
+      const g = s("g"), add = g.append.bind(g); g.append = (...k) => add(...k.flat()); c.draw(g); svg.append(g);
+      /* numbered markers sit outside the cell, with a leader line to the structure, like an exam diagram */
+      const pos = {};
+      [0, 1].forEach(side => {
+        const list = c.spots.map((p, j) => ({ p, j })).filter(({ p }) => (p.x >= 200) === !!side).sort((a, b) => a.p.y - b.p.y);
+        let y = -1e9; list.forEach(o => { y = Math.max(o.p.y, y + 30); o.ly = y; });
+        const over = list.length ? list[list.length - 1].ly - 246 : 0; if (over > 0) list.forEach(o => o.ly -= over);
+        list.forEach(o => pos[o.j] = { lx: side ? 430 : -30, ly: Math.max(14, o.ly) });
+      });
       c.spots.forEach((p, j) => {
-        const key = c.k + j, done = !!st.found[key];
+        const key = c.k + j, done = !!st.found[key], { lx, ly } = pos[j], right = lx > 200;
+        svg.insertBefore(s("g", { class: "lead" + (done ? " ok" : "") }, s("line", { x1: lx + (right ? -12 : 12), y1: ly, x2: p.x, y2: p.y }), s("circle", { cx: p.x, cy: p.y, r: 6 })), null);
         const hs = s("g", { class: "hs" + (done ? " ok" : ""), tabindex: 0, role: "button", "aria-label": done ? p.n : "Structure " + (j + 1) },
-          s("circle", { cx: p.x, cy: p.y, r: 12 }), s("text", { x: p.x, y: p.y + 4.5, "text-anchor": "middle" }, done ? "✓" : String(j + 1)));
-        if (done) hs.append(s("text", { x: p.x + (p.x > 300 ? -16 : 16), y: p.y - 14, class: "hslab", "text-anchor": p.x > 300 ? "end" : "start" }, p.n));
+          s("circle", { cx: lx, cy: ly, r: 12 }), s("text", { x: lx, y: ly + 4.5, "text-anchor": "middle" }, done ? "✓" : String(j + 1)));
+        if (done && !narrow) hs.append(s("text", { x: lx + (right ? 18 : -18), y: ly + 4.5, class: "hslab", "text-anchor": right ? "start" : "end" }, p.n));
         const ask = () => quiz(c, j, hs);
         hs.addEventListener("click", ask); hs.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); ask(); } });
         svg.append(hs);

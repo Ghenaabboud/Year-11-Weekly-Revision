@@ -71,7 +71,7 @@
 .simacts .btn{padding:8px 12px;font-size:14px}
 
 /* cell explorer */
-.cellstage svg{width:100%;max-height:330px;display:block}
+.cellstage svg{width:100%;max-height:360px;display:block}
 .cellsvg .wall{fill:none;stroke:#7E9C5E;stroke-width:8}
 .cellsvg .pwall,.solsvg .pwall{fill:none;stroke:#6F9442;stroke-width:9}
 .cyto{fill:#EEF6E9}
@@ -89,6 +89,8 @@
 .chlo{fill:#5DA55A;stroke:#2F6E2E;stroke-width:1.5}
 .grana{stroke:#2F6E2E;stroke-width:1.5}
 .hs{cursor:pointer}
+.lead line{pointer-events:none;stroke:var(--ink);stroke-width:1.5;stroke-dasharray:4 3}.lead circle{fill:none;stroke:var(--ink);stroke-width:2}
+.lead.ok line{stroke:var(--green);stroke-dasharray:none}.lead.ok circle{fill:none;stroke:var(--green)}
 .hs circle{fill:var(--amber);stroke:#fff;stroke-width:2.5;transform-box:fill-box;transform-origin:center;animation:mpulse 1.8s ease-in-out infinite}
 .hs text{fill:#fff;font:800 13px var(--f-display);pointer-events:none}
 .hs.sel circle{fill:var(--blue);animation:none}
@@ -180,4 +182,5 @@
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .cyto{fill:#1E2A23}}
 :root[data-theme="dark"] .cyto{fill:#1E2A23}
 .mblock,.mdone{scroll-margin-top:84px}
-@media (max-width:520px){.hs .hslab{display:none}}
+.hs .hslab{font-size:15px}
+.cellstage{min-height:120px}
