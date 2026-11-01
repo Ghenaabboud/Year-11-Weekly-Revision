@@ -354,10 +354,10 @@ window.REVISION_WEEKS = [
   id: "w3",
   title: "Cells, specialised cells and transport",
   topic: "Year 10 recap: Cells",
-  lessons: "Year 10 Unit 1 – Lessons 3–6",
+  lessons: "Year 10 Unit 1 – Lessons 3–5",
   opens: "2026-11-02T07:00:00+04:00",
   due: "2026-11-08T23:59:00+04:00",
-  minutes: 45,
+  minutes: 40,
   sections: [
   {
     crit: "R", name: "Recall missions",
@@ -473,41 +473,7 @@ window.REVISION_WEEKS = [
         options: ["Diffusion", "Osmosis", "Active transport", "All three"], answer: 2,
         explain: "Only active transport needs energy (ATP), because it moves substances against their concentration gradient." },
 
-      { type: "info", exam: "<b>In criterion A this becomes:</b> question A6. It gives you data (6 : 1 and 1.5 : 1). <b>Quote the numbers</b> in your answer, then explain what a smaller SA : V means for exchange across the membrane." },
-
-      { type: "info", mission: { n: 4, title: "Osmosis lab", lesson: "Lesson 6 · Osmosis",
-        story: "A nurse asks why a drip must contain 0.9% salt, not pure water. Show you can predict what water does to cells." } },
-      { type: "info", predict: { q: "A potato cylinder is left in <b>pure water</b> for one hour. What happens to its mass?",
-        options: ["It increases", "It decreases", "It stays the same"], answer: 0,
-        reveal: "Pure water is hypotonic to the potato cells, so water moves into the cells by osmosis and the cylinder gains mass. In a concentrated sucrose solution the opposite happens." } },
-      { type: "info", sim: { name: "potatoLab", title: "Virtual lab: potato cylinders in sucrose" } },
-      { type: "info", sim: { name: "solutionViewer", title: "Animal and plant cells in three solutions" } },
-      { type: "info", flash: [
-        { q: "Hypotonic, isotonic, hypertonic: compared with what?", a: "Always the solution OUTSIDE compared with the cell contents. Hypo = fewer solutes outside (water moves in). Iso = same (no net movement). Hyper = more solutes outside (water moves out)." },
-        { q: "Why don't plant cells burst in pure water?", a: "The strong cell wall resists the swelling vacuole, so the cell becomes turgid instead of bursting. Animal cells have no cell wall, so they can burst (lysis)." },
-        { q: "The 4 steps for any osmosis answer?", a: "1. Compare the solution with the cell (hypo/iso/hypertonic). 2. Water concentration higher/same/lower outside. 3. Water moves in/out by osmosis through the partially permeable membrane. 4. Effect on the cell." }
-      ] },
-      { id: "w3r10", type: "cloze", marks: 4,
-        prompt: "Complete the definition of osmosis.",
-        text: "Osmosis is the net movement of [[0]] molecules from a region of [[1]] water concentration to a region of [[2]] water concentration, through a [[3]] membrane.",
-        options: ["water", "solute", "higher", "lower", "partially permeable", "fully permeable"],
-        blanks: ["water", "higher", "lower", "partially permeable"] },
-      { id: "w3r11", type: "match", marks: 5,
-        prompt: "<b>Predict</b> what happens to each cell.",
-        head: ["Cell and solution", "What happens"],
-        options: ["swells and bursts (lysis)", "shrinks (crenated)", "becomes turgid", "becomes plasmolysed", "becomes flaccid", "no change at all"],
-        rows: [
-          { label: "Red blood cell in pure water (hypotonic)", answer: "swells and bursts (lysis)" },
-          { label: "Red blood cell in 3% salt solution (hypertonic)", answer: "shrinks (crenated)" },
-          { label: "Onion cell in pure water (hypotonic)", answer: "becomes turgid" },
-          { label: "Onion cell in 10% salt solution (hypertonic)", answer: "becomes plasmolysed" },
-          { label: "Plant cell in an isotonic solution", answer: "becomes flaccid" }
-        ] },
-      { id: "w3r12", type: "mcq", marks: 1,
-        prompt: "Potato cylinders gained mass in 0.2 mol/dm³ sucrose and lost mass in 0.4 mol/dm³ sucrose. What is the best estimate of the concentration of the potato cell contents?",
-        options: ["0.1 mol/dm³", "About 0.3 mol/dm³", "0.5 mol/dm³", "1.0 mol/dm³"], answer: 1,
-        explain: "The isotonic point (no change in mass) lies between the solution where mass was gained and the one where it was lost, so about 0.3 mol/dm³." },
-      { type: "info", exam: "<b>In criterion A this becomes:</b> question A7 about Bustanica's lettuce [4]. The <b>4 osmosis steps</b> you just practised (compare → water concentration → movement → effect) earn one mark each." }
+      { type: "info", exam: "<b>In criterion A this becomes:</b> question A6. It gives you data (6 : 1 and 1.5 : 1). <b>Quote the numbers</b> in your answer, then explain what a smaller SA : V means for exchange across the membrane." }
     ]
   },
   {
@@ -546,12 +512,6 @@ window.REVISION_WEEKS = [
         prompt: "A 1 cm cube has a surface area to volume ratio of 6:1, but a 4 cm cube has a ratio of only 1.5:1. Use this information to <b>explain</b> why cells divide instead of growing very large.",
         model: "As a cell gets larger, its volume increases faster than its surface area, so the SA:V ratio falls (from 6:1 to 1.5:1) (1). The membrane is the exchange surface, so a large cell has less membrane per unit of volume to take in nutrients and oxygen and remove wastes (1). Substances would not move in and out fast enough to meet the cell's needs, so cells divide to keep a high SA:V ratio (1).",
         points: ["Volume increases faster than surface area, SA:V decreases (uses data)", "Less membrane (exchange surface) per unit volume", "Exchange too slow for the cell's needs, so cells divide"] },
-
-      { id: "w3a7", type: "text", marks: 4, minWords: 40,
-        prompt: "To save water, Bustanica's engineers made their hydroponic nutrient solution <b>more concentrated</b>. The lettuce began to wilt. <b>Explain</b> why, using the 4 steps for osmosis.",
-        hint: "Use the 4 steps: <b>1. Compare</b> (hypo/iso/hypertonic) → <b>2. Water concentration</b> → <b>3. Movement</b> by osmosis through the partially permeable membrane → <b>4. Effect</b> on the cells.",
-        model: "1. The concentrated nutrient solution is hypertonic compared with the cytoplasm of the root hair cells (1). 2. So the water concentration is lower outside the cells than inside (1). 3. Water moves out of the root cells by osmosis through the partially permeable membrane, instead of in (1). 4. The cells lose water and become flaccid or plasmolysed, the plant cannot take up enough water, so it wilts (1).",
-        points: ["Solution is hypertonic to the root cells", "Lower water concentration outside", "Water leaves by osmosis through partially permeable membrane", "Cells become flaccid/plasmolysed → lettuce wilts"] },
 
       { id: "w3a8", type: "text", marks: 3, minWords: 30,
         prompt: "A student writes: <i>“Diffusion and active transport are the same thing, because both move particles across the cell membrane.”</i> <b>Evaluate</b> this statement.",
