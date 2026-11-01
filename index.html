@@ -738,6 +738,13 @@ async function doSubmit(){
       try { r = await API.submit(payload); lastErr = null; break; }
       catch (e) { lastErr = e; b.textContent = "Trying again…"; await new Promise(res => setTimeout(res, attempt * 2500)); }
     }
+    /* keep a permanent copy of what was sent on this device, whatever happens */
+    try { localStorage.setItem("y11rev_sent_" + S.student.id + "_" + S.week.id, JSON.stringify({ at: new Date().toISOString(), payload })); } catch (e) {}
+    /* never trust the reply alone: confirm the Sheet really has this pack */
+    if (!lastErr && !API.demo) {
+      try { const st = await API.verify(S.student.id); const sub = (st.submissions || []).find(s => s.week === S.week.id); if (!sub) lastErr = new Error("the Sheet did not store it"); else r = { ts: sub.ts }; }
+      catch (e) { /* could not check: keep the answers on the device to be safe */ r.unconfirmed = true; }
+    }
     if (lastErr) {
       /* the answers may have been saved even though the reply was lost, or the backup route may get through */
       const landed = async () => { try { const st = await API.verify(S.student.id); return (st.submissions || []).find(s => s.week === S.week.id); } catch (e) { return null; } };
@@ -748,7 +755,7 @@ async function doSubmit(){
     }
     const ts = r.ts || new Date().toISOString();
     S.student.submissions = (S.student.submissions||[]).filter(s=>s.week!==S.week.id).concat([{week:S.week.id, ts, auto, autoMax, answers:S.answers}]);
-    try { localStorage.removeItem(draftKey()); localStorage.removeItem(draftKey()+"_i"); } catch(e){}
+    if (!r.unconfirmed) { try { localStorage.removeItem(draftKey()); localStorage.removeItem(draftKey()+"_i"); } catch(e){} }
     renderResult(S.answers, ts, true);
   } catch(err){
     try { API.progress({ id:S.student.id, week:S.week.id, answered: qs.length, total: qs.length, sections:{}, integ:{}, submitError: String(err && err.message || err) }); } catch(e){}
