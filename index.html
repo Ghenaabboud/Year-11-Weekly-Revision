@@ -65,7 +65,7 @@
   .sticky-in{max-width:960px;margin:0 auto;padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;gap:6px;align-items:center;overflow-x:auto}
   .step{display:flex;gap:7px;align-items:center;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:4px 12px 4px 4px;cursor:pointer;white-space:nowrap;font-size:14px;color:var(--ink)}
   .step .dot{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;font:800 13px var(--f-display);background:var(--line);color:var(--ink)}
-  .step.A .dot{background:var(--ca);color:var(--card)}.step.B .dot{background:var(--cb);color:var(--card)}.step.C .dot{background:var(--cc);color:var(--card)}.step.D .dot{background:var(--cd);color:var(--card)}
+  .step.R .dot{background:var(--cr);color:var(--card)}.step.A .dot{background:var(--ca);color:var(--card)}.step.B .dot{background:var(--cb);color:var(--card)}.step.C .dot{background:var(--cc);color:var(--card)}.step.D .dot{background:var(--cd);color:var(--card)}
   .step[aria-current="step"]{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)}
   .step .n{font:500 12px var(--f-mono);color:var(--muted)}
   .step.full .n{color:var(--green)}
@@ -143,6 +143,24 @@
 
   .qhint{font-size:14px;background:var(--amber-soft);color:var(--ink);border-left:4px solid var(--amber);border-radius:0 8px 8px 0;padding:8px 12px;margin:0 0 10px}
   .qhint b:first-child{color:var(--amber)}
+  /* recall missions */
+  .mission{display:flex;gap:14px;align-items:center;background:var(--cr);color:var(--card);border-radius:12px;padding:14px 18px;margin-top:10px}
+  .mission .mnum{flex:none;min-width:64px;padding:6px 8px;border-radius:10px;border:2px solid currentColor;text-align:center;font:700 10px/1.1 var(--f-body);letter-spacing:.08em;text-transform:uppercase}
+  .mission .mnum b{display:block;font:800 24px/1.1 var(--f-display);letter-spacing:0}
+  .mission h3{font-size:20px}
+  .mission .ml{font:700 12px var(--f-body);letter-spacing:.08em;text-transform:uppercase;opacity:.85}
+  .mission p{margin:4px 0 0;font-size:15px;opacity:.95}
+  .flashes{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}
+  .flashes .fh{grid-column:1/-1;font-size:14px;color:var(--muted)}
+  details.flash{background:var(--cr-soft);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+  details.flash summary{cursor:pointer;font-weight:700;list-style:none}
+  details.flash summary::-webkit-details-marker{display:none}
+  details.flash summary::after{content:"Tap to check ↓";display:block;font:500 12px var(--f-mono);color:var(--cr);margin-top:6px}
+  details.flash[open] summary::after{content:"Answer ↓"}
+  details.flash div{margin-top:6px;font-size:15px}
+  .cloze{line-height:2.4;font-size:17px}
+  .cloze select{border:1px solid var(--line);border-radius:6px;padding:4px 6px;background:var(--card);font-size:15px;max-width:100%}
+  .cloze .ok{color:var(--green);font-weight:700}.cloze .no{color:var(--red);font-weight:700}
   /* criterion D structure guide */
   .dguide{border:2px solid var(--cd);border-radius:12px;background:var(--card);overflow:hidden}
   .dguide-head{background:var(--cd);color:var(--card);padding:12px 18px}
@@ -206,6 +224,7 @@ const TERMS = {
   "justify":"Give reasons or evidence that support your answer."
 };
 const CRIT = {
+  R:{tests:"Quick recall of the key facts from the lessons, before you use them in exam-style questions.", tip:"Try each card from memory first, then tap it to check. Every question here is marked straight away."},
   A:{tests:"What you know and understand: key facts, processes and scientific words from the lessons.", tip:"Look at the marks in brackets. [3] means make three separate points."},
   B:{tests:"How you plan an investigation: research question, hypothesis, variables, method and safety.", tip:"Always name the independent variable, the dependent variable and how you will measure it, with units."},
   C:{tests:"How you work with data: calculate, describe patterns, spot anomalies and judge the method.", tip:"Quote numbers from the data in your answer, with units."},
@@ -214,6 +233,7 @@ const CRIT = {
 const HOWTO = {
   mcq: "Choose one answer.",
   match: "Choose an answer from each drop-down list.",
+  cloze: "Choose the correct word for each gap.",
   num: "Type a number only. No units needed.",
   numtable: "Type a number in each box, rounded to 1 decimal place.",
   text: q => `Write at least ${q.minWords} words in full sentences. The bar turns green when you have written enough.`
@@ -238,11 +258,15 @@ function guideHTML(g){
     <div class="dfoot"><div><h4>How the levels are awarded</h4><div class="ladder">${g.ladder.map((r,i)=>`<div class="rung ${i===g.ladder.length-1?"top":""}"><span>${esc(r.lv)}</span><div><b>${esc(r.verb)}:</b> ${esc(r.d)}</div></div>`).join("")}</div></div>
     <div><h4>Before you move on, check</h4><ul class="dcheck">${g.checklist.map(c=>`<li>${esc(c)}</li>`).join("")}</ul></div></div></div>`;
 }
-const infoHTML = q => q.guide ? guideHTML(q.guide) : `<div class="info">${q.html}</div>`;
+const infoHTML = q => q.guide ? guideHTML(q.guide)
+  : q.mission ? `<div class="mission"><div class="mnum">Mission<b>${q.mission.n}</b></div><div><div class="ml">${esc(q.mission.lesson)}</div><h3>${esc(q.mission.title)}</h3><p>${esc(q.mission.story)}</p></div></div>`
+  : q.flash ? `<div class="flashes"><div class="fh">Recall first: say the answer in your head, then tap the card to check.</div>${q.flash.map(f=>`<details class="flash"><summary>${esc(f.q)}</summary><div>${esc(f.a)}</div></details>`).join("")}</div>`
+  : `<div class="info">${q.html}</div>`;
 
 function answered(q, a){
   if (q.type==="mcq") return Number.isInteger(a);
   if (q.type==="match") return Array.isArray(a) && q.rows.every((_,i)=>a[i]);
+  if (q.type==="cloze") return Array.isArray(a) && q.blanks.every((_,i)=>a[i]);
   if (q.type==="num") return num(a)!==null;
   if (q.type==="numtable") return Array.isArray(a) && q.rows.every((_,i)=>num(a[i])!==null);
   if (q.type==="text") return words(a) >= q.minWords;
@@ -251,6 +275,7 @@ function answered(q, a){
 function markOf(q, a){
   if (q.type==="mcq") return a===q.answer ? q.marks : 0;
   if (q.type==="match") return q.rows.reduce((t,r,i)=>t+((a||[])[i]===r.answer?1:0),0);
+  if (q.type==="cloze") return q.blanks.reduce((t,b,i)=>t+((a||[])[i]===b?1:0),0);
   if (q.type==="num"){ const n=num(a); return n!==null && n>=q.min-1e-9 && n<=q.max+1e-9 ? q.marks : 0; }
   if (q.type==="numtable") return q.rows.reduce((t,r,i)=>{const n=num((a||[])[i]);return t+(n!==null&&Math.abs(n-r.answer)<=r.tol+1e-9?1:0);},0);
   return null;
@@ -403,14 +428,14 @@ function renderStart(){
         <ul class="checklist">
           <li>Have your notes and slides from ${esc(w.lessons)} ready.</li>
           <li>Work somewhere quiet. Treat it like a real exam.</li>
-          <li>Do the parts in order: A, then B, C and D. Use the buttons at the top to move between them.</li>
+          <li>Do the parts in order: ${w.sections.map(s=>s.crit==="R"?"the recall missions":s.crit).join(", then ")}. Use the buttons at the top to move between them.</li>
           <li>Your answers save on this device as you type. You can close the page and continue later on the same device.</li>
           <li>Answer on your own, from what you know and your class notes. Pasting is turned off, and the page records each time you leave it and for how long.</li>
           <li>When everything is answered, go to <b>Submit</b>. You can only submit once.</li>
         </ul>
       </div>
       <div class="stack">
-        <h2 class="mid">The four parts</h2>
+        <h2 class="mid">What's in this pack</h2>
         ${w.sections.map(s=>`<div class="row" style="gap:12px;align-items:flex-start;flex-wrap:nowrap"><span class="crit ${s.crit}">${s.crit}</span><div><b>${esc(s.name)}</b><div class="note">${CRIT[s.crit].tests}</div></div></div>`).join("")}
       </div>
     </div>
@@ -425,7 +450,7 @@ function renderStart(){
       <div class="termlist">${Object.entries(TERMS).map(([t,d])=>`<b>${t[0].toUpperCase()+t.slice(1)}</b><span>${d}</span>`).join("")}</div>
     </details>
     <label class="pledge" for="pledge"><input type="checkbox" id="pledge" ${S.integ.pledged?"checked":""}><span><b>My promise.</b> I will answer these questions myself. I will not copy answers, search online, use AI or ask someone else to answer for me.</span></label>
-    <div class="navrow"><span class="saved" id="pledgeMsg"></span><button class="btn" id="go">Start with criterion A →</button></div>
+    <div class="navrow"><span class="saved" id="pledgeMsg"></span><button class="btn" id="go">${w.sections[0].crit==="R"?"Start the recall missions":"Start with criterion "+w.sections[0].crit} →</button></div>
   </div>`;
   document.getElementById("back").onclick = renderWeeks;
   document.getElementById("pledge").onchange = e => { S.integ.pledged = e.target.checked; saveInteg(); };
@@ -440,6 +465,7 @@ function qHTML(q, L){
   let body = "";
   if (q.type==="mcq") body = q.options.map((o,i)=>`<label class="opt"><input type="radio" name="${q.id}" value="${i}" ${a===i?"checked":""}><span>${esc(o)}</span></label>`).join("");
   if (q.type==="match") body = `<div class="tbl"><table><thead><tr><th>${esc(q.head[0])}</th><th>${esc(q.head[1])}</th></tr></thead><tbody>${q.rows.map((r,i)=>`<tr><td>${esc(r.label)}</td><td><select id="${q.id}_${i}" data-q="${q.id}" data-i="${i}" aria-label="${esc(r.label)}"><option value="">Choose…</option>${q.options.map(o=>`<option ${(a||[])[i]===o?"selected":""}>${esc(o)}</option>`).join("")}</select></td></tr>`).join("")}</tbody></table></div>`;
+  if (q.type==="cloze") { let k = 0; body = `<div class="cloze">${esc(q.text).replace(/\[\[(\d+)\]\]/g, (m, n) => { const i = Number(n); return `<select id="${q.id}_${i}" data-q="${q.id}" data-i="${i}" aria-label="Gap ${i+1}"><option value="">Choose…</option>${q.options.map(o=>`<option ${(a||[])[i]===o?"selected":""}>${esc(o)}</option>`).join("")}</select>`; })}</div>`; }
   if (q.type==="num") body = `<div class="num"><input class="input" id="${q.id}" data-q="${q.id}" inputmode="decimal" value="${esc(a??"")}" aria-label="Your answer"><span>${esc(q.unit||"")}</span></div>`;
   if (q.type==="numtable") body = `<div class="tbl"><table><thead><tr><th>${esc(q.head[0])}</th><th>${esc(q.head[1])}</th></tr></thead><tbody>${q.rows.map((r,i)=>`<tr><td>${esc(r.label)}</td><td><input id="${q.id}_${i}" data-q="${q.id}" data-i="${i}" inputmode="decimal" value="${esc((a||[])[i]??"")}" aria-label="${esc(r.label)}"></td></tr>`).join("")}</tbody></table></div>`;
   if (q.type==="text") body = `<textarea class="input" id="${q.id}" data-q="${q.id}" aria-label="Your answer" placeholder="${esc(q.placeholder||"Write your answer here…")}"></textarea><div class="wc" id="${q.id}_wc"></div>`;
@@ -453,10 +479,11 @@ function qHTML(q, L){
 function renderSection(sec){
   const L = labels(S.week), st = steps(), i = S.step;
   const next = st[i+1], prev = st[i-1];
-  const nextLabel = next==="submit" ? "Check and submit →" : `Next: criterion ${next} →`;
-  const prevLabel = prev==="start" ? "← Start page" : `← Criterion ${prev}`;
+  const nm = k => k==="R" ? "recall missions" : "criterion " + k;
+  const nextLabel = next==="submit" ? "Check and submit →" : `Next: ${nm(next)} →`;
+  const prevLabel = prev==="start" ? "← Start page" : `← ${nm(prev)[0].toUpperCase()+nm(prev).slice(1)}`;
   app.innerHTML = `<div class="stack" style="gap:16px">
-    <div class="sec-head"><span class="crit ${sec.crit}">${sec.crit}</span><div><div class="eyebrow">Criterion ${sec.crit} · part ${i} of 4</div><h1 style="font-size:clamp(24px,4vw,32px)">${esc(sec.name)}</h1></div></div>
+    <div class="sec-head"><span class="crit ${sec.crit}">${sec.crit}</span><div><div class="eyebrow">${sec.crit==="R"?"Revision":"Criterion "+sec.crit} · part ${i} of ${S.week.sections.length}</div><h1 style="font-size:clamp(24px,4vw,32px)">${esc(sec.name)}</h1></div></div>
     <dl class="guide"><dt>What it tests</dt><dd>${CRIT[sec.crit].tests}</dd><dt>Top tip</dt><dd>${CRIT[sec.crit].tip}</dd></dl>
     ${sec.items.map(q => q.type==="info" ? infoHTML(q) : qHTML(q, L[q.id])).join("")}
     <div class="navrow"><button class="btn ghost" id="prev">${prevLabel}</button><span class="saved" id="saved">Answers save automatically</span><button class="btn" id="next">${nextLabel}</button></div>
@@ -474,7 +501,7 @@ function onInput(e){
   if (e.type === "change" && (el.tagName === "TEXTAREA" || (el.tagName === "INPUT" && el.type !== "radio"))) return;
   const q = items(S.week).find(x => x.id===id); if (!q) return;
   if (q.type==="mcq") S.answers[id] = Number(el.value);
-  else if (q.type==="match"||q.type==="numtable"){ const arr = S.answers[id] || []; arr[Number(el.dataset.i)] = el.value; S.answers[id] = arr; }
+  else if (q.type==="match"||q.type==="numtable"||q.type==="cloze"){ const arr = S.answers[id] || []; arr[Number(el.dataset.i)] = el.value; S.answers[id] = arr; }
   else {
     const before = String(S.answers[id] || "").length;
     if (q.type === "text" && el.value.length - before > 60) { S.integ.big++; saveInteg(); toast("A large block of text appeared at once. This has been recorded."); }
@@ -582,6 +609,7 @@ function renderResult(ans, ts, fresh){
     let detail = "";
     if (q.type==="mcq") detail = `<div class="fb">Your answer: <b>${esc(Number.isInteger(a)?q.options[a]:"—")}</b>${m?"":` · Correct answer: <b>${esc(q.options[q.answer])}</b>`}</div><div class="fb">${esc(q.explain||"")}</div>`;
     if (q.type==="match") detail = `<div class="tbl"><table><tbody>${q.rows.map((r,i)=>{const ok=(a||[])[i]===r.answer;return `<tr><td>${esc(r.label)}</td><td>${ok?"✓":"✗"} ${esc((a||[])[i]||"—")}${ok?"":` <br><span class="note">Correct: ${esc(r.answer)}</span>`}</td></tr>`;}).join("")}</tbody></table></div>`;
+    if (q.type==="cloze") detail = `<div class="cloze">${esc(q.text).replace(/\[\[(\d+)\]\]/g, (m, n) => { const i = Number(n), v = (a||[])[i], ok = v===q.blanks[i]; return ok ? `<span class="ok">✓ ${esc(v)}</span>` : `<span class="no">✗ ${esc(v||"—")}</span> <span class="note">(${esc(q.blanks[i])})</span>`; })}</div>`;
     if (q.type==="num") detail = `<div class="fb">Your answer: <b>${esc(a??"—")} ${esc(q.unit||"")}</b></div><div class="fb">${esc(q.explain||"")}</div>`;
     if (q.type==="numtable") detail = `<div class="tbl"><table><tbody>${q.rows.map((r,i)=>{const n=num((a||[])[i]);const ok=n!==null&&Math.abs(n-r.answer)<=r.tol+1e-9;return `<tr><td>${esc(r.label)}</td><td>${ok?"✓":"✗"} ${esc((a||[])[i]??"—")}${ok?"":` <br><span class="note">Correct: ${r.answer.toFixed(1)}${r.hint?". "+esc(r.hint):""}</span>`}</td></tr>`;}).join("")}</tbody></table></div>`;
     if (q.type==="text") detail = `<div class="note">Your answer</div><div class="yours" data-yours="${q.id}"></div><div class="model"><b>Model answer</b><div>${esc(q.model)}</div><b style="display:block;margin-top:8px">Mark points: did you include these?</b><ul>${q.points.map(p=>`<li>${esc(p)}</li>`).join("")}</ul></div>`;

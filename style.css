@@ -5,7 +5,7 @@
   --green:#0E6A44; --green-ink:#FFFFFF; --green-soft:#E2EFE7;
   --red:#C2342B; --red-soft:#FBE7E5; --amber:#9A6412; --amber-soft:#FBF0DC;
   --blue:#245C8F; --blue-soft:#E3EDF7;
-  --ca:#0E6A44; --cb:#245C8F; --cc:#9A6412; --cd:#9B2C55;
+  --ca:#0E6A44; --cb:#245C8F; --cc:#9A6412; --cd:#9B2C55; --cr:#4B3F9E; --cr-soft:#ECEAF8;
   --focus:#245C8F;
   --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
   --f-body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
@@ -16,13 +16,13 @@
   --green:#4CC38A; --green-ink:#08130D; --green-soft:#16291F;
   --red:#F2766C; --red-soft:#3A1916; --amber:#E2B154; --amber-soft:#33270F;
   --blue:#7FB2E5; --blue-soft:#14243A;
-  --ca:#4CC38A; --cb:#7FB2E5; --cc:#E2B154; --cd:#EC86AE; --focus:#7FB2E5; color-scheme:dark }}
+  --ca:#4CC38A; --cb:#7FB2E5; --cc:#E2B154; --cd:#EC86AE; --cr:#ABA2F2; --cr-soft:#211D3A; --focus:#7FB2E5; color-scheme:dark }}
 :root[data-theme="dark"]{
   --paper:#0E1512; --card:#151F1A; --ink:#E5EDE8; --muted:#9BACA3; --line:#27352E;
   --green:#4CC38A; --green-ink:#08130D; --green-soft:#16291F;
   --red:#F2766C; --red-soft:#3A1916; --amber:#E2B154; --amber-soft:#33270F;
   --blue:#7FB2E5; --blue-soft:#14243A;
-  --ca:#4CC38A; --cb:#7FB2E5; --cc:#E2B154; --cd:#EC86AE; --focus:#7FB2E5; color-scheme:dark }
+  --ca:#4CC38A; --cb:#7FB2E5; --cc:#E2B154; --cd:#EC86AE; --cr:#ABA2F2; --cr-soft:#211D3A; --focus:#7FB2E5; color-scheme:dark }
 
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
@@ -72,7 +72,7 @@ a{color:var(--blue)}
 
 /* criterion tag */
 .crit{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:6px;font:800 15px var(--f-display);color:var(--card);flex:none}
-.crit.A{background:var(--ca)}.crit.B{background:var(--cb)}.crit.C{background:var(--cc)}.crit.D{background:var(--cd)}
+.crit.R{background:var(--cr)}.crit.A{background:var(--ca)}.crit.B{background:var(--cb)}.crit.C{background:var(--cc)}.crit.D{background:var(--cd)}
 
 .tbl{overflow-x:auto;margin:10px 0}
 .tbl table{border-collapse:collapse;min-width:100%;font-variant-numeric:tabular-nums}

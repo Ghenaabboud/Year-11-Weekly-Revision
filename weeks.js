@@ -348,5 +348,194 @@ window.REVISION_WEEKS = [
     ]
   }
   ]
+},
+
+{
+  id: "w3",
+  title: "Cells, specialised cells and transport",
+  topic: "Year 10 recap: Cells",
+  lessons: "Year 10 Unit 1 – Lessons 3–6",
+  opens: "2026-11-02T07:00:00+04:00",
+  due: "2026-11-08T23:59:00+04:00",
+  minutes: 45,
+  sections: [
+  {
+    crit: "R", name: "Recall missions",
+    items: [
+      { type: "info", mission: { n: 1, title: "Cell ID", lesson: "Lesson 3 · What are cells?",
+        story: "A new sample has arrived at the lab. Before you can identify it, prove you remember what every cell is built from." } },
+      { type: "info", flash: [
+        { q: "What are the three principles of cell theory?", a: "1. All living organisms are made of one or more cells. 2. The cell is the basic unit of structure and function. 3. All cells arise from pre-existing cells." },
+        { q: "What is the ONE feature that tells you a cell is prokaryotic?", a: "No nucleus: its DNA is free in the cytoplasm (often as a loop). Prokaryotes also have no membrane-bound organelles." },
+        { q: "Typical size: prokaryotic vs eukaryotic cells?", a: "Prokaryotic: about 0.1–10 micrometres. Eukaryotic: about 10–100 micrometres." }
+      ] },
+      { id: "w3r1", type: "match", marks: 6,
+        prompt: "<b>Sort</b> each feature: is it found in prokaryotic cells only, eukaryotic cells only, or both?",
+        head: ["Feature", "Found in"],
+        options: ["Prokaryotic only", "Eukaryotic only", "Both"],
+        rows: [
+          { label: "DNA free in the cytoplasm (no nucleus)", answer: "Prokaryotic only" },
+          { label: "Membrane-bound nucleus", answer: "Eukaryotic only" },
+          { label: "Mitochondria", answer: "Eukaryotic only" },
+          { label: "Ribosomes", answer: "Both" },
+          { label: "Cell membrane", answer: "Both" },
+          { label: "Cytoplasm", answer: "Both" }
+        ] },
+      { id: "w3r2", type: "match", marks: 6,
+        prompt: "Organelle library: <b>identify</b> the job of each organelle.",
+        head: ["Organelle", "Job"],
+        options: ["controls the cell's activities and stores DNA", "makes proteins", "releases energy by respiration", "modifies and packages proteins", "carries out photosynthesis", "supports the cell and keeps its shape", "digests waste material"],
+        rows: [
+          { label: "Nucleus", answer: "controls the cell's activities and stores DNA" },
+          { label: "Ribosome", answer: "makes proteins" },
+          { label: "Mitochondrion", answer: "releases energy by respiration" },
+          { label: "Golgi apparatus", answer: "modifies and packages proteins" },
+          { label: "Chloroplast", answer: "carries out photosynthesis" },
+          { label: "Cell wall", answer: "supports the cell and keeps its shape" }
+        ] },
+      { id: "w3r3", type: "mcq", marks: 1,
+        prompt: "Spot the correct statement.",
+        options: ["Prokaryotic cells have a nucleus that stores their DNA.", "Eukaryotic cells are usually smaller than prokaryotic cells.", "Both cell types have membrane-bound organelles such as mitochondria.", "Every cell is surrounded by a cell membrane and contains ribosomes and cytoplasm."], answer: 3,
+        explain: "Prokaryotes have no nucleus, eukaryotic cells are usually larger (10–100 µm), and only eukaryotes have membrane-bound organelles. All cells share a cell membrane, cytoplasm and ribosomes." },
+
+      { type: "info", mission: { n: 2, title: "Specialist match", lesson: "Lesson 4 · Specialised cells",
+        story: "The Abu Dhabi Stem Cells Center needs a lab assistant who knows how cells become specialised. Show them you are ready." } },
+      { type: "info", flash: [
+        { q: "What is a stem cell?", a: "An unspecialised cell that can divide to make more stem cells (self-renewal) and whose daughter cells can differentiate into specialised cells." },
+        { q: "What does 'cell potency' mean?", a: "The range of cell types a stem cell can become. It depends on the type of stem cell, so not every stem cell can become every cell." },
+        { q: "Why does a sperm cell's midpiece contain many mitochondria?", a: "Mitochondria release energy by respiration, which powers the tail (flagellum) so the sperm can swim to the egg." }
+      ] },
+      { id: "w3r4", type: "match", marks: 4,
+        prompt: "<b>Identify</b> the key adaptation of each specialised cell.",
+        head: ["Specialised cell", "Key adaptation"],
+        options: ["no nucleus, leaving more room for haemoglobin", "long extension that increases surface area", "midpiece packed with mitochondria and a long tail", "long axon with branched ends", "many chloroplasts"],
+        rows: [
+          { label: "Red blood cell (carries oxygen)", answer: "no nucleus, leaving more room for haemoglobin" },
+          { label: "Root hair cell (absorbs water and minerals)", answer: "long extension that increases surface area" },
+          { label: "Sperm cell (swims to the egg)", answer: "midpiece packed with mitochondria and a long tail" },
+          { label: "Nerve cell (carries electrical signals)", answer: "long axon with branched ends" }
+        ] },
+      { id: "w3r5", type: "cloze", marks: 4,
+        prompt: "Complete the description of stem cells.",
+        text: "Stem cells are [[0]] cells. They divide to produce more stem cells: this is called [[1]]. Some of their daughter cells develop structures for one particular job: this is called [[2]]. The types of cell a stem cell can turn into is called its [[3]].",
+        options: ["unspecialised", "specialised", "self-renewal", "differentiation", "potency", "osmosis"],
+        blanks: ["unspecialised", "self-renewal", "differentiation", "potency"] },
+      { id: "w3r6", type: "mcq", marks: 1,
+        prompt: "Why do root hair cells have <b>no</b> chloroplasts?",
+        options: ["They are too small to hold chloroplasts.", "They are underground, so they receive no light and cannot photosynthesise.", "Chloroplasts would block water from entering.", "They get all their energy from the soil."], answer: 1,
+        explain: "Root hair cells are underground and never receive light, so chloroplasts would be useless. Their job is absorption, not photosynthesis." },
+
+      { type: "info", mission: { n: 3, title: "Transport detective", lesson: "Lesson 5 · Cell transport",
+        story: "Bustanica, Dubai's vertical farm, has a problem with its lettuce roots. First, prove you can work out how substances get in and out of cells." } },
+      { type: "info", flash: [
+        { q: "What happens to the SA:V ratio as a cell gets bigger?", a: "It decreases. Volume grows faster than surface area, so each unit of volume has less membrane for exchange. This is one reason cells divide instead of growing very large." },
+        { q: "Passive vs active transport?", a: "Passive (diffusion, osmosis): down a concentration gradient, no energy needed. Active transport: against the gradient (low → high), needs energy from respiration (ATP) and carrier proteins." },
+        { q: "What is dynamic equilibrium?", a: "When concentrations are equal: particles keep moving randomly, but there is no net change in concentration." }
+      ] },
+      { id: "w3r7", type: "numtable", marks: 4,
+        prompt: "<b>Calculate</b> for each cube. Surface area = 6 × edge², volume = edge³, SA:V = surface area ÷ volume. Give SA:V as a number (for 6:1 type 6).",
+        head: ["Value", "Answer"],
+        rows: [
+          { label: "SA:V of a 2 cm cube", answer: 3.0, tol: 0.05 },
+          { label: "Surface area of a 5 cm cube (cm²)", answer: 150.0, tol: 0.05 },
+          { label: "Volume of a 5 cm cube (cm³)", answer: 125.0, tol: 0.05 },
+          { label: "SA:V of a 5 cm cube (to 1 d.p.)", answer: 1.2, tol: 0.05 }
+        ] },
+      { id: "w3r8", type: "match", marks: 4,
+        prompt: "<b>Identify</b> the transport process in each situation at a root hair cell.",
+        head: ["Situation", "Process"],
+        options: ["diffusion", "osmosis", "active transport"],
+        rows: [
+          { label: "Oxygen moves into the root hair cell from water with more dissolved oxygen", answer: "diffusion" },
+          { label: "Water moves into the root hair cell from a dilute solution", answer: "osmosis" },
+          { label: "Mineral ions move in from soil water where their concentration is lower than in the cell", answer: "active transport" },
+          { label: "Carbon dioxide made in respiration moves out of the cell", answer: "diffusion" }
+        ] },
+      { id: "w3r9", type: "mcq", marks: 1,
+        prompt: "Which process needs energy from respiration?",
+        options: ["Diffusion", "Osmosis", "Active transport", "All three"], answer: 2,
+        explain: "Only active transport needs energy (ATP), because it moves substances against their concentration gradient." },
+
+      { type: "info", mission: { n: 4, title: "Osmosis lab", lesson: "Lesson 6 · Osmosis",
+        story: "A nurse asks why a drip must contain 0.9% salt, not pure water. Show you can predict what water does to cells." } },
+      { type: "info", flash: [
+        { q: "Hypotonic, isotonic, hypertonic: compared with what?", a: "Always the solution OUTSIDE compared with the cell contents. Hypo = fewer solutes outside (water moves in). Iso = same (no net movement). Hyper = more solutes outside (water moves out)." },
+        { q: "Why don't plant cells burst in pure water?", a: "The strong cell wall resists the swelling vacuole, so the cell becomes turgid instead of bursting. Animal cells have no cell wall, so they can burst (lysis)." },
+        { q: "The 4 steps for any osmosis answer?", a: "1. Compare the solution with the cell (hypo/iso/hypertonic). 2. Water concentration higher/same/lower outside. 3. Water moves in/out by osmosis through the partially permeable membrane. 4. Effect on the cell." }
+      ] },
+      { id: "w3r10", type: "cloze", marks: 4,
+        prompt: "Complete the definition of osmosis.",
+        text: "Osmosis is the net movement of [[0]] molecules from a region of [[1]] water concentration to a region of [[2]] water concentration, through a [[3]] membrane.",
+        options: ["water", "solute", "higher", "lower", "partially permeable", "fully permeable"],
+        blanks: ["water", "higher", "lower", "partially permeable"] },
+      { id: "w3r11", type: "match", marks: 5,
+        prompt: "<b>Predict</b> what happens to each cell.",
+        head: ["Cell and solution", "What happens"],
+        options: ["swells and bursts (lysis)", "shrinks (crenated)", "becomes turgid", "becomes plasmolysed", "becomes flaccid", "no change at all"],
+        rows: [
+          { label: "Red blood cell in pure water (hypotonic)", answer: "swells and bursts (lysis)" },
+          { label: "Red blood cell in 3% salt solution (hypertonic)", answer: "shrinks (crenated)" },
+          { label: "Onion cell in pure water (hypotonic)", answer: "becomes turgid" },
+          { label: "Onion cell in 10% salt solution (hypertonic)", answer: "becomes plasmolysed" },
+          { label: "Plant cell in an isotonic solution", answer: "becomes flaccid" }
+        ] },
+      { id: "w3r12", type: "mcq", marks: 1,
+        prompt: "Potato cylinders gained mass in 0.2 mol/dm³ sucrose and lost mass in 0.4 mol/dm³ sucrose. What is the best estimate of the concentration of the potato cell contents?",
+        options: ["0.1 mol/dm³", "About 0.3 mol/dm³", "0.5 mol/dm³", "1.0 mol/dm³"], answer: 1,
+        explain: "The isotonic point (no change in mass) lies between the solution where mass was gained and the one where it was lost, so about 0.3 mol/dm³." }
+    ]
+  },
+  {
+    crit: "A", name: "Knowing and understanding",
+    items: [
+      { type: "info",
+        html: "<p>These questions are in the style of the MYP eAssessment. They test three strands: <b>(i)</b> explaining scientific knowledge, <b>(ii)</b> applying it to familiar and unfamiliar situations, and <b>(iii)</b> analysing and evaluating information to make a judgement.</p>" },
+
+      { id: "w3a1", type: "text", marks: 3, minWords: 20,
+        prompt: "<b>State</b> the three principles of cell theory.",
+        model: "1. All living organisms are made of one or more cells (1). 2. The cell is the basic unit of structure and function in living organisms (1). 3. All cells arise from pre-existing cells (1).",
+        points: ["All living things are made of one or more cells", "The cell is the basic unit of structure and function", "All cells come from pre-existing cells"] },
+
+      { id: "w3a2", type: "text", marks: 4, minWords: 40,
+        prompt: "<b>Compare and contrast</b> prokaryotic and eukaryotic cells.",
+        hint: "<b>Compare and contrast</b> means give similarities AND differences. Use words like “both”, “whereas” and “however”. Aim for at least one similarity and three differences.",
+        model: "Similarity: both prokaryotic and eukaryotic cells have a cell membrane, cytoplasm and ribosomes (1). Differences: prokaryotic cells have no nucleus and their DNA is free in the cytoplasm, whereas eukaryotic cells have their DNA enclosed in a nucleus (1). Prokaryotic cells have no membrane-bound organelles, whereas eukaryotic cells have organelles such as mitochondria (1). Prokaryotic cells are much smaller (about 0.1–10 µm) than eukaryotic cells (about 10–100 µm) (1).",
+        points: ["Similarity: both have cell membrane / cytoplasm / ribosomes", "Nucleus: absent in prokaryotes (DNA free) vs present in eukaryotes", "Membrane-bound organelles only in eukaryotes", "Size: prokaryotes smaller than eukaryotes"] },
+
+      { id: "w3a3", type: "text", marks: 3, minWords: 25,
+        prompt: "A mutation stops the Golgi apparatus in a cell from working. <b>Predict</b> what would happen to the proteins made by this cell and <b>explain</b> your prediction.",
+        model: "Proteins would still be made by the ribosomes and assembled in the endoplasmic reticulum (1), but they would not be modified and packaged (1), so they could not be sent to where they are needed in the cell or released from it, and they would not work properly (1).",
+        points: ["Proteins are still made (ribosomes / ER)", "Golgi normally modifies and packages proteins", "So proteins are not packaged or transported to where they are needed"] },
+
+      { id: "w3a4", type: "text", marks: 3, minWords: 25,
+        prompt: "<b>Explain</b> how the structure of a root hair cell is suited to its function.",
+        model: "A root hair cell absorbs water and mineral ions from the soil (1). Its long, thin extension increases the surface area of the membrane in contact with soil water, so more water and ions can be absorbed at the same time (1). It has no chloroplasts because it is underground and receives no light, so it does not photosynthesise; it may have many mitochondria to release energy for the active transport of mineral ions (1).",
+        points: ["Function: absorbs water and mineral ions", "Long extension → larger surface area → faster absorption", "Second adaptation explained (no chloroplasts / mitochondria for active transport)"] },
+
+      { id: "w3a5", type: "text", marks: 3, minWords: 30,
+        prompt: "In 2023, the Abu Dhabi Stem Cells Center (ADSCC) treated a patient with Multiple Sclerosis using a bone-marrow stem-cell transplant made from the <b>patient's own</b> stem cells. <b>Explain</b> why doctors must choose a specific type of stem cell, and <b>suggest</b> why they used the patient's own cells.",
+        model: "Stem cells have different potency: the type of stem cell determines which specialised cells it can differentiate into (1), so doctors must use a stem cell that can become the type of cell needed to repair that tissue; any stem cell would not work (1). Using the patient's own stem cells means the immune system recognises them as 'self', so they are less likely to be rejected (1).",
+        points: ["Potency: stem-cell type determines which cells it can become", "So the stem cell must match the tissue being repaired", "Own cells: less risk of rejection by the immune system"] },
+
+      { id: "w3a6", type: "text", marks: 3, minWords: 30,
+        prompt: "A 1 cm cube has a surface area to volume ratio of 6:1, but a 4 cm cube has a ratio of only 1.5:1. Use this information to <b>explain</b> why cells divide instead of growing very large.",
+        model: "As a cell gets larger, its volume increases faster than its surface area, so the SA:V ratio falls (from 6:1 to 1.5:1) (1). The membrane is the exchange surface, so a large cell has less membrane per unit of volume to take in nutrients and oxygen and remove wastes (1). Substances would not move in and out fast enough to meet the cell's needs, so cells divide to keep a high SA:V ratio (1).",
+        points: ["Volume increases faster than surface area, SA:V decreases (uses data)", "Less membrane (exchange surface) per unit volume", "Exchange too slow for the cell's needs, so cells divide"] },
+
+      { id: "w3a7", type: "text", marks: 4, minWords: 40,
+        prompt: "To save water, Bustanica's engineers made their hydroponic nutrient solution <b>more concentrated</b>. The lettuce began to wilt. <b>Explain</b> why, using the 4 steps for osmosis.",
+        hint: "Use the 4 steps: <b>1. Compare</b> (hypo/iso/hypertonic) → <b>2. Water concentration</b> → <b>3. Movement</b> by osmosis through the partially permeable membrane → <b>4. Effect</b> on the cells.",
+        model: "1. The concentrated nutrient solution is hypertonic compared with the cytoplasm of the root hair cells (1). 2. So the water concentration is lower outside the cells than inside (1). 3. Water moves out of the root cells by osmosis through the partially permeable membrane, instead of in (1). 4. The cells lose water and become flaccid or plasmolysed, the plant cannot take up enough water, so it wilts (1).",
+        points: ["Solution is hypertonic to the root cells", "Lower water concentration outside", "Water leaves by osmosis through partially permeable membrane", "Cells become flaccid/plasmolysed → lettuce wilts"] },
+
+      { id: "w3a8", type: "text", marks: 3, minWords: 30,
+        prompt: "A student writes: <i>“Diffusion and active transport are the same thing, because both move particles across the cell membrane.”</i> <b>Evaluate</b> this statement.",
+        hint: "<b>Evaluate</b> means weigh up what is correct and what is wrong in the statement, then give a judgement.",
+        model: "The student is partly right: both processes move particles across the cell membrane (1). However, diffusion is passive: particles move down a concentration gradient (high to low) and no energy is needed, whereas active transport moves particles against a concentration gradient (low to high) and needs energy from respiration (ATP) and carrier proteins (1). So the statement is incorrect: they are different processes, for example oxygen enters a root hair cell by diffusion but mineral ions are absorbed by active transport (1).",
+        points: ["Similarity acknowledged: both move particles across the membrane", "Difference: direction relative to gradient and energy (ATP) needed", "Clear judgement that the statement is wrong, with an example"] }
+    ]
+  }
+  ]
 }
+
 ];
