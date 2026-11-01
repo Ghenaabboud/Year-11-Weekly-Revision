@@ -701,6 +701,10 @@ function renderSubmit(){
   document.getElementById("prev").onclick = () => { S.step--; renderStep(); };
   app.querySelectorAll("[data-go]").forEach(b => b.onclick = () => { S.step = Number(b.dataset.go); renderStep(); const t = document.getElementById("box_"+b.dataset.q); if (t){ t.classList.add("missing"); t.scrollIntoView({block:"center"}); } });
   const area = document.getElementById("submitArea");
+  if (todo.length && S.student.id === "TEST1"){
+    area.innerHTML = `<div class="panel confirm stack"><h2 class="mid">Teacher test submit</h2><p style="margin:0">Only the TEST1 account sees this. It sends this pack to the Sheet as it is, so you can check that submissions arrive.</p><div class="err" id="subErr"></div><div class="row"><button class="btn" id="yes">Send test submission</button></div></div>`;
+    document.getElementById("yes").onclick = doSubmit; return;
+  }
   if (todo.length){ area.innerHTML = `<div class="panel"><b>You can't submit yet.</b> ${todo.length} question${todo.length>1?"s are":" is"} not finished.</div>`; return; }
   area.innerHTML = `<div class="panel confirm stack"><h2 class="mid">Ready to submit?</h2><p style="margin:0">Once you submit, you can't change your answers. You will see your marks and the model answers straight away.</p>
     <div class="err" id="subErr"></div><div class="row"><button class="btn" id="yes">Submit my pack</button></div></div>`;
