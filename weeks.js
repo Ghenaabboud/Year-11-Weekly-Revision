@@ -189,7 +189,7 @@ window.REVISION_WEEKS = [
   topic: "Food and Digestion",
   lessons: "Unit 6 – Lessons 4–5",
   opens: "2026-10-26T07:00:00+04:00",
-  due: "2026-11-01T23:59:00+04:00",
+  due: "2026-11-04T23:59:00+04:00",
   minutes: 40,
   sections: [
   {
