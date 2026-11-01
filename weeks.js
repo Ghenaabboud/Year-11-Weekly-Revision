@@ -364,6 +364,10 @@ window.REVISION_WEEKS = [
     items: [
       { type: "info", mission: { n: 1, title: "Cell ID", lesson: "Lesson 3 · What are cells?",
         story: "A new sample has arrived at the lab. Before you can identify it, prove you remember what every cell is built from." } },
+      { type: "info", predict: { q: "A cell is 2 µm long and has <b>no nucleus</b>. What is it most likely to be?",
+        options: ["A plant cell", "A red blood cell", "A prokaryotic cell such as a bacterium", "A nerve cell"], answer: 2,
+        reveal: "The size gives it away. A red blood cell also has no nucleus, but it is about 7 µm across and it is eukaryotic: it loses its nucleus as it matures. A cell of about 2 µm with its DNA loose in the cytoplasm is prokaryotic." } },
+      { type: "info", sim: { name: "cellExplorer", title: "Label the cells" } },
       { type: "info", flash: [
         { q: "What are the three principles of cell theory?", a: "1. All living organisms are made of one or more cells. 2. The cell is the basic unit of structure and function. 3. All cells arise from pre-existing cells." },
         { q: "What is the ONE feature that tells you a cell is prokaryotic?", a: "No nucleus: its DNA is free in the cytoplasm (often as a loop). Prokaryotes also have no membrane-bound organelles." },
@@ -398,8 +402,14 @@ window.REVISION_WEEKS = [
         options: ["Prokaryotic cells have a nucleus that stores their DNA.", "Eukaryotic cells are usually smaller than prokaryotic cells.", "Both cell types have membrane-bound organelles such as mitochondria.", "Every cell is surrounded by a cell membrane and contains ribosomes and cytoplasm."], answer: 3,
         explain: "Prokaryotes have no nucleus, eukaryotic cells are usually larger (10–100 µm), and only eukaryotes have membrane-bound organelles. All cells share a cell membrane, cytoplasm and ribosomes." },
 
+      { type: "info", exam: "<b>In criterion A this becomes:</b> “<b>Compare and contrast</b> prokaryotic and eukaryotic cells [4]” (question A2). Use <i>both</i> for similarities and <i>whereas</i> for differences, and give one point per mark." },
+
       { type: "info", mission: { n: 2, title: "Specialist match", lesson: "Lesson 4 · Specialised cells",
         story: "The Abu Dhabi Stem Cells Center needs a lab assistant who knows how cells become specialised. Show them you are ready." } },
+      { type: "info", predict: { q: "A stem cell taken from an adult's <b>bone marrow</b> is given the chemical signal to become a <b>nerve cell</b>. What happens?",
+        options: ["It becomes a nerve cell, because stem cells can become anything", "It does not become a nerve cell", "It becomes a nerve cell, but only if it divides first"], answer: 1,
+        reveal: "Adult bone-marrow stem cells can only make blood cells. Their <b>potency</b> is limited. Embryonic stem cells can become almost any cell type. This is why the ADSCC has to choose the right type of stem cell for each treatment." } },
+      { type: "info", sim: { name: "stemLab", title: "Stem cell lab" } },
       { type: "info", flash: [
         { q: "What is a stem cell?", a: "An unspecialised cell that can divide to make more stem cells (self-renewal) and whose daughter cells can differentiate into specialised cells." },
         { q: "What does 'cell potency' mean?", a: "The range of cell types a stem cell can become. It depends on the type of stem cell, so not every stem cell can become every cell." },
@@ -425,8 +435,15 @@ window.REVISION_WEEKS = [
         options: ["They are too small to hold chloroplasts.", "They are underground, so they receive no light and cannot photosynthesise.", "Chloroplasts would block water from entering.", "They get all their energy from the soil."], answer: 1,
         explain: "Root hair cells are underground and never receive light, so chloroplasts would be useless. Their job is absorption, not photosynthesis." },
 
+      { type: "info", exam: "<b>In criterion A this becomes:</b> the ADSCC question (A5), strand (ii): <b>apply</b> what you know about potency and rejection to a real treatment in the UAE." },
+
       { type: "info", mission: { n: 3, title: "Transport detective", lesson: "Lesson 5 · Cell transport",
         story: "Bustanica, Dubai's vertical farm, has a problem with its lettuce roots. First, prove you can work out how substances get in and out of cells." } },
+      { type: "info", predict: { q: "A 1 cm agar cube and a 6 cm agar cube are soaked in acid for 10 minutes. Which one has the <b>greater percentage</b> of its volume reached by the acid?",
+        options: ["The 1 cm cube", "The 6 cm cube", "Both the same: the acid moves at the same speed"], answer: 0,
+        reveal: "The acid moves at the same speed into both, but the small cube has a much bigger surface area to volume ratio (6 : 1 compared with 1 : 1), so a much larger share of it is reached. Big cells have the same problem." } },
+      { type: "info", sim: { name: "saVLab", title: "Agar cube lab: surface area to volume" } },
+      { type: "info", sim: { name: "membraneLab", title: "Across the membrane: diffusion vs active transport" } },
       { type: "info", flash: [
         { q: "What happens to the SA:V ratio as a cell gets bigger?", a: "It decreases. Volume grows faster than surface area, so each unit of volume has less membrane for exchange. This is one reason cells divide instead of growing very large." },
         { q: "Passive vs active transport?", a: "Passive (diffusion, osmosis): down a concentration gradient, no energy needed. Active transport: against the gradient (low → high), needs energy from respiration (ATP) and carrier proteins." },
@@ -456,8 +473,15 @@ window.REVISION_WEEKS = [
         options: ["Diffusion", "Osmosis", "Active transport", "All three"], answer: 2,
         explain: "Only active transport needs energy (ATP), because it moves substances against their concentration gradient." },
 
+      { type: "info", exam: "<b>In criterion A this becomes:</b> question A6. It gives you data (6 : 1 and 1.5 : 1). <b>Quote the numbers</b> in your answer, then explain what a smaller SA : V means for exchange across the membrane." },
+
       { type: "info", mission: { n: 4, title: "Osmosis lab", lesson: "Lesson 6 · Osmosis",
         story: "A nurse asks why a drip must contain 0.9% salt, not pure water. Show you can predict what water does to cells." } },
+      { type: "info", predict: { q: "A potato cylinder is left in <b>pure water</b> for one hour. What happens to its mass?",
+        options: ["It increases", "It decreases", "It stays the same"], answer: 0,
+        reveal: "Pure water is hypotonic to the potato cells, so water moves into the cells by osmosis and the cylinder gains mass. In a concentrated sucrose solution the opposite happens." } },
+      { type: "info", sim: { name: "potatoLab", title: "Virtual lab: potato cylinders in sucrose" } },
+      { type: "info", sim: { name: "solutionViewer", title: "Animal and plant cells in three solutions" } },
       { type: "info", flash: [
         { q: "Hypotonic, isotonic, hypertonic: compared with what?", a: "Always the solution OUTSIDE compared with the cell contents. Hypo = fewer solutes outside (water moves in). Iso = same (no net movement). Hyper = more solutes outside (water moves out)." },
         { q: "Why don't plant cells burst in pure water?", a: "The strong cell wall resists the swelling vacuole, so the cell becomes turgid instead of bursting. Animal cells have no cell wall, so they can burst (lysis)." },
@@ -482,7 +506,8 @@ window.REVISION_WEEKS = [
       { id: "w3r12", type: "mcq", marks: 1,
         prompt: "Potato cylinders gained mass in 0.2 mol/dm³ sucrose and lost mass in 0.4 mol/dm³ sucrose. What is the best estimate of the concentration of the potato cell contents?",
         options: ["0.1 mol/dm³", "About 0.3 mol/dm³", "0.5 mol/dm³", "1.0 mol/dm³"], answer: 1,
-        explain: "The isotonic point (no change in mass) lies between the solution where mass was gained and the one where it was lost, so about 0.3 mol/dm³." }
+        explain: "The isotonic point (no change in mass) lies between the solution where mass was gained and the one where it was lost, so about 0.3 mol/dm³." },
+      { type: "info", exam: "<b>In criterion A this becomes:</b> question A7 about Bustanica's lettuce [4]. The <b>4 osmosis steps</b> you just practised (compare → water concentration → movement → effect) earn one mark each." }
     ]
   },
   {

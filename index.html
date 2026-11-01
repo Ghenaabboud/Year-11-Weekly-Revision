@@ -9,6 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=JetBrains+Mono:wght@500&display=swap">
 <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="missions.css">
 <style>
   h1.big{font-size:clamp(30px,5.5vw,44px);font-weight:800;margin-top:6px}
   h2.mid{font-size:22px}
@@ -200,6 +201,7 @@
 <script src="config.js"></script>
 <script src="weeks.js"></script>
 <script src="api.js"></script>
+<script src="sims.js"></script>
 <script>
 (function(){
 const W = window.REVISION_WEEKS, API = window.RevisionAPI;
@@ -248,6 +250,10 @@ const num = v => { const n = parseFloat(String(v ?? "").replace(",", ".").trim()
 const ls = (k, v) => { try { if (v === undefined) return JSON.parse(localStorage.getItem(k) || "null"); localStorage.setItem(k, JSON.stringify(v)); } catch(e){ return null; } };
 const draftKey = () => "y11rev_draft_" + S.student.id + "_" + S.week.id;
 const items = week => week.sections.flatMap(s => s.items.filter(i => i.type !== "info").map(i => ({...i, crit:s.crit})));
+function MS(){ if (!S.ms) S.ms = Object.assign({cur:0, pred:{}, sim:{}, flip:{}, chk:{}, simdata:{}}, ls(draftKey()+"_m") || {}); return S.ms; }
+function saveMS(){ if (S.ms) ls(draftKey()+"_m", S.ms); }
+/* a question counts as done when answered; recall-mission questions must also have been checked */
+const ok = q => answered(q, S.answers[q.id]) && (q.crit !== "R" || !!MS().chk[q.id]);
 function labels(week){ const c = {}, out = {}; week.sections.forEach(s => s.items.forEach(i => { if(i.type==="info") return; c[s.crit]=(c[s.crit]||0)+1; out[i.id]=s.crit+c[s.crit]; })); return out; }
 function termsIn(html){ const found = []; (html.match(/<b>([^<]+)<\/b>/g)||[]).forEach(m => { m.replace(/<\/?b>/g,"").toLowerCase().split(/\s+and\s+/).forEach(t => { if (TERMS[t] && !found.includes(t)) found.push(t); }); }); return found; }
 
@@ -260,6 +266,8 @@ function guideHTML(g){
 }
 const infoHTML = q => q.guide ? guideHTML(q.guide)
   : q.mission ? `<div class="mission"><div class="mnum">Mission<b>${q.mission.n}</b></div><div><div class="ml">${esc(q.mission.lesson)}</div><h3>${esc(q.mission.title)}</h3><p>${esc(q.mission.story)}</p></div></div>`
+  : (q.predict || q.sim) ? ""
+  : q.exam ? `<div class="info">${q.exam}</div>`
   : q.flash ? `<div class="flashes"><div class="fh">Recall first: say the answer in your head, then tap the card to check.</div>${q.flash.map(f=>`<details class="flash"><summary>${esc(f.q)}</summary><div>${esc(f.a)}</div></details>`).join("")}</div>`
   : `<div class="info">${q.html}</div>`;
 
@@ -387,7 +395,7 @@ function openWeek(w){
   S.week = w;
   const st = weekStatus(w);
   if (st.sub) return renderResult(st.sub.answers || {}, st.sub.ts);
-  S.answers = ls(draftKey()) || {};
+  S.answers = ls(draftKey()) || {}; S.ms = null;
   S.integ = Object.assign({left:0, away:0, paste:0, big:0, active:0, pledged:false}, ls(draftKey()+"_i") || {});
   S.step = Object.keys(S.answers).length && S.integ.pledged ? 1 : 0;
   syncProgress(true);
@@ -400,8 +408,8 @@ function stepper(){
   const qs = items(S.week), st = steps();
   const parts = st.map((k,i) => {
     if (k==="start") return `<button class="step" data-step="${i}" ${S.step===i?'aria-current="step"':""}><span class="dot">i</span>Start</button>`;
-    if (k==="submit") { const all = qs.every(q=>answered(q,S.answers[q.id])); return `<button class="step ${all?"full":""}" data-step="${i}" ${S.step===i?'aria-current="step"':""}><span class="dot">✓</span>Submit</button>`; }
-    const sq = qs.filter(q=>q.crit===k), d = sq.filter(q=>answered(q,S.answers[q.id])).length;
+    if (k==="submit") { const all = qs.every(ok); return `<button class="step ${all?"full":""}" data-step="${i}" ${S.step===i?'aria-current="step"':""}><span class="dot">✓</span>Submit</button>`; }
+    const sq = qs.filter(q=>q.crit===k), d = sq.filter(ok).length;
     const full = d===sq.length;
     return `<button class="step ${k} ${full?"full":""}" data-step="${i}" ${S.step===i?'aria-current="step"':""}><span class="dot">${full?"✓":k}</span><span class="n">${full?k+" done":d+"/"+sq.length}</span></button>`;
   });
@@ -412,7 +420,7 @@ function stepper(){
 function renderStep(){
   S.mode = "week"; setWho(); stepper();
   const k = steps()[S.step];
-  if (k==="start") renderStart(); else if (k==="submit") renderSubmit(); else renderSection(S.week.sections.find(s=>s.crit===k));
+  if (k==="start") renderStart(); else if (k==="submit") renderSubmit(); else if (k==="R") renderMissions(S.week.sections.find(s=>s.crit===k)); else renderSection(S.week.sections.find(s=>s.crit===k));
   window.scrollTo(0,0);
 }
 
@@ -494,6 +502,123 @@ function renderSection(sec){
   updateCounts();
 }
 
+/* ---------- recall missions: Think first → Explore → Recall → Check yourself → Exam link ---------- */
+function missionList(sec){
+  const out = [];
+  sec.items.forEach((it, idx) => { if (it.type==="info" && it.mission) out.push({ m: it.mission, items: [] }); else if (out.length) out[out.length-1].items.push({ it, key: it.id || ("i"+idx) }); });
+  return out;
+}
+const isGate = it => it.predict || it.sim || it.flash || it.type !== "info";
+function gateDone(it, key){
+  const ms = MS();
+  if (it.predict) return ms.pred[key] != null;
+  if (it.sim) return !!ms.sim[key];
+  if (it.flash) return (ms.flip[key] || []).length >= it.flash.length;
+  if (it.type !== "info") return !!ms.chk[it.id];
+  return true;
+}
+const missionDone = ml => ml.items.every(({it, key}) => !isGate(it) || gateDone(it, key));
+function atpScore(sec){
+  const ms = MS(); let got = 0, max = 0;
+  sec.items.filter(q => q.type !== "info").forEach(q => { max += q.marks; if (ms.chk[q.id]) got += markOf(q, S.answers[q.id]) || 0; });
+  return [got, max];
+}
+function renderMissions(sec){
+  const ms = MS(), L = labels(S.week), list = missionList(sec), st = steps(), i = S.step;
+  const unlocked = j => j === 0 || list.slice(0, j).every(missionDone);
+  if (ms.cur >= list.length || !unlocked(ms.cur)) ms.cur = 0;
+  const next = st[i+1], prev = st[i-1];
+  const nm = k => k==="R" ? "recall missions" : "criterion " + k;
+  const [got, max] = atpScore(sec);
+  app.innerHTML = `<div class="stack" style="gap:16px">
+    <div class="sec-head"><span class="crit R">R</span><div><div class="eyebrow">Revision · part ${i} of ${S.week.sections.length}</div><h1 style="font-size:clamp(24px,4vw,32px)">${esc(sec.name)}</h1></div></div>
+    <dl class="guide"><dt>How it works</dt><dd>Each mission has 5 steps: <b>think first</b>, <b>explore</b> a simulation, <b>recall</b> with flip cards, <b>check yourself</b> with marked questions, then an <b>exam link</b>. Each step unlocks the next.</dd><dt>Marks</dt><dd>You get <b>one try</b> at each “Check yourself” question. Press <b>Check</b> and the marks are locked in, so think before you check. Every mark earns you ⚡ ATP.</dd></dl>
+    <div class="mtop"><nav class="mtrail" aria-label="Missions">${list.map((ml, j) => `${j ? `<span class="mpath ${missionDone(list[j-1]) ? "done" : ""}"></span>` : ""}<button class="mstop ${missionDone(ml) ? "done" : ""}" data-m="${j}" ${unlocked(j) ? "" : "disabled"} ${ms.cur === j ? 'aria-current="step"' : ""}><span class="d">${missionDone(ml) ? "✓" : ml.m.n}</span><span class="t">${esc(ml.m.title)}</span></button>`).join("")}</nav>
+      <span class="atp" id="atp" title="Marks earned in the recall missions">⚡ ${got} / ${max} ATP</span></div>
+    <div id="mbody" class="stack" style="gap:16px"></div>
+    <div class="navrow"><button class="btn ghost" id="prev">${prev==="start" ? "← Start page" : "← " + nm(prev)}</button><span class="saved" id="saved">Progress saves automatically</span><button class="btn ghost" id="next">${next==="submit" ? "Check and submit →" : `Skip to ${nm(next)} →`}</button></div>
+  </div>`;
+  app.querySelectorAll("[data-m]").forEach(b => b.onclick = () => { ms.cur = Number(b.dataset.m); saveMS(); renderMissions(sec); window.scrollTo(0, 0); });
+  document.getElementById("prev").onclick = () => { S.step--; renderStep(); };
+  document.getElementById("next").onclick = () => { S.step++; renderStep(); };
+  const ml = list[ms.cur], body = document.getElementById("mbody");
+  body.insertAdjacentHTML("beforeend", infoHTML({ mission: ml.m }));
+  let ptr = 0;
+  const refreshTop = () => {
+    const [g, mx] = atpScore(sec); document.getElementById("atp").textContent = `⚡ ${g} / ${mx} ATP`;
+    updateCounts(); syncProgress(false);
+  };
+  const reveals = () => body.querySelectorAll("[data-reveal]").forEach(el => {
+    const it = ml.items.find(x => x.key === el.dataset.reveal).it, simDone = ml.items.some(x => x.it.sim && ms.sim[x.key]);
+    if (!simDone) return;
+    const p = ms.pred[el.dataset.reveal], right = p === it.predict.answer;
+    el.className = "reveal" + (right ? "" : " miss"); el.hidden = false;
+    el.innerHTML = `<b>${right ? "Your prediction was right!" : "Surprised?"}</b> ${it.predict.reveal}`;
+  });
+  function blockFor(it, key){
+    const box = document.createElement("section"); box.className = "mblock"; box.dataset.key = key;
+    if (it.predict){
+      const p = ms.pred[key];
+      box.innerHTML = `<span class="mtag think">Think first</span><h3>${it.predict.q}</h3><div class="popts">${it.predict.options.map((o, j) => `<button type="button" class="popt ${p === j ? "sel" : ""}" data-j="${j}" ${p != null ? "disabled" : ""}>${esc(o)}</button>`).join("")}</div>
+        <div class="locked" ${p == null ? "hidden" : ""}>Prediction locked in. Explore below to test it. (Predictions are not marked.)</div><div data-reveal="${key}" hidden></div>`;
+      box.querySelectorAll(".popt").forEach(b => b.onclick = () => { ms.pred[key] = Number(b.dataset.j); saveMS(); box.replaceWith(blockFor(it, key)); grow(true); });
+    } else if (it.sim){
+      box.innerHTML = `<span class="mtag explore">Explore</span><h3>${esc(it.sim.title)}</h3>`;
+      const root = document.createElement("div"); box.append(root);
+      ms.simdata[key] = ms.simdata[key] || {};
+      const api = { store: ms.simdata[key], save: saveMS, done: () => { if (ms.sim[key]) return; ms.sim[key] = 1; saveMS(); reveals(); toast("Simulation complete. Next step unlocked ↓"); grow(true); } };
+      try { window.SIMS[it.sim.name](root, api); } catch (e) { root.innerHTML = `<p class="err">This simulation could not load. Tap continue.</p>`; const b = document.createElement("button"); b.className = "btn"; b.textContent = "Continue"; b.onclick = api.done; root.append(b); }
+    } else if (it.flash){
+      const f = ms.flip[key] || [];
+      box.innerHTML = `<span class="mtag recall">Recall</span><h3>Flip cards</h3><p>Say the answer out loud, or in your head, <b>before</b> you flip each card. Flip them all to continue.</p>
+        <div class="fcards">${it.flash.map((c, j) => `<button type="button" class="fcard" data-j="${j}" aria-label="${esc(c.q)}. Tap to flip"><span class="in"><span class="f fr"><b>${esc(c.q)}</b><small>${f.includes(j) ? "✓ seen · tap to flip" : "tap to flip"}</small></span><span class="f bk">${esc(c.a)}</span></span></button>`).join("")}</div>`;
+      box.querySelectorAll(".fcard").forEach(b => b.onclick = () => {
+        b.classList.toggle("on"); const j = Number(b.dataset.j), arr = ms.flip[key] = ms.flip[key] || [];
+        if (!arr.includes(j)){ arr.push(j); saveMS(); b.querySelector("small").textContent = "✓ seen · tap to flip"; if (arr.length >= it.flash.length) grow(true); }
+      });
+    } else if (it.exam){
+      box.innerHTML = `<span class="mtag exam">Exam link</span><div class="mres">${it.exam}</div>`;
+    } else if (it.type !== "info"){
+      const q = { ...it, crit: "R" };
+      if (ms.chk[q.id]){
+        const m = markOf(q, S.answers[q.id]);
+        box.innerHTML = `<span class="mtag check">Check yourself</span><div class="q" style="border:0;padding:0;margin-top:8px"><div class="q-top"><span class="q-id">${L[q.id]}</span><span class="mark ${m === q.marks ? "good" : "bad"}">${m}/${q.marks}</span></div><div class="q-prompt">${q.prompt}</div><div class="mres">${detailHTML(q, S.answers[q.id])}</div></div>`;
+      } else {
+        box.innerHTML = `<span class="mtag check">Check yourself</span>${qHTML(q, L[q.id])}<div class="chkrow"><span class="note">One try only: your marks lock when you press Check.</span><button type="button" class="btn" id="chk_${q.id}" ${answered(q, S.answers[q.id]) ? "" : "disabled"}>Check</button></div>`;
+        box.querySelector(".q").style.cssText = "border:0;padding:0;margin-top:8px";
+        box.querySelector("#chk_" + q.id).onclick = () => {
+          if (!answered(q, S.answers[q.id])) return;
+          ms.chk[q.id] = 1; saveMS();
+          const m = markOf(q, S.answers[q.id]);
+          toast(m === q.marks ? `Full marks! +${m} ATP ⚡` : `+${m} ATP ⚡. Read the correct answers below.`);
+          box.replaceWith(blockFor(it, key)); refreshTop(); grow(true);
+        };
+      }
+    } else return null;
+    return box;
+  }
+  function grow(scroll){
+    let first = null;
+    while (ptr < ml.items.length){
+      const {it, key} = ml.items[ptr++], b = blockFor(it, key);
+      if (b){ body.append(b); first = first || b; }
+      if (isGate(it) && !gateDone(it, key)) break;
+    }
+    if (ptr >= ml.items.length && missionDone(ml) && !body.querySelector(".mdone")){
+      const last = ms.cur === list.length - 1, [g, mx] = atpScore(sec);
+      const d = document.createElement("div"); d.className = "mdone";
+      d.innerHTML = `<div class="big">✓</div><div class="grow"><b>Mission ${ml.m.n} complete!</b><div class="note">${last ? `All four missions done. You earned ${g} of ${mx} ATP. Now use what you recalled in the exam-style questions.` : "The next mission is unlocked."}</div></div><button class="btn" type="button">${last ? `Next: ${nm(next)} →` : `Mission ${list[ms.cur+1].m.n}: ${esc(list[ms.cur+1].m.title)} →`}</button>`;
+      d.querySelector("button").onclick = () => { if (last){ S.step++; renderStep(); } else { ms.cur++; saveMS(); renderMissions(sec); window.scrollTo(0, 0); } };
+      body.append(d); first = first || d;
+      app.querySelectorAll(".mstop")[ms.cur]?.classList.add("done");
+    }
+    reveals();
+    if (scroll && first) setTimeout(() => first.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" }), 80);
+  }
+  grow(false);
+  updateCounts();
+}
+
 function onInput(e){
   if (S.mode !== "week") return;
   const el = e.target, id = el.dataset.q || el.name;
@@ -509,6 +634,7 @@ function onInput(e){
   }
   ls(draftKey(), S.answers);
   document.getElementById("box_"+id)?.classList.remove("missing");
+  const cb = document.getElementById("chk_"+id); if (cb) cb.disabled = !answered(q, S.answers[id]);
   const sv = document.getElementById("saved"); if (sv) sv.textContent = "Saved on this device ✓";
   syncProgress(false);
   updateCounts();
@@ -527,8 +653,8 @@ function updateCounts(){
   stickyMount.querySelectorAll(".step").forEach(b => {
     const k = steps()[Number(b.dataset.step)];
     if (k==="start") return;
-    if (k==="submit"){ b.classList.toggle("full", qs.every(q=>answered(q,S.answers[q.id]))); return; }
-    const sq = qs.filter(q=>q.crit===k), d = sq.filter(q=>answered(q,S.answers[q.id])).length;
+    if (k==="submit"){ b.classList.toggle("full", qs.every(ok)); return; }
+    const sq = qs.filter(q=>q.crit===k), d = sq.filter(ok).length;
     const full = d===sq.length;
     b.classList.toggle("full", full); const n = b.querySelector(".n"); if (n) n.textContent = full ? k+" done" : d+"/"+sq.length;
     const dot = b.querySelector(".dot"); if (dot) dot.textContent = full ? "✓" : k;
@@ -537,13 +663,13 @@ function updateCounts(){
 
 function renderSubmit(){
   const w = S.week, L = labels(w), qs = items(w), st = steps();
-  const todo = qs.filter(q => !answered(q, S.answers[q.id]));
+  const todo = qs.filter(q => !ok(q));
   app.innerHTML = `<div class="stack" style="gap:18px">
     <div><div class="eyebrow">Last step</div><h1 style="font-size:clamp(24px,4vw,32px)">Check and submit</h1>
       <p class="lead">Due ${fmt(w.due)}. ${todo.length ? "Finish the questions below, then come back here." : "Everything is answered. Read through your answers once more, then submit."}</p></div>
     <div class="panel">${w.sections.map(s=>{
-      const sq = qs.filter(q=>q.crit===s.crit), left = sq.filter(q=>!answered(q,S.answers[q.id]));
-      return `<div class="sumrow"><div class="row" style="gap:12px;flex-wrap:nowrap;align-items:flex-start"><span class="crit ${s.crit}">${s.crit}</span><div><b>${esc(s.name)}</b>${left.length?`<ul class="todo">${left.map(q=>`<li>${L[q.id]} not finished${q.type==="text"?` (${words(S.answers[q.id])} of ${q.minWords} words)`:""}</li>`).join("")}</ul>`:`<div class="note" style="color:var(--green)">All ${sq.length} answered ✓</div>`}</div></div>
+      const sq = qs.filter(q=>q.crit===s.crit), left = sq.filter(q=>!ok(q));
+      return `<div class="sumrow"><div class="row" style="gap:12px;flex-wrap:nowrap;align-items:flex-start"><span class="crit ${s.crit}">${s.crit}</span><div><b>${esc(s.name)}</b>${left.length?`<ul class="todo">${left.map(q=>`<li>${L[q.id]} not finished${q.crit==="R"&&answered(q,S.answers[q.id])?" (press Check)":""}${q.type==="text"?` (${words(S.answers[q.id])} of ${q.minWords} words)`:""}</li>`).join("")}</ul>`:`<div class="note" style="color:var(--green)">All ${sq.length} answered ✓</div>`}</div></div>
         ${left.length?`<button class="btn small ghost" data-go="${st.indexOf(s.crit)}" data-q="${left[0].id}">Go to ${s.crit}</button>`:""}</div>`;}).join("")}</div>
     <div id="submitArea"></div>
     <div class="navrow"><button class="btn ghost" id="prev">← Criterion ${st[st.length-2]}</button><span></span></div>
@@ -596,6 +722,18 @@ async function doSubmit(){
   }
 }
 
+function detailHTML(q, a){
+  const m = markOf(q, a);
+  let detail = "";
+    if (q.type==="mcq") detail = `<div class="fb">Your answer: <b>${esc(Number.isInteger(a)?q.options[a]:"—")}</b>${m?"":` · Correct answer: <b>${esc(q.options[q.answer])}</b>`}</div><div class="fb">${esc(q.explain||"")}</div>`;
+    if (q.type==="match") detail = `<div class="tbl"><table><tbody>${q.rows.map((r,i)=>{const ok=(a||[])[i]===r.answer;return `<tr><td>${esc(r.label)}</td><td>${ok?"✓":"✗"} ${esc((a||[])[i]||"—")}${ok?"":` <br><span class="note">Correct: ${esc(r.answer)}</span>`}</td></tr>`;}).join("")}</tbody></table></div>`;
+    if (q.type==="cloze") detail = `<div class="cloze">${esc(q.text).replace(/\[\[(\d+)\]\]/g, (m, n) => { const i = Number(n), v = (a||[])[i], ok = v===q.blanks[i]; return ok ? `<span class="ok">✓ ${esc(v)}</span>` : `<span class="no">✗ ${esc(v||"—")}</span> <span class="note">(${esc(q.blanks[i])})</span>`; })}</div>`;
+    if (q.type==="num") detail = `<div class="fb">Your answer: <b>${esc(a??"—")} ${esc(q.unit||"")}</b></div><div class="fb">${esc(q.explain||"")}</div>`;
+    if (q.type==="numtable") detail = `<div class="tbl"><table><tbody>${q.rows.map((r,i)=>{const n=num((a||[])[i]);const ok=n!==null&&Math.abs(n-r.answer)<=r.tol+1e-9;return `<tr><td>${esc(r.label)}</td><td>${ok?"✓":"✗"} ${esc((a||[])[i]??"—")}${ok?"":` <br><span class="note">Correct: ${r.answer.toFixed(1)}${r.hint?". "+esc(r.hint):""}</span>`}</td></tr>`;}).join("")}</tbody></table></div>`;
+    if (q.type==="text") detail = `<div class="note">Your answer</div><div class="yours" data-yours="${q.id}"></div><div class="model"><b>Model answer</b><div>${esc(q.model)}</div><b style="display:block;margin-top:8px">Mark points: did you include these?</b><ul>${q.points.map(p=>`<li>${esc(p)}</li>`).join("")}</ul></div>`;
+  return detail;
+}
+
 /* ---------- 4. marks + model answers ---------- */
 function renderResult(ans, ts, fresh){
   S.mode = "result";
@@ -606,13 +744,7 @@ function renderResult(ans, ts, fresh){
   const late = new Date(ts) > new Date(w.due);
   const block = q => {
     const a = ans[q.id], m = markOf(q,a);
-    let detail = "";
-    if (q.type==="mcq") detail = `<div class="fb">Your answer: <b>${esc(Number.isInteger(a)?q.options[a]:"—")}</b>${m?"":` · Correct answer: <b>${esc(q.options[q.answer])}</b>`}</div><div class="fb">${esc(q.explain||"")}</div>`;
-    if (q.type==="match") detail = `<div class="tbl"><table><tbody>${q.rows.map((r,i)=>{const ok=(a||[])[i]===r.answer;return `<tr><td>${esc(r.label)}</td><td>${ok?"✓":"✗"} ${esc((a||[])[i]||"—")}${ok?"":` <br><span class="note">Correct: ${esc(r.answer)}</span>`}</td></tr>`;}).join("")}</tbody></table></div>`;
-    if (q.type==="cloze") detail = `<div class="cloze">${esc(q.text).replace(/\[\[(\d+)\]\]/g, (m, n) => { const i = Number(n), v = (a||[])[i], ok = v===q.blanks[i]; return ok ? `<span class="ok">✓ ${esc(v)}</span>` : `<span class="no">✗ ${esc(v||"—")}</span> <span class="note">(${esc(q.blanks[i])})</span>`; })}</div>`;
-    if (q.type==="num") detail = `<div class="fb">Your answer: <b>${esc(a??"—")} ${esc(q.unit||"")}</b></div><div class="fb">${esc(q.explain||"")}</div>`;
-    if (q.type==="numtable") detail = `<div class="tbl"><table><tbody>${q.rows.map((r,i)=>{const n=num((a||[])[i]);const ok=n!==null&&Math.abs(n-r.answer)<=r.tol+1e-9;return `<tr><td>${esc(r.label)}</td><td>${ok?"✓":"✗"} ${esc((a||[])[i]??"—")}${ok?"":` <br><span class="note">Correct: ${r.answer.toFixed(1)}${r.hint?". "+esc(r.hint):""}</span>`}</td></tr>`;}).join("")}</tbody></table></div>`;
-    if (q.type==="text") detail = `<div class="note">Your answer</div><div class="yours" data-yours="${q.id}"></div><div class="model"><b>Model answer</b><div>${esc(q.model)}</div><b style="display:block;margin-top:8px">Mark points: did you include these?</b><ul>${q.points.map(p=>`<li>${esc(p)}</li>`).join("")}</ul></div>`;
+    const detail = detailHTML(q, a);
     const tag = m===null ? `<span class="mark self">Your teacher marks this · ${q.marks}</span>` : `<span class="mark ${m===q.marks?"good":"bad"}">${m}/${q.marks}</span>`;
     return `<div class="q"><div class="q-top"><span class="q-id">${L[q.id]}</span>${tag}</div><div class="q-prompt">${q.prompt}</div>${detail}</div>`;
   };
@@ -663,8 +795,8 @@ function syncProgress(now){
   clearTimeout(progTimer);
   const go = () => {
     const qs = items(S.week), sections = {};
-    S.week.sections.forEach(s => { const sq = qs.filter(q => q.crit === s.crit); sections[s.crit] = sq.filter(q => answered(q, S.answers[q.id])).length + "/" + sq.length; });
-    const answeredN = qs.filter(q => answered(q, S.answers[q.id])).length;
+    S.week.sections.forEach(s => { const sq = qs.filter(q => q.crit === s.crit); sections[s.crit] = sq.filter(ok).length + "/" + sq.length; });
+    const answeredN = qs.filter(ok).length;
     const sig = answeredN + JSON.stringify(sections) + S.integ.left + "|" + Math.floor(S.integ.active / 60);
     if (sig === lastProg && !now) return;
     lastProg = sig;
