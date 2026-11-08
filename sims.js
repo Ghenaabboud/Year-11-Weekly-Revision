@@ -462,5 +462,108 @@
     draw();
   };
 
+  /* =============== Plot grid (shared: graph practice sim + plot questions) ===============
+     PlotGrid(root, { xs, xLabels, xMin, xMax, xTitle, yTitle, yMin, yMax, yMajor, yMinor, title,
+                      values, onChange(values), readOnly, correct, good }) */
+  function PlotGrid(root, o) {
+    const vals = (o.values || o.xs.map(() => null)).slice();
+    const W = 600, H = 420, L = 70, Rr = 18, T = o.title ? 34 : 14, B = 64;
+    const xMin = o.xMin ?? 0, xMax = o.xMax ?? o.xs[o.xs.length - 1];
+    const X = v => L + (v - xMin) / (xMax - xMin) * (W - L - Rr);
+    const Y = v => T + (o.yMax - v) / (o.yMax - o.yMin) * (H - T - B);
+    const yOf = py => o.yMin + (H - B - py) / (H - T - B) * (o.yMax - o.yMin);
+    let sel = -1;
+    const wrap = h("div", { class: "pgrid" });
+    const svg = s("svg", { viewBox: `0 0 ${W} ${H}`, class: "pgsvg" + (o.readOnly ? "" : " live"), role: "img", "aria-label": `Graph grid: ${o.yTitle} against ${o.xTitle}` });
+    const pts = s("g");
+    function base() {
+      if (o.title) svg.append(s("text", { x: (W + L) / 2, y: 20, "text-anchor": "middle", class: "pgtitle" }, o.title));
+      const steps = Math.round((o.yMax - o.yMin) / o.yMinor);
+      for (let i = 0; i <= steps; i++) {
+        const v = +(o.yMin + i * o.yMinor).toFixed(6), major = Math.abs(v / o.yMajor - Math.round(v / o.yMajor)) < 1e-6;
+        svg.append(s("line", { x1: L, x2: W - Rr, y1: Y(v), y2: Y(v), class: v === 0 ? "pz" : major ? "pmaj" : "pmin" }));
+        if (major) svg.append(s("text", { x: L - 8, y: Y(v) + 4, "text-anchor": "end", class: "ptick" }, (v > 0 ? "+" + v : v < 0 ? "−" + Math.abs(v) : "0")));
+      }
+      const xMinor = o.xMinor || (o.xs[1] - o.xs[0]) / 5;
+      for (let v = xMin; v <= xMax + 1e-9; v += xMinor) svg.append(s("line", { x1: X(v), x2: X(v), y1: Y(o.yMax), y2: Y(o.yMin), class: "pmin" }));
+      o.xs.forEach((x, i) => svg.append(s("line", { x1: X(x), x2: X(x), y1: Y(o.yMax), y2: Y(o.yMin), class: "pmaj" }),
+        s("text", { x: X(x), y: H - B + 18, "text-anchor": "middle", class: "ptick" }, o.xLabels ? o.xLabels[i] : String(x))));
+      svg.append(s("line", { x1: L, x2: L, y1: Y(o.yMax), y2: Y(o.yMin), class: "paxis" }),
+        s("text", { x: (W + L) / 2, y: H - 14, "text-anchor": "middle", class: "paxl" }, o.xTitle),
+        s("text", { x: 16, y: (T + H - B) / 2, "text-anchor": "middle", class: "paxl", transform: `rotate(-90 16 ${(T + H - B) / 2})` }, o.yTitle));
+      svg.append(pts);
+    }
+    function cross(x, y, cls) {
+      const g = s("g", { class: "px " + cls, transform: `translate(${x} ${y})` });
+      g.append(s("path", { d: "M-7 -7 L7 7 M-7 7 L7 -7" }));
+      return g;
+    }
+    const status = h("div", { class: "pstatus" });
+    function draw() {
+      pts.innerHTML = "";
+      if (o.correct) o.correct.forEach((y, i) => pts.append(s("circle", { cx: X(o.xs[i]), cy: Y(y), r: 8, class: "pghost" })));
+      vals.forEach((y, i) => {
+        if (typeof y !== "number") return;
+        const cls = o.good ? (o.good[i] ? "good" : "bad") : (o.marks ? (o.marks[i] === true ? "good" : o.marks[i] === false ? "bad" : "") : "") + (i === sel ? " sel" : "");
+        pts.append(cross(X(o.xs[i]), Y(y), cls));
+      });
+      if (!o.readOnly) {
+        status.innerHTML = "";
+        o.xs.forEach((x, i) => status.append(h("button", { type: "button", class: "pchip" + (typeof vals[i] === "number" ? " on" : "") + (i === sel ? " sel" : ""),
+          "aria-pressed": i === sel, onclick: () => { sel = i; draw(); } }, (typeof vals[i] === "number" ? "✓ " : "") + (o.xLabels ? o.xLabels[i] : x))));
+      }
+    }
+    function emit() { if (o.onChange) o.onChange(vals.slice()); }
+    if (!o.readOnly) {
+      svg.addEventListener("click", e => {
+        const pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY;
+        const p = pt.matrixTransform(svg.getScreenCTM().inverse());
+        if (p.y < Y(o.yMax) - 10 || p.y > Y(o.yMin) + 10 || p.x < L - 20) return;
+        let i = 0; o.xs.forEach((x, j) => { if (Math.abs(X(x) - p.x) < Math.abs(X(o.xs[i]) - p.x)) i = j; });
+        const y = Math.max(o.yMin, Math.min(o.yMax, Math.round(yOf(p.y) * 10) / 10));
+        vals[i] = y; sel = i; draw(); emit();
+      });
+    }
+    base(); wrap.append(svg);
+    if (!o.readOnly) {
+      const nudge = d => { if (sel < 0 || typeof vals[sel] !== "number") return; vals[sel] = Math.max(o.yMin, Math.min(o.yMax, Math.round((vals[sel] + d) * 10) / 10)); draw(); emit(); };
+      wrap.append(h("div", { class: "pctrl" }, h("span", { class: "note" }, "Selected cross:"), status,
+        h("button", { type: "button", class: "btn ghost small", "aria-label": "Move selected cross up", onclick: () => nudge(o.yMinor / 2) }, "▲"),
+        h("button", { type: "button", class: "btn ghost small", "aria-label": "Move selected cross down", onclick: () => nudge(-o.yMinor / 2) }, "▼"),
+        h("button", { type: "button", class: "btn ghost small", onclick: () => { if (sel < 0) return; vals[sel] = null; draw(); emit(); } }, "Remove")));
+    }
+    root.innerHTML = ""; root.append(wrap); draw();
+    return { set marks(m) { o.marks = m; draw(); }, values: () => vals.slice() };
+  }
+  window.PlotGrid = PlotGrid;
+
+  /* =============== Graph practice: plot negative values =============== */
+  SIMS.graphPlot = (root, api) => {
+    const st = api.store;
+    const D = [[0, 15.0], [0.2, 6.2], [0.4, -5.1], [0.6, -12.2], [0.8, -17.0], [1.0, -19.2]];
+    st.vals = st.vals || D.map(() => null);
+    root.append(h("p", { class: "simhelp", html: "These are the potato means from Lesson 6. Plot each one with a cross. The zero line is in the <b>middle</b> of the grid: gains go above it, losses go below it. Each small square on the y-axis is <b>1%</b>." }),
+      h("div", { class: "tbl" }, h("table", null, h("thead", null, h("tr", null, h("th", null, "Sucrose (mol/dm³)"), ...D.map(d => h("th", null, d[0].toFixed(1))))),
+        h("tbody", null, h("tr", null, h("td", null, "Mean % change"), ...D.map(d => h("td", null, (d[1] > 0 ? "+" : "") + d[1].toFixed(1))))))));
+    const host = h("div");
+    const fb = h("div", { class: "simfb", "aria-live": "polite" });
+    const chk = h("button", { type: "button", class: "btn" }, "Check my points");
+    root.append(host, h("div", { class: "row" }, chk), fb);
+    const mark = tasks(root, ["Plot all six means", "Get every cross within half a small square (press Check)"]);
+    const g = PlotGrid(host, { xs: D.map(d => d[0]), xLabels: D.map(d => d[0].toFixed(1)), xMin: 0, xMax: 1.0, xMinor: 0.04, xTitle: "Sucrose concentration (mol/dm³)", yTitle: "Mean % change in mass (%)",
+      yMin: -20, yMax: 20, yMajor: 5, yMinor: 1, values: st.vals, onChange: v => { st.vals = v; api.save(); g.marks = null; mark(0, v.every(x => typeof x === "number")); fb.textContent = ""; } });
+    mark(0, st.vals.every(x => typeof x === "number"));
+    chk.onclick = () => {
+      const v = g.values();
+      if (!v.every(x => typeof x === "number")) { fb.innerHTML = "<b>Plot all six points first.</b>"; return; }
+      const m = v.map((y, i) => Math.abs(y - D[i][1]) <= 0.6);
+      g.marks = m;
+      const bad = m.map((ok, i) => ok ? null : D[i]).filter(Boolean);
+      if (!bad.length) { fb.innerHTML = "<b>All six are accurate.</b> Notice how the points go below the zero line once the potato starts losing mass."; mark(1, true); api.done(); return; }
+      const tip = bad.some(d => d[1] < 0) ? " For a negative value, count the small squares <b>down from zero</b>: −12.2 is 12 squares and a bit below the zero line." : " Count the small squares up from zero.";
+      fb.innerHTML = `<b>${bad.length} cross${bad.length > 1 ? "es are" : " is"} not accurate yet</b> (red): ${bad.map(d => d[0].toFixed(1)).join(", ")} mol/dm³. Click the right place to move it, then check again.${tip}`;
+    };
+  };
+
   window.SIMS = SIMS;
 })();

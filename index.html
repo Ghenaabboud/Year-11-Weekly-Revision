@@ -8,8 +8,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=JetBrains+Mono:wght@500&display=swap">
-<link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="missions.css">
+<link rel="stylesheet" href="style.css?v=202611082250">
+<link rel="stylesheet" href="missions.css?v=202611082250">
 <style>
   h1.big{font-size:clamp(30px,5.5vw,44px);font-weight:800;margin-top:6px}
   h2.mid{font-size:22px}
@@ -198,10 +198,10 @@
 <main class="wrap wider" id="app"></main>
 <div class="toast" id="toast" role="status" hidden></div>
 
-<script src="config.js"></script>
-<script src="weeks.js"></script>
-<script src="api.js"></script>
-<script src="sims.js"></script>
+<script src="config.js?v=202611082250"></script>
+<script src="weeks.js?v=202611082250"></script>
+<script src="api.js?v=202611082250"></script>
+<script src="sims.js?v=202611082250"></script>
 <script>
 (function(){
 const W = window.REVISION_WEEKS, API = window.RevisionAPI;
@@ -224,7 +224,8 @@ const TERMS = {
   "suggest":"Propose a sensible answer or solution.",
   "predict":"Say what you expect to happen.",
   "design":"Produce a plan or method someone else could follow.",
-  "justify":"Give reasons or evidence that support your answer."
+  "justify":"Give reasons or evidence that support your answer.",
+  "plot":"Mark each value accurately on the graph, using the scale on the axes."
 };
 const CRIT = {
   R:{tests:"Quick recall of the key facts from the lessons, before you use them in exam-style questions.", tip:"Try each card from memory first, then tap it to check. Every question here is marked straight away."},
@@ -239,9 +240,11 @@ const HOWTO = {
   cloze: "Choose the correct word for each gap.",
   num: "Type a number only. No units needed.",
   numtable: "Type a number in each box, rounded to 1 decimal place.",
+  plot: "Click on the graph to place a cross (×) for each value. Click again to move it. Use ▲ ▼ to nudge the selected cross. Read the scale carefully, especially below zero.",
   text: q => `Write at least ${q.minWords} words in full sentences. The bar turns green when you have written enough.`
 };
 
+const rName = w => ((w.sections.find(s => s.crit==="R") || {}).short || "recall missions");
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const now = () => new Date();
 const fmt = d => new Date(d).toLocaleString("en-GB",{weekday:"long",day:"numeric",month:"long",hour:"numeric",minute:"2-digit",timeZone:"Asia/Dubai"});
@@ -265,7 +268,9 @@ function guideHTML(g){
     <div class="dfoot"><div><h4>How the levels are awarded</h4><div class="ladder">${g.ladder.map((r,i)=>`<div class="rung ${i===g.ladder.length-1?"top":""}"><span>${esc(r.lv)}</span><div><b>${esc(r.verb)}:</b> ${esc(r.d)}</div></div>`).join("")}</div></div>
     <div><h4>Before you move on, check</h4><ul class="dcheck">${g.checklist.map(c=>`<li>${esc(c)}</li>`).join("")}</ul></div></div></div>`;
 }
+const learnHTML = l => `<div class="learn"><span class="mtag learn">Learn</span><h3>${esc(l.h)}</h3>${l.html}</div>`;
 const infoHTML = q => q.guide ? guideHTML(q.guide)
+  : q.learn ? learnHTML(q.learn)
   : q.mission ? `<div class="mission"><div class="mnum">Mission<b>${q.mission.n}</b></div><div><div class="ml">${esc(q.mission.lesson)}</div><h3>${esc(q.mission.title)}</h3><p>${esc(q.mission.story)}</p></div></div>`
   : (q.predict || q.sim) ? ""
   : q.exam ? `<div class="info">${q.exam}</div>`
@@ -279,6 +284,7 @@ function answered(q, a){
   if (q.type==="num") return num(a)!==null;
   if (q.type==="numtable") return Array.isArray(a) && q.rows.every((_,i)=>num(a[i])!==null);
   if (q.type==="text") return words(a) >= q.minWords;
+  if (q.type==="plot") return Array.isArray(a) && q.points.every((_,i)=>typeof a[i]==="number");
   return true;
 }
 function markOf(q, a){
@@ -287,6 +293,7 @@ function markOf(q, a){
   if (q.type==="cloze") return q.blanks.reduce((t,b,i)=>t+((a||[])[i]===b?1:0),0);
   if (q.type==="num"){ const n=num(a); return n!==null && n>=q.min-1e-9 && n<=q.max+1e-9 ? q.marks : 0; }
   if (q.type==="numtable") return q.rows.reduce((t,r,i)=>{const n=num((a||[])[i]);return t+(n!==null&&Math.abs(n-r.answer)<=r.tol+1e-9?1:0);},0);
+  if (q.type==="plot") return Math.min(q.marks, q.points.reduce((t,p,i)=>t+(typeof (a||[])[i]==="number"&&Math.abs(a[i]-p.y)<=q.tol+1e-9?1:0),0));
   return null;
 }
 function weekStatus(week){
@@ -438,7 +445,7 @@ function renderStart(){
         <ul class="checklist">
           <li>Have your notes and slides from ${esc(w.lessons)} ready.</li>
           <li>Work somewhere quiet. Treat it like a real exam.</li>
-          <li>Do the parts in order: ${w.sections.map(s=>s.crit==="R"?"the recall missions":s.crit).join(", then ")}. Use the buttons at the top to move between them.</li>
+          <li>Do the parts in order: ${w.sections.map(s=>s.crit==="R"?"the "+rName(w):s.crit).join(", then ")}. Use the buttons at the top to move between them.</li>
           <li>Your answers save on this device as you type. You can close the page and continue later on the same device.</li>
           <li>Answer on your own, from what you know and your class notes. Pasting is turned off, and the page records each time you leave it and for how long.</li>
           <li>When everything is answered, go to <b>Submit</b>. You can only submit once.</li>
@@ -446,7 +453,7 @@ function renderStart(){
       </div>
       <div class="stack">
         <h2 class="mid">What's in this pack</h2>
-        ${w.sections.map(s=>`<div class="row" style="gap:12px;align-items:flex-start;flex-wrap:nowrap"><span class="crit ${s.crit}">${s.crit}</span><div><b>${esc(s.name)}</b><div class="note">${CRIT[s.crit].tests}</div></div></div>`).join("")}
+        ${w.sections.map(s=>`<div class="row" style="gap:12px;align-items:flex-start;flex-wrap:nowrap"><span class="crit ${s.crit}">${s.crit}</span><div><b>${esc(s.name)}</b><div class="note">${s.tests || CRIT[s.crit].tests}</div></div></div>`).join("")}
       </div>
     </div>
     <h2 class="mid">Types of question</h2>
@@ -460,7 +467,7 @@ function renderStart(){
       <div class="termlist">${Object.entries(TERMS).map(([t,d])=>`<b>${t[0].toUpperCase()+t.slice(1)}</b><span>${d}</span>`).join("")}</div>
     </details>
     <label class="pledge" for="pledge"><input type="checkbox" id="pledge" ${S.integ.pledged?"checked":""}><span><b>My promise.</b> I will answer these questions myself. I will not copy answers, search online, use AI or ask someone else to answer for me.</span></label>
-    <div class="navrow"><span class="saved" id="pledgeMsg"></span><button class="btn" id="go">${w.sections[0].crit==="R"?"Start the recall missions":"Start with criterion "+w.sections[0].crit} →</button></div>
+    <div class="navrow"><span class="saved" id="pledgeMsg"></span><button class="btn" id="go">${w.sections[0].crit==="R"?"Start the "+rName(w):"Start with criterion "+w.sections[0].crit} →</button></div>
   </div>`;
   document.getElementById("back").onclick = renderWeeks;
   document.getElementById("pledge").onchange = e => { S.integ.pledged = e.target.checked; saveInteg(); };
@@ -492,6 +499,7 @@ function qHTML(q, L){
   if (q.type==="cloze") { let k = 0; body = `<div class="cloze">${esc(q.text).replace(/\[\[(\d+)\]\]/g, (m, n) => { const i = Number(n); return `<select id="${q.id}_${i}" data-q="${q.id}" data-i="${i}" aria-label="Gap ${i+1}"><option value="">Choose…</option>${mixed(q).map(o=>`<option ${(a||[])[i]===o?"selected":""}>${esc(o)}</option>`).join("")}</select>`; })}</div>`; }
   if (q.type==="num") body = `<div class="num"><input class="input" id="${q.id}" data-q="${q.id}" inputmode="decimal" value="${esc(a??"")}" aria-label="Your answer"><span>${esc(q.unit||"")}</span></div>`;
   if (q.type==="numtable") body = `<div class="tbl"><table><thead><tr><th>${esc(q.head[0])}</th><th>${esc(q.head[1])}</th></tr></thead><tbody>${q.rows.map((r,i)=>`<tr><td>${esc(r.label)}</td><td><input id="${q.id}_${i}" data-q="${q.id}" data-i="${i}" inputmode="decimal" value="${esc((a||[])[i]??"")}" aria-label="${esc(r.label)}"></td></tr>`).join("")}</tbody></table></div>`;
+  if (q.type==="plot") body = `<div class="plotq" data-plotq="${q.id}"></div>`;
   if (q.type==="text") body = `<textarea class="input" id="${q.id}" data-q="${q.id}" aria-label="Your answer" placeholder="${esc(q.placeholder||"Write your answer here…")}"></textarea><div class="wc" id="${q.id}_wc"></div>`;
   const how = q.howto || (typeof HOWTO[q.type]==="function" ? HOWTO[q.type](q) : HOWTO[q.type]);
   const terms = termsIn(q.prompt);
@@ -500,19 +508,43 @@ function qHTML(q, L){
     ${terms.length?`<div class="term">${terms.map(t=>`<b>${t[0].toUpperCase()+t.slice(1)}</b> means: ${TERMS[t]}`).join("<br>")}</div>`:""}</div>`;
 }
 
+/* ---------- plot-the-graph questions ---------- */
+const plotOpts = q => ({ xs: q.points.map(p=>p.x), xLabels: q.points.map(p=>p.label), xMin: q.xMin, xMax: q.xMax, xTitle: q.xTitle, yTitle: q.yTitle, yMin: q.yMin, yMax: q.yMax, yMajor: q.yMajor, yMinor: q.yMinor, title: q.title });
+function mountPlots(sec){
+  sec.items.filter(q=>q.type==="plot").forEach(q => {
+    const el = app.querySelector(`[data-plotq="${q.id}"]`); if (!el || !window.PlotGrid) return;
+    const start = Array.isArray(S.answers[q.id]) ? S.answers[q.id].slice() : q.points.map(()=>null);
+    window.PlotGrid(el, { ...plotOpts(q), values: start, onChange: vals => {
+      S.answers[q.id] = vals.slice(); ls(draftKey(), S.answers);
+      document.getElementById("box_"+q.id)?.classList.remove("missing");
+      const sv = document.getElementById("saved"); if (sv) sv.textContent = "Saved on this device ✓";
+      syncProgress(false); updateCounts();
+    } });
+  });
+}
+function mountPlotResults(){
+  app.querySelectorAll("[data-plotres]").forEach(el => {
+    const q = items(S.week).find(x=>x.id===el.dataset.plotres); if (!q || !window.PlotGrid) return;
+    let vals = []; try { vals = JSON.parse(el.dataset.vals || "[]"); } catch(e){}
+    window.PlotGrid(el, { ...plotOpts(q), values: q.points.map((_,i)=>typeof vals[i]==="number"?vals[i]:null), readOnly: true,
+      correct: q.points.map(p=>p.y), good: q.points.map((p,i)=>typeof vals[i]==="number" && Math.abs(vals[i]-p.y)<=q.tol+1e-9) });
+  });
+}
+
 function renderSection(sec){
   const L = labels(S.week), st = steps(), i = S.step;
   const next = st[i+1], prev = st[i-1];
-  const nm = k => k==="R" ? "recall missions" : "criterion " + k;
+  const nm = k => k==="R" ? rName(S.week) : "criterion " + k;
   const nextLabel = next==="submit" ? "Check and submit →" : `Next: ${nm(next)} →`;
   const prevLabel = prev==="start" ? "← Start page" : `← ${nm(prev)[0].toUpperCase()+nm(prev).slice(1)}`;
   app.innerHTML = `<div class="stack" style="gap:16px">
     <div class="sec-head"><span class="crit ${sec.crit}">${sec.crit}</span><div><div class="eyebrow">${sec.crit==="R"?"Revision":"Criterion "+sec.crit} · part ${i} of ${S.week.sections.length}</div><h1 style="font-size:clamp(24px,4vw,32px)">${esc(sec.name)}</h1></div></div>
-    <dl class="guide"><dt>What it tests</dt><dd>${CRIT[sec.crit].tests}</dd><dt>Top tip</dt><dd>${CRIT[sec.crit].tip}</dd></dl>
-    ${sec.items.map(q => q.type==="info" ? infoHTML(q) : qHTML(q, L[q.id]) + (TEACHER ? `<details class="teach-ans"><summary>Show answer</summary>${detailHTML(q, q.type==="mcq" ? q.answer : q.type==="match" ? q.rows.map(r=>r.answer) : q.type==="cloze" ? q.blanks : q.type==="numtable" ? q.rows.map(r=>String(r.answer)) : q.type==="num" ? String(q.min) : "").replace(/Your answer:/g,"Answer:")}</details>` : "")).join("")}
+    <dl class="guide"><dt>What it tests</dt><dd>${sec.tests || CRIT[sec.crit].tests}</dd><dt>Top tip</dt><dd>${sec.tip || CRIT[sec.crit].tip}</dd></dl>
+    ${sec.items.map(q => q.type==="info" ? infoHTML(q) : qHTML(q, L[q.id]) + (TEACHER ? `<details class="teach-ans"><summary>Show answer</summary>${detailHTML(q, q.type==="mcq" ? q.answer : q.type==="match" ? q.rows.map(r=>r.answer) : q.type==="cloze" ? q.blanks : q.type==="numtable" ? q.rows.map(r=>String(r.answer)) : q.type==="num" ? String(q.min) : q.type==="plot" ? q.points.map(p=>p.y) : "").replace(/Your answer:/g,"Answer:")}</details>` : "")).join("")}
     <div class="navrow"><button class="btn ghost" id="prev">${prevLabel}</button><span class="saved" id="saved">Answers save automatically</span><button class="btn" id="next">${nextLabel}</button></div>
   </div>`;
   sec.items.filter(q=>q.type==="text").forEach(q => { document.getElementById(q.id).value = S.answers[q.id] || ""; });
+  mountPlots(sec); mountPlotResults();
   document.getElementById("prev").onclick = () => { S.step--; renderStep(); };
   document.getElementById("next").onclick = () => { S.step++; renderStep(); };
   updateCounts();
@@ -544,12 +576,12 @@ function renderMissions(sec){
   const unlocked = j => TEACHER || j === 0 || list.slice(0, j).every(missionDone);
   if (ms.cur >= list.length || !unlocked(ms.cur)) ms.cur = 0;
   const next = st[i+1], prev = st[i-1];
-  const nm = k => k==="R" ? "recall missions" : "criterion " + k;
+  const nm = k => k==="R" ? rName(S.week) : "criterion " + k;
   const [got, max] = atpScore(sec);
   app.innerHTML = `<div class="stack" style="gap:16px">
     <div class="sec-head"><span class="crit R">R</span><div><div class="eyebrow">Revision · part ${i} of ${S.week.sections.length}</div><h1 style="font-size:clamp(24px,4vw,32px)">${esc(sec.name)}</h1></div></div>
-    <dl class="guide"><dt>How it works</dt><dd>Each mission has 5 steps: <b>think first</b>, <b>explore</b> a simulation, <b>recall</b> with flip cards, <b>check yourself</b> with marked questions, then an <b>exam link</b>. Each step unlocks the next.</dd><dt>Marks</dt><dd>You get <b>one try</b> at each “Check yourself” question. Press <b>Check</b> and the marks are locked in, so think before you check. Every mark earns you ⚡ ATP.</dd></dl>
-    <div class="mtop"><nav class="mtrail" aria-label="Missions">${list.map((ml, j) => `${j ? `<span class="mpath ${missionDone(list[j-1]) ? "done" : ""}"></span>` : ""}<button class="mstop ${missionDone(ml) ? "done" : ""}" data-m="${j}" ${unlocked(j) ? "" : "disabled"} ${ms.cur === j ? 'aria-current="step"' : ""}><span class="d">${missionDone(ml) ? "✓" : ml.m.n}</span><span class="t">${esc(ml.m.title)}</span></button>`).join("")}</nav>
+    <dl class="guide"><dt>How it works</dt><dd>${sec.how || "Each mission has 5 steps: <b>think first</b>, <b>explore</b> a simulation, <b>recall</b> with flip cards, <b>check yourself</b> with marked questions, then an <b>exam link</b>. Each step unlocks the next."}</dd><dt>Marks</dt><dd>You get <b>one try</b> at each “Check yourself” question. Press <b>Check</b> and the marks are locked in, so think before you check. Every mark earns you ⚡ ATP.</dd></dl>
+    <div class="mtop"><nav class="mtrail${list.length>4?" many":""}" aria-label="Missions">${list.map((ml, j) => `${j ? `<span class="mpath ${missionDone(list[j-1]) ? "done" : ""}"></span>` : ""}<button class="mstop ${missionDone(ml) ? "done" : ""}" data-m="${j}" ${unlocked(j) ? "" : "disabled"} ${ms.cur === j ? 'aria-current="step"' : ""}><span class="d">${missionDone(ml) ? "✓" : ml.m.n}</span><span class="t">${esc(ml.m.title)}</span></button>`).join("")}</nav>
       <span class="atp" id="atp" title="Marks earned in the recall missions">⚡ ${got} / ${max} ATP</span></div>
     <div id="mbody" class="stack" style="gap:16px"></div>
     <div class="navrow"><button class="btn ghost" id="prev">${prev==="start" ? "← Start page" : "← " + nm(prev)}</button><span class="saved" id="saved">Progress saves automatically</span><button class="btn ghost" id="next">${next==="submit" ? "Check and submit →" : `Skip to ${nm(next)} →`}</button></div>
@@ -593,6 +625,8 @@ function renderMissions(sec){
         b.classList.toggle("on"); const j = Number(b.dataset.j), arr = ms.flip[key] = ms.flip[key] || [];
         if (!arr.includes(j)){ arr.push(j); saveMS(); b.querySelector("small").textContent = "✓ seen · tap to flip"; if (arr.length >= it.flash.length) grow(true); }
       });
+    } else if (it.learn){
+      box.classList.add("mlearn"); box.innerHTML = learnHTML(it.learn);
     } else if (it.exam){
       box.innerHTML = `<span class="mtag exam">Exam link</span><div class="mres">${it.exam}</div>`;
     } else if (it.type !== "info"){
@@ -631,7 +665,7 @@ function renderMissions(sec){
     if (ptr >= ml.items.length && missionDone(ml) && !body.querySelector(".mdone")){
       const last = ms.cur === list.length - 1, [g, mx] = atpScore(sec);
       const d = document.createElement("div"); d.className = "mdone";
-      d.innerHTML = `<div class="big">✓</div><div class="grow"><b>Mission ${ml.m.n} complete!</b><div class="note">${last ? `All four missions done. You earned ${g} of ${mx} ATP. Now use what you recalled in the exam-style questions.` : "The next mission is unlocked."}</div></div><button class="btn" type="button">${last ? `Next: ${nm(next)} →` : `Mission ${list[ms.cur+1].m.n}: ${esc(list[ms.cur+1].m.title)} →`}</button>`;
+      d.innerHTML = `<div class="big">✓</div><div class="grow"><b>Mission ${ml.m.n} complete!</b><div class="note">${last ? `All ${list.length} missions done. You earned ${g} of ${mx} ATP. Now use it in the exam-style questions.` : "The next mission is unlocked."}</div></div><button class="btn" type="button">${last ? `Next: ${nm(next)} →` : `Mission ${list[ms.cur+1].m.n}: ${esc(list[ms.cur+1].m.title)} →`}</button>`;
       d.querySelector("button").onclick = () => { if (last){ S.step++; renderStep(); } else { ms.cur++; saveMS(); renderMissions(sec); window.scrollTo(0, 0); } };
       body.append(d); first = first || d;
       app.querySelectorAll(".mstop")[ms.cur]?.classList.add("done");
@@ -772,6 +806,7 @@ function detailHTML(q, a){
     if (q.type==="cloze") detail = `<div class="cloze">${esc(q.text).replace(/\[\[(\d+)\]\]/g, (m, n) => { const i = Number(n), v = (a||[])[i], ok = v===q.blanks[i]; return ok ? `<span class="ok">✓ ${esc(v)}</span>` : `<span class="no">✗ ${esc(v||"—")}</span> <span class="note">(${esc(q.blanks[i])})</span>`; })}</div>`;
     if (q.type==="num") detail = `<div class="fb">Your answer: <b>${esc(a??"—")} ${esc(q.unit||"")}</b></div><div class="fb">${esc(q.explain||"")}</div>`;
     if (q.type==="numtable") detail = `<div class="tbl"><table><tbody>${q.rows.map((r,i)=>{const n=num((a||[])[i]);const ok=n!==null&&Math.abs(n-r.answer)<=r.tol+1e-9;return `<tr><td>${esc(r.label)}</td><td>${ok?"✓":"✗"} ${esc((a||[])[i]??"—")}${ok?"":` <br><span class="note">Correct: ${r.answer.toFixed(1)}${r.hint?". "+esc(r.hint):""}</span>`}</td></tr>`;}).join("")}</tbody></table></div>`;
+    if (q.type==="plot") detail = `<div class="plotq" data-plotres="${q.id}" data-vals="${esc(JSON.stringify(Array.isArray(a)?a:[]))}"></div><div class="note">✕ your crosses: green = within half a small square, red = not accurate enough. ○ = where each point should be.</div>`;
     if (q.type==="text") detail = `<div class="note">Your answer</div><div class="yours" data-yours="${q.id}"></div><div class="model"><b>Model answer</b><div>${esc(q.model)}</div><b style="display:block;margin-top:8px">Mark points: did you include these?</b><ul>${q.points.map(p=>`<li>${esc(p)}</li>`).join("")}</ul></div>`;
   return detail;
 }
@@ -799,6 +834,7 @@ function renderResult(ans, ts, fresh){
     </div>
     ${w.sections.map(s=>`<section class="stack" style="gap:12px"><div class="sec-head" style="margin-top:14px"><span class="crit ${s.crit}">${s.crit}</span><h2 class="mid">${esc(s.name)}</h2></div>${s.items.map(q=>q.type==="info"?infoHTML(q):block(q)).join("")}</section>`).join("")}
   </div>`;
+  mountPlotResults();
   app.querySelectorAll("[data-yours]").forEach(el => { const t = ans[el.dataset.yours]; el.textContent = t ? t : "No answer recorded."; });
   document.getElementById("back").onclick = renderWeeks;
   window.scrollTo(0,0);
