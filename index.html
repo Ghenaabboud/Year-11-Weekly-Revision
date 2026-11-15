@@ -8,8 +8,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=JetBrains+Mono:wght@500&display=swap">
-<link rel="stylesheet" href="style.css?v=202611152140">
-<link rel="stylesheet" href="missions.css?v=202611152140">
+<link rel="stylesheet" href="style.css?v=202611152143">
+<link rel="stylesheet" href="missions.css?v=202611152143">
 <style>
   h1.big{font-size:clamp(30px,5.5vw,44px);font-weight:800;margin-top:6px}
   h2.mid{font-size:22px}
@@ -198,15 +198,15 @@
 <main class="wrap wider" id="app"></main>
 <div class="toast" id="toast" role="status" hidden></div>
 
-<script src="config.js?v=202611152140"></script>
-<script src="weeks.js?v=202611152140"></script>
-<script src="api.js?v=202611152140"></script>
-<script src="sims.js?v=202611152140"></script>
+<script src="config.js?v=202611152143"></script>
+<script src="weeks.js?v=202611152143"></script>
+<script src="api.js?v=202611152143"></script>
+<script src="sims.js?v=202611152143"></script>
 <script>
 (function(){
 const W = window.REVISION_WEEKS, API = window.RevisionAPI;
-const PREVIEW = /[?&]preview\b/.test(location.search);
-const TEACHER = false; // true only in the teacher's private preview copy: unlocks every step and shows answers
+const TEACHER = /[?&]teacher\b/.test(location.search); // teacher view: unlocks every step and shows answers
+const PREVIEW = TEACHER || /[?&]preview\b/.test(location.search);
 const app = document.getElementById("app"), who = document.getElementById("who"), stickyMount = document.getElementById("stickyMount");
 let S = { student:null, week:null, answers:{}, step:0, mode:"" };
 
@@ -638,7 +638,7 @@ function renderMissions(sec){
         box.innerHTML = `<span class="mtag check">Check yourself</span>${qHTML(q, L[q.id])}<div class="chkrow"><span class="note">One try only: your marks lock when you press Check.</span><button type="button" class="btn" id="chk_${q.id}" ${answered(q, S.answers[q.id]) ? "" : "disabled"}>Check</button></div>`;
         box.querySelector(".q").style.cssText = "border:0;padding:0;margin-top:8px";
         if (TEACHER){
-          const key = q.type==="mcq" ? q.answer : q.type==="match" ? q.rows.map(r=>r.answer) : q.type==="cloze" ? q.blanks.slice() : q.type==="numtable" ? q.rows.map(r=>String(r.answer)) : null;
+          const key = q.type==="mcq" ? q.answer : q.type==="match" ? q.rows.map(r=>r.answer) : q.type==="cloze" ? q.blanks.slice() : q.type==="numtable" ? q.rows.map(r=>String(r.answer)) : q.type==="num" ? String(q.min) : null;
           const tb = document.createElement("button"); tb.type = "button"; tb.className = "btn ghost small"; tb.textContent = "Show answer";
           const ans = document.createElement("div"); ans.className = "teach-ans"; ans.hidden = true; ans.innerHTML = `<b>Answer key</b>${detailHTML(q, key).replace(/Your answer:/g,"Answer:")}`;
           tb.onclick = () => { ans.hidden = !ans.hidden; tb.textContent = ans.hidden ? "Show answer" : "Hide answer"; };
