@@ -565,5 +565,219 @@
     };
   };
 
+
+  /* ---------- shared: label a diagram with numbered markers and leader lines ---------- */
+  function labeller(stage, panel, found, cfg, onChange) {
+    const W = cfg.w || 400, H = cfg.h || 260;
+    const pool = cfg.pool || cfg.spots.map(p => p.n);
+    function draw() {
+      stage.innerHTML = "";
+      const narrow = (stage.clientWidth || window.innerWidth) < 600;
+      const svg = s("svg", { viewBox: narrow ? `-46 0 ${W + 92} ${H}` : `-${cfg.pad || 235} 0 ${W + 2 * (cfg.pad || 235)} ${H}`, class: "cellsvg " + (cfg.cls || ""), role: "img", "aria-label": cfg.label || "Diagram" });
+      const g = s("g"), add = g.append.bind(g); g.append = (...k) => add(...k.flat()); cfg.draw(g); svg.append(g);
+      const pos = {};
+      [0, 1].forEach(side => {
+        const list = cfg.spots.map((p, j) => ({ p, j })).filter(({ p }) => (p.x >= W / 2) === !!side).sort((a, b) => a.p.y - b.p.y);
+        let y = -1e9; list.forEach(o => { y = Math.max(o.p.y, y + 30); o.ly = y; });
+        const over = list.length ? list[list.length - 1].ly - (H - 14) : 0; if (over > 0) list.forEach(o => o.ly -= over);
+        list.forEach(o => pos[o.j] = { lx: side ? W + 30 : -30, ly: Math.max(14, o.ly) });
+      });
+      cfg.spots.forEach((p, j) => {
+        const done = !!found[j], { lx, ly } = pos[j], right = lx > W / 2;
+        svg.append(s("g", { class: "lead" + (done ? " ok" : "") }, s("line", { x1: lx + (right ? -12 : 12), y1: ly, x2: p.x, y2: p.y }), s("circle", { cx: p.x, cy: p.y, r: 6 })));
+      });
+      cfg.spots.forEach((p, j) => {
+        const done = !!found[j], { lx, ly } = pos[j], right = lx > W / 2;
+        const hs = s("g", { class: "hs" + (done ? " ok" : ""), tabindex: 0, role: "button", "aria-label": done ? p.n : "Structure " + (j + 1) },
+          s("circle", { cx: lx, cy: ly, r: 12 }), s("text", { x: lx, y: ly + 4.5, "text-anchor": "middle" }, done ? "✓" : String(j + 1)));
+        if (done && !narrow) hs.append(s("text", { x: lx + (right ? 18 : -18), y: ly + 4.5, class: "hslab", "text-anchor": right ? "start" : "end" }, p.n));
+        const ask = () => quiz(j, hs);
+        hs.addEventListener("click", ask); hs.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); ask(); } });
+        svg.append(hs);
+      });
+      stage.append(svg);
+      onChange(cfg.spots.filter((_, j) => found[j]).length, cfg.spots.length);
+    }
+    function quiz(j, hs) {
+      const p = cfg.spots[j];
+      if (found[j]) { panel.innerHTML = `<b>${p.n}</b>${p.info ? " · " + p.info : ""}`; return; }
+      hs.ownerSVGElement.querySelectorAll(".hs.sel").forEach(x => x.classList.remove("sel")); hs.classList.add("sel");
+      const opts = shuffle([p.n, ...shuffle(pool.filter(n => n !== p.n)).slice(0, 2)]);
+      panel.innerHTML = "";
+      panel.append(h("b", null, cfg.question ? cfg.question(j) : `What is structure ${j + 1}?`), h("div", { class: "simopts" }, opts.map(o => h("button", { type: "button", class: "simopt", onclick: e => {
+        if (o === p.n) { found[j] = 1; draw(); panel.innerHTML = `<span class="good">✓ <b>${p.n}</b></span>${p.info ? " · " + p.info : ""}`; }
+        else { const b = e.currentTarget; b.classList.remove("no"); void b.offsetWidth; b.classList.add("no"); b.disabled = true; }
+      } }, o))));
+    }
+    draw();
+  }
+
+  /* =============== 7. Sense organs + CNS / PNS map =============== */
+  SIMS.senseMap = (root, api) => {
+    const st = api.store; st.found = st.found || {}; st.seen = st.seen || {};
+    const stage = h("div", { class: "cellstage" }), panel = h("div", { class: "simpanel", "aria-live": "polite" }), count = h("div", { class: "simcount" });
+    root.append(h("p", { class: "simhelp" }, "Part 1: tap each numbered receptor and choose the stimulus it detects."), stage, panel, count);
+    const body = h("div", { class: "nsbody" });
+    const btns = h("div", { class: "simtabs" });
+    const info = h("div", { class: "simpanel", "aria-live": "polite" }, "Part 2: switch between the two parts of the nervous system.");
+    root.append(h("p", { class: "simhelp", style: "margin-top:14px" }, "Part 2: show where each part of the nervous system is."), btns, body, info);
+    const mark = tasks(root, ["Identify the stimulus for all six receptors", "Show the central nervous system (CNS)", "Show the peripheral nervous system (PNS)"]);
+    const POOL = ["Light", "Sound", "Change in position", "Chemicals in food", "Chemicals in the air", "Touch, pressure, pain and temperature"];
+    const cfg = {
+      label: "Head and hand with receptors", w: 400, h: 260, pad: 350, pool: POOL,
+      question: j => `What stimulus is detected at receptor ${j + 1}?`,
+      draw: g => g.append(
+        s("path", { d: "M70 210 C 50 150, 60 70, 130 40 C 190 18, 250 40, 262 95 L 284 128 L 262 136 C 266 160, 262 178, 246 186 C 236 206, 200 214, 170 214 L 165 250 L 92 250 Z", class: "skin" }),
+        s("ellipse", { cx: 228, cy: 100, rx: 13, ry: 8, class: "eyew" }), s("circle", { cx: 232, cy: 100, r: 5, class: "iris" }),
+        s("path", { d: "M216 92 q 12 -10 24 0", class: "lid" }),
+        s("path", { d: "M128 102 C 104 96, 104 150, 128 146 C 120 136, 120 112, 128 102 Z", class: "earo" }),
+        s("path", { d: "M152 128 m -7 0 a 7 7 0 1 0 14 0 a 4 4 0 1 0 -8 0", class: "coch" }),
+        [0, 1, 2].map(i => s("ellipse", { cx: 150 + i * 4, cy: 110 - i * 3, rx: 7, ry: 4, class: "canal", transform: `rotate(${i * 50 - 40} ${150 + i * 4} ${110 - i * 3})` })),
+        s("path", { d: "M236 120 C 252 112, 270 118, 280 126", class: "nasal" }),
+        s("path", { d: "M222 170 q 16 10 30 0", class: "lips" }), s("path", { d: "M222 172 q 14 6 26 -1", class: "tongue" }),
+        s("g", { transform: "translate(300 150)" },
+          s("rect", { x: 0, y: 30, width: 50, height: 60, rx: 14, class: "skin" }),
+          [0, 1, 2, 3].map(i => s("rect", { x: 2 + i * 12, y: 0, width: 10, height: 40, rx: 5, class: "skin" })),
+          s("rect", { x: -14, y: 40, width: 18, height: 10, rx: 5, class: "skin", transform: "rotate(-30 -5 45)" }))),
+      spots: [
+        { x: 236, y: 100, n: "Light", info: "Sense: sight · Receptors: retina, at the back of the eye" },
+        { x: 152, y: 130, n: "Sound", info: "Sense: hearing · Receptors: cochlea, in the inner ear" },
+        { x: 152, y: 106, n: "Change in position", info: "Sense: balance · Receptors: semicircular canals, in the inner ear" },
+        { x: 236, y: 172, n: "Chemicals in food", info: "Sense: taste · Receptors: taste buds on the tongue" },
+        { x: 262, y: 118, n: "Chemicals in the air", info: "Sense: smell · Receptors: lining at the top of the nasal cavity" },
+        { x: 307, y: 156, n: "Touch, pressure, pain and temperature", info: "Sense: touch · Receptors: all over the skin, most in the fingertips and lips" }]
+    };
+    let nF = 0;
+    const done = () => { mark(0, nF === 6); mark(1, st.seen.cns); mark(2, st.seen.pns); if (nF === 6 && st.seen.cns && st.seen.pns) api.done(); };
+    labeller(stage, panel, st.found, cfg, (n, t) => { nF = n; count.textContent = `Identified ${n} of ${t}`; api.save(); done(); });
+    /* body map */
+    const svg = s("svg", { viewBox: "0 0 240 300", class: "nssvg", role: "img", "aria-label": "Human body showing the nervous system" });
+    svg.append(
+      s("circle", { cx: 120, cy: 40, r: 28, class: "bodyo" }),
+      s("path", { d: "M92 76 h56 l18 110 h-20 l-6 100 h-16 l-4 -90 l-4 90 h-16 l-6 -100 h-20 Z", class: "bodyo" }),
+      s("path", { d: "M92 80 l-34 90 M148 80 l34 90", class: "limb" }));
+    const cns = s("g", { class: "cns" }, s("ellipse", { cx: 120, cy: 36, rx: 20, ry: 15 }), s("path", { d: "M120 52 V 182" }));
+    const pns = s("g", { class: "pns" }, s("path", { d: "M120 90 L 70 150 L 60 172 M120 90 L 170 150 L 180 172 M120 110 L 96 120 M120 110 L 144 120 M120 182 L 104 280 M120 182 L 136 280 M120 140 L 100 150 M120 140 L 140 150" }));
+    svg.append(pns, cns); body.append(svg);
+    const TXT = {
+      cns: "<b>Central nervous system (CNS)</b>: the brain and spinal cord. It is the coordinator: it receives impulses, processes the information and decides on a response.",
+      pns: "<b>Peripheral nervous system (PNS)</b>: all the nerves that connect the CNS to every part of the body. Sensory neurones carry impulses to the CNS; motor neurones carry them back out to muscles and glands."
+    };
+    [["cns", "Show the CNS"], ["pns", "Show the PNS"]].forEach(([k, t]) => btns.append(h("button", { type: "button", class: "simtab", "data-k": k, onclick: () => {
+      svg.classList.toggle("showC", k === "cns"); svg.classList.toggle("showP", k === "pns");
+      [...btns.children].forEach(b => b.setAttribute("aria-selected", b.dataset.k === k));
+      info.innerHTML = TXT[k]; st.seen[k] = 1; api.save(); done();
+    } }, t)));
+    done();
+  };
+
+  /* =============== 8. Stimulus → response pathway =============== */
+  SIMS.pathwayBuilder = (root, api) => {
+    const st = api.store; st.ran = st.ran || {};
+    const STAGES = ["Stimulus", "Receptor", "Sensory neurone", "Coordinator (CNS)", "Motor neurone", "Effector", "Response"];
+    const SC = {
+      pan: { n: "Hot pan", t: 0.05, cells: ["Heat from the pan", "Temperature receptors in the skin", "Sensory neurone", "Spinal cord (relay neurone)", "Motor neurone", "Arm muscle", "Hand pulls away"], note: "The spinal cord coordinates this response, with no thinking involved. The pathway is short, so it is very fast: you pull away before the brain even registers pain." },
+      light: { n: "Red light", t: 0.75, cells: ["Red traffic light", "Light receptors in the retina", "Sensory neurone", "Brain", "Motor neurone", "Leg muscle", "Foot presses the brake"], note: "The brain has to process the information and decide to stop, so this takes much longer than the hot pan." },
+      phone: { n: "Red light + phone", t: 1.5, cells: ["Red traffic light", "Light receptors in the retina", "Sensory neurone", "Brain (distracted)", "Motor neurone", "Leg muscle", "Foot presses the brake"], note: "The driver's attention is on the phone, so the light is noticed later and the brain takes longer to decide. At 100 km/h a car travels about 28 m every second: about 21 m before braking starts when focused, but about 42 m when distracted." },
+      save: { n: "Penalty save", t: 0.4, cells: ["Moving ball (light)", "Light receptors in the retina", "Sensory neurones", "Brain", "Motor neurones", "Leg and arm muscles", "Keeper dives"], note: "The brain must work out where the ball is going and choose a movement. Practice makes it faster, but it is still slower than an automatic response coordinated by the spinal cord." }
+    };
+    st.placed = st.placed || 0;
+    const slots = h("ol", { class: "pslots" });
+    const chips = h("div", { class: "pchips" });
+    const msg = h("div", { class: "simpanel", "aria-live": "polite" });
+    const tabs = h("div", { class: "simtabs" });
+    const timer = h("div", { class: "ptimer" });
+    root.append(h("p", { class: "simhelp" }, "Step 1: tap the stages in the right order to build the pathway. Step 2: run real scenarios through it and compare how long they take."), slots, chips, msg, tabs, timer);
+    const mark = tasks(root, ["Build the pathway in the right order", "Run the hot pan", "Run the red light", "Run the red light with a distracted driver"]);
+    STAGES.forEach((t, i) => slots.append(h("li", { class: "pslot" }, h("b", null, i < st.placed ? t : "?"), h("small", null, ""))));
+    const order = shuffle(STAGES.map((t, i) => i));
+    function drawChips() {
+      chips.innerHTML = "";
+      order.filter(i => i >= st.placed).forEach(i => chips.append(h("button", { type: "button", class: "simopt", onclick: e => {
+        if (i === st.placed) {
+          slots.children[i].querySelector("b").textContent = STAGES[i]; slots.children[i].classList.add("in");
+          st.placed++; api.save(); msg.innerHTML = st.placed === 7 ? "<span class='good'>✓ Pathway complete.</span> Every response to a stimulus follows these seven stages. Now run a scenario." : `✓ ${STAGES[i]}`; drawChips(); upd();
+        } else { const b = e.currentTarget; b.classList.remove("no"); void b.offsetWidth; b.classList.add("no"); msg.textContent = `Not yet. What comes straight after “${st.placed ? STAGES[st.placed - 1] : "the start"}”?`; }
+      } }, STAGES[i])));
+    }
+    let busy = false;
+    Object.entries(SC).forEach(([k, v]) => tabs.append(h("button", { type: "button", class: "simtab", "data-k": k, onclick: () => run(k) }, "▶ " + v.n)));
+    function run(k) {
+      if (st.placed < 7) { msg.textContent = "Build the pathway first (step 1)."; return; }
+      if (busy) return; busy = true;
+      const v = SC[k];
+      [...tabs.children].forEach(b => b.setAttribute("aria-selected", b.dataset.k === k));
+      [...slots.children].forEach((li, i) => { li.classList.remove("lit"); li.querySelector("small").textContent = v.cells[i]; });
+      const step = RM() ? 0 : Math.max(120, v.t * 900 / 7 * 2);
+      let i = 0;
+      const tick = () => {
+        if (i > 0) slots.children[i - 1].classList.remove("hot");
+        if (i < 7) { slots.children[i].classList.add("lit", "hot"); timer.textContent = `⏱ ${(v.t * (i + 1) / 7).toFixed(2)} s`; i++; setTimeout(tick, step); }
+        else { timer.innerHTML = `⏱ about <b>${v.t} s</b> from stimulus to response`; msg.innerHTML = v.note; st.ran[k] = 1; api.save(); busy = false; upd(); }
+      };
+      tick();
+    }
+    function upd() {
+      mark(0, st.placed >= 7); mark(1, st.ran.pan); mark(2, st.ran.light); mark(3, st.ran.phone);
+      if (st.placed >= 7 && st.ran.pan && st.ran.light && st.ran.phone) api.done();
+    }
+    if (st.placed) [...slots.children].forEach((li, i) => { if (i < st.placed) li.classList.add("in"); });
+    drawChips(); upd();
+  };
+
+  /* =============== 9. Neurone lab =============== */
+  SIMS.neuronLab = (root, api) => {
+    const st = api.store; st.found = st.found || {};
+    const stage = h("div", { class: "cellstage" }), panel = h("div", { class: "simpanel", "aria-live": "polite" }), count = h("div", { class: "simcount" });
+    root.append(h("p", { class: "simhelp" }, "Part 1: this is a motor neurone. Tap each number and choose the name of the part."), stage, panel, count);
+    const race = h("div", { class: "race" }), rmsg = h("div", { class: "simpanel", "aria-live": "polite" });
+    const go = h("button", { type: "button", class: "btn gold" }, "Send an impulse along both axons");
+    root.append(h("p", { class: "simhelp", style: "margin-top:14px" }, "Part 2: the impulse race. One axon has a myelin sheath, the other does not."), race, h("div", { class: "row" }, go), rmsg);
+    const mark = tasks(root, ["Label all six parts of the motor neurone", "Run the impulse race"]);
+    const cfg = {
+      label: "Motor neurone", w: 400, h: 200, pool: ["Dendrite", "Cell body", "Nucleus", "Axon", "Myelin sheath", "Axon terminal", "Receptor", "Synapse"],
+      draw: g => {
+        g.append([[-1, -1], [-1, 1], [1, -1], [0, -1.3], [0, 1.3], [-1.3, 0]].map(([dx, dy]) => s("path", { d: `M60 100 l ${dx * 34} ${dy * 30} l ${dx * 10 - 6} ${dy * 4 + 6} M${60 + dx * 34} ${100 + dy * 30} l ${dx * 4 + 8} ${dy * 12}`, class: "dend" })));
+        g.append(s("circle", { cx: 60, cy: 100, r: 24, class: "soma" }), s("circle", { cx: 60, cy: 100, r: 9, class: "nucl" }));
+        g.append(s("path", { d: "M84 100 H 330", class: "axon" }));
+        g.append([0, 1, 2, 3, 4].map(i => s("rect", { x: 100 + i * 44, y: 91, width: 36, height: 18, rx: 9, class: "myel" })));
+        g.append(s("path", { d: "M330 100 l 22 -26 M330 100 l 26 0 M330 100 l 22 26 M352 74 l 8 -4 M356 100 l 8 0 M352 126 l 8 4", class: "axon" }));
+        g.append([[360, 70], [364, 100], [360, 130]].map(([x, y]) => s("circle", { cx: x, cy: y, r: 4, class: "term" })));
+        g.append(s("rect", { x: 368, y: 60, width: 28, height: 80, rx: 8, class: "muscle" }));
+      },
+      spots: [
+        { x: 30, y: 72, n: "Dendrite", info: "receives impulses from other neurones" },
+        { x: 52, y: 118, n: "Cell body", info: "contains the nucleus and most of the cytoplasm" },
+        { x: 60, y: 100, n: "Nucleus", info: "controls the cell" },
+        { x: 142, y: 100, n: "Myelin sheath", info: "a fatty layer that insulates the axon and speeds up the impulse" },
+        { x: 327, y: 100, n: "Axon", info: "carries the impulse away from the cell body, can be over 1 m long" },
+        { x: 362, y: 72, n: "Axon terminal", info: "releases neurotransmitters to the next cell (here, a muscle fibre)" }]
+    };
+    let nF = 0;
+    const upd = () => { mark(0, nF === 6); mark(1, st.raced); if (nF === 6 && st.raced) api.done(); };
+    labeller(stage, panel, st.found, cfg, (n, t) => { nF = n; count.textContent = `Labelled ${n} of ${t}`; api.save(); upd(); });
+    /* race */
+    const rs = s("svg", { viewBox: "0 0 400 130", class: "racesvg", role: "img", "aria-label": "Two axons, one with myelin and one without" });
+    rs.append(s("text", { x: 4, y: 22, class: "rlab" }, "With myelin sheath"), s("path", { d: "M10 42 H 390", class: "axon" }),
+      [0, 1, 2, 3, 4, 5, 6].map(i => s("rect", { x: 14 + i * 54, y: 33, width: 46, height: 18, rx: 9, class: "myel" })),
+      s("text", { x: 4, y: 88, class: "rlab" }, "Without myelin sheath"), s("path", { d: "M10 108 H 390", class: "axon" }));
+    const d1 = s("circle", { cx: 10, cy: 42, r: 7, class: "imp" }), d2 = s("circle", { cx: 10, cy: 108, r: 7, class: "imp" });
+    rs.append(d1, d2); race.append(rs);
+    go.onclick = () => {
+      go.disabled = true; rmsg.textContent = "Impulses travelling…";
+      const t0 = performance.now(), T1 = RM() ? 1 : 900, T2 = RM() ? 1 : 3600;
+      const nodes = [10, 64, 118, 172, 226, 280, 334, 390];
+      const f = t => {
+        const e = t - t0, p1 = Math.min(1, e / T1), p2 = Math.min(1, e / T2);
+        d1.setAttribute("cx", nodes[Math.min(7, Math.floor(p1 * 7.999))]); d2.setAttribute("cx", 10 + 380 * p2);
+        if (p2 < 1) requestAnimationFrame(f);
+        else { go.disabled = false; st.raced = 1; api.save(); upd();
+          rmsg.innerHTML = "<b>The myelinated axon wins easily.</b> The myelin sheath insulates the axon, so the impulse jumps from gap to gap instead of travelling along every part of the membrane. In humans, impulses in myelinated neurones travel at up to about 100 m/s, compared with about 1 m/s in unmyelinated ones. That speed matters for survival: think of pulling away from a hot pan."; }
+      };
+      requestAnimationFrame(f);
+    };
+    upd();
+  };
+
   window.SIMS = SIMS;
 })();
