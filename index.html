@@ -8,8 +8,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=JetBrains+Mono:wght@500&display=swap">
-<link rel="stylesheet" href="style.css?v=202611152143">
-<link rel="stylesheet" href="missions.css?v=202611152143">
+<link rel="stylesheet" href="style.css?v=202611152155">
+<link rel="stylesheet" href="missions.css?v=202611152155">
 <style>
   h1.big{font-size:clamp(30px,5.5vw,44px);font-weight:800;margin-top:6px}
   h2.mid{font-size:22px}
@@ -198,10 +198,11 @@
 <main class="wrap wider" id="app"></main>
 <div class="toast" id="toast" role="status" hidden></div>
 
-<script src="config.js?v=202611152143"></script>
-<script src="weeks.js?v=202611152143"></script>
-<script src="api.js?v=202611152143"></script>
-<script src="sims.js?v=202611152143"></script>
+<script src="config.js?v=202611152155"></script>
+<script src="weeks.js?v=202611152155"></script>
+<script src="api.js?v=202611152155"></script>
+<script src="sims.js?v=202611152155"></script>
+<script src="terms.js?v=202611152155"></script>
 <script>
 (function(){
 const W = window.REVISION_WEEKS, API = window.RevisionAPI;
@@ -225,7 +226,12 @@ const TERMS = {
   "predict":"Say what you expect to happen.",
   "design":"Produce a plan or method someone else could follow.",
   "justify":"Give reasons or evidence that support your answer.",
-  "plot":"Mark each value accurately on the graph, using the scale on the axes."
+  "plot":"Mark each value accurately on the graph, using the scale on the axes.",
+  "compare":"Give similarities AND differences, referring to both things in every point. Use “both” and “whereas”.",
+  "classify":"Put each item into one of the groups given in the question.",
+  "analyse":"Break down the data to bring out the pattern, quote numbers, and say where the pattern changes.",
+  "comment":"Give a judgement based on a statement or the result of a calculation, with a reason.",
+  "select":"Choose the correct answer from the options given."
 };
 const CRIT = {
   R:{tests:"Quick recall of the key facts from the lessons, before you use them in exam-style questions.", tip:"Try each card from memory first, then tap it to check. Every question here is marked straight away."},
@@ -392,12 +398,80 @@ function renderWeeks(){
   }).join("");
   app.innerHTML = `<div class="stack" style="gap:20px">
     <div><div class="eyebrow">Welcome back</div><h1 class="big" style="font-size:clamp(28px,4.5vw,36px)">Hello ${esc(S.student.first)}</h1></div>
+    ${tabBar("packs")}
     ${banner}
     <h2 class="mid">All packs</h2>
     <div class="weeklist">${rows}</div>
   </div>`;
   app.querySelectorAll("[data-w]").forEach(b => b.onclick = () => openWeek(W.find(w => w.id===b.dataset.w)));
+  bindTabs();
 }
+
+/* ---------- command terms guide ---------- */
+const CT = window.COMMAND_TERMS || [], CTL = window.TERM_LEVELS || {};
+const ctKey = () => "y11rev_terms_" + (S.student ? S.student.id : "x");
+function tabBar(cur){
+  const m = (ls(ctKey()) || []).length;
+  return `<div class="tabbar" role="tablist"><button role="tab" data-tab="packs" aria-selected="${cur==="packs"}">Weekly packs</button><button role="tab" data-tab="terms" aria-selected="${cur==="terms"}">Command terms <span class="tcount">${m}/${CT.length} mastered</span></button></div>`;
+}
+function bindTabs(){ app.querySelectorAll("[data-tab]").forEach(b => b.onclick = () => b.dataset.tab==="terms" ? renderTerms() : renderWeeks()); }
+function markHTML(txt){ return esc(txt).replace(/ ?✓/g, ' <span class="mk">✓</span>').replace(/\n/g, "<br>"); }
+function termCard(t, onMaster){
+  const el = document.createElement("article"); el.className = "tcard";
+  const order = Math.random() < .5 ? ["good","weak"] : ["weak","good"];
+  el.innerHTML = `<div class="tc-head"><h2>${esc(t.t)}</h2><span class="tlvl l${t.lvl}">${esc((CTL[t.lvl]||{}).n||"")} · ${esc((CTL[t.lvl]||{}).d||"")}</span><span class="note">Used in criterion ${esc(t.crit)}</span></div>
+    <p class="tc-means"><b>What it asks you to do:</b> ${esc(t.means)}</p>
+    <div class="tc-two"><div><h3>How to answer</h3><ol class="tc-how">${t.how.map(x=>`<li>${esc(x)}</li>`).join("")}</ol></div>
+      <div><h3>Sentence starters</h3><ul class="tc-start">${t.starters.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div></div>
+    <div class="tc-try"><span class="mtag check">Try it</span><p class="tc-q"><b>${esc(t.q)}</b> <span class="q-marks">[${t.marks}]</span></p>
+      <p class="note" style="margin:0 0 8px">Two students answered this. Which answer gets full marks?</p>
+      <div class="tc-opts">${order.map((k,i)=>`<button type="button" class="tc-opt" data-k="${k}"><span class="tc-l">Answer ${"AB"[i]}</span><span>${markHTML(t[k]).replace(/ <span class="mk">✓<\/span>/g,"")}</span></button>`).join("")}</div>
+      <div class="tc-res" hidden></div></div>`;
+  const res = el.querySelector(".tc-res");
+  el.querySelectorAll(".tc-opt").forEach(b => b.onclick = () => {
+    const right = b.dataset.k === "good";
+    el.querySelectorAll(".tc-opt").forEach(x => { x.disabled = true; x.classList.add(x.dataset.k==="good" ? "right" : "wrong"); });
+    res.hidden = false;
+    res.innerHTML = `<p class="${right?"good":"bad"}" style="margin:0 0 8px"><b>${right?"Correct! You spotted the full-marks answer.":"Not this one. The other answer gets full marks."}</b></p>
+      <div class="model"><b>Model answer, mark by mark</b> <span class="note">(each <span class="mk">✓</span> is where a mark is earned)</span><div style="margin-top:6px">${markHTML(t.good)}</div></div>
+      <div class="tc-why"><b>Why the other answer loses marks:</b> ${esc(t.why)}</div>`;
+    if (right && onMaster) onMaster(t.k);
+  });
+  return el;
+}
+function renderTerms(sel){
+  S.mode = "terms"; stickyMount.innerHTML = ""; setWho();
+  const done = ls(ctKey()) || [];
+  sel = sel || (CT.find(t => !done.includes(t.k)) || CT[0]).k;
+  app.innerHTML = `<div class="stack" style="gap:20px">
+    <div><div class="eyebrow">Exam skills</div><h1 class="big" style="font-size:clamp(28px,4.5vw,36px)">Master the command terms</h1>
+      <p class="lead">The bold word in every exam question tells you what kind of answer gets the marks. Learn what each one asks for, see a full-marks answer, then test yourself: spot the answer that gets full marks.</p></div>
+    ${tabBar("terms")}
+    <div class="tlevels">${[1,2,3,4].map(l=>`<div class="tl"><div class="tl-h"><span class="tlvl l${l}">${esc(CTL[l].n)}</span><span class="note">${esc(CTL[l].d)}</span></div><div class="tchips">${CT.filter(t=>t.lvl===l).map(t=>`<button type="button" class="tchip ${done.includes(t.k)?"ok":""}" data-t="${t.k}" aria-pressed="${t.k===sel}">${done.includes(t.k)?"✓ ":""}${esc(t.t)}</button>`).join("")}</div></div>`).join("")}</div>
+    <div id="tdetail"></div>
+  </div>`;
+  const det = document.getElementById("tdetail");
+  det.append(termCard(CT.find(t=>t.k===sel), k => { const d = ls(ctKey()) || []; if (!d.includes(k)) { d.push(k); ls(ctKey(), d); } const c = app.querySelector(`.tchip[data-t="${k}"]`); if (c) { c.classList.add("ok"); c.textContent = "✓ " + c.textContent.replace(/^✓ /,""); } const tc = app.querySelector(".tcount"); if (tc) tc.textContent = `${d.length}/${CT.length} mastered`; }));
+  const i = CT.findIndex(t=>t.k===sel), nxt = CT[(i+1)%CT.length];
+  const nb = document.createElement("div"); nb.className = "navrow"; nb.innerHTML = `<span></span><button class="btn" type="button">Next: ${esc(nxt.t)} →</button>`;
+  nb.querySelector("button").onclick = () => { renderTerms(nxt.k); window.scrollTo(0,0); };
+  det.append(nb);
+  app.querySelectorAll("[data-t]").forEach(b => b.onclick = () => { renderTerms(b.dataset.t); });
+  bindTabs();
+}
+/* the same guide as a pop-up while working on a pack, so students keep their place */
+function openGuide(k){
+  const t = CT.find(x => x.k === k); if (!t) return;
+  let ov = document.getElementById("guideOv");
+  if (!ov){ ov = document.createElement("div"); ov.id = "guideOv"; ov.className = "gov"; document.body.append(ov); ov.addEventListener("click", e => { if (e.target === ov) ov.hidden = true; }); document.addEventListener("keydown", e => { if (e.key === "Escape") ov.hidden = true; }); }
+  ov.innerHTML = `<div class="gbox" role="dialog" aria-modal="true" aria-label="How to answer: ${esc(t.t)}"><button type="button" class="gclose" aria-label="Close">✕ Close</button></div>`;
+  const box = ov.querySelector(".gbox");
+  box.append(termCard(t, k2 => { const d = ls(ctKey()) || []; if (!d.includes(k2)) { d.push(k2); ls(ctKey(), d); } }));
+  box.querySelector(".gclose").onclick = () => { ov.hidden = true; };
+  ov.hidden = false; box.querySelector(".gclose").focus();
+}
+document.addEventListener("click", e => { const g = e.target.closest("[data-guide]"); if (g){ e.preventDefault(); openGuide(g.dataset.guide); } });
+const guideKey = t => (t === "compare and contrast" || t === "compare" || t === "contrast") ? "compare" : t;
 
 function openWeek(w){
   S.week = w;
@@ -464,7 +538,7 @@ function renderStart(){
       <div class="type"><b>Written answer</b>Full sentences. A bar shows when you have written the minimum number of words.</div>
     </div>
     <details class="terms" open><summary>Command terms: what the bold word in each question asks you to do</summary>
-      <div class="termlist">${Object.entries(TERMS).map(([t,d])=>`<b>${t[0].toUpperCase()+t.slice(1)}</b><span>${d}</span>`).join("")}</div>
+      <div class="termlist">${Object.entries(TERMS).map(([t,d])=>`<b>${t[0].toUpperCase()+t.slice(1)}</b><span>${d}${CT.some(c=>c.k===guideKey(t))?` <button type="button" class="linkbtn" data-guide="${guideKey(t)}">How to answer →</button>`:""}</span>`).join("")}</div>
     </details>
     <label class="pledge" for="pledge"><input type="checkbox" id="pledge" ${S.integ.pledged?"checked":""}><span><b>My promise.</b> I will answer these questions myself. I will not copy answers, search online, use AI or ask someone else to answer for me.</span></label>
     <div class="navrow"><span class="saved" id="pledgeMsg"></span><button class="btn" id="go">${w.sections[0].crit==="R"?"Start the "+rName(w):"Start with criterion "+w.sections[0].crit} →</button></div>
@@ -505,7 +579,7 @@ function qHTML(q, L){
   const terms = termsIn(q.prompt);
   return `<div class="q" id="box_${q.id}"><div class="q-top"><span class="q-id">${L}</span><span class="q-marks">${q.marks} mark${q.marks>1?"s":""}</span></div>
     <div class="q-prompt">${q.prompt}</div><div class="how-to"><b>How to answer:</b><span>${how}</span></div>${q.hint?`<div class="qhint"><b>Hint:</b> ${q.hint}</div>`:""}${body}
-    ${terms.length?`<div class="term">${terms.map(t=>`<b>${t[0].toUpperCase()+t.slice(1)}</b> means: ${TERMS[t]}`).join("<br>")}</div>`:""}</div>`;
+    ${terms.length?`<div class="term">${terms.map(t=>`<b>${t[0].toUpperCase()+t.slice(1)}</b> means: ${TERMS[t]}${CT.some(c=>c.k===guideKey(t))?` <button type="button" class="linkbtn" data-guide="${guideKey(t)}">How to answer →</button>`:""}`).join("<br>")}</div>`:""}</div>`;
 }
 
 /* ---------- plot-the-graph questions ---------- */

@@ -911,11 +911,11 @@ window.REVISION_WEEKS = [
     crit: "R", name: "Recall missions",
     items: [
       /* ---------- Mission 1 ---------- */
-      { type: "info", mission: { n: 1, title: "Mission control", lesson: "CNS, PNS and receptors",
-        story: "You are a neurosurgeon training junior doctors. Before anyone touches a patient, they must know how the body detects changes and where the messages go." } },
-      { type: "info", predict: { q: "A driver sees a traffic light turn red. Which part of the nervous system <b>decides</b> to press the brake?",
-        options: ["The eye", "The brain", "The leg muscle", "The sensory neurone"], answer: 1,
-        reveal: "The eye contains the <b>receptors</b> that detect the light, but the <b>brain</b> is the coordinator: it processes the information and decides on the response. The leg muscle is the <b>effector</b> that carries the response out." } },
+      { type: "info", mission: { n: 1, title: "Sensor check", lesson: "CNS, PNS and receptors",
+        story: "You have joined the sports science team at a Dubai athletics academy. Before you can test athletes' reactions, show that you know how the body detects changes and where the messages go." } },
+      { type: "info", predict: { q: "A sprinter hears the starting gun and pushes off the blocks. Which part of the nervous system <b>decides</b> to start running?",
+        options: ["The ear", "The brain", "The leg muscles", "The sensory neurone"], answer: 1,
+        reveal: "The ear contains the <b>receptors</b> that detect the sound, but the <b>brain</b> is the coordinator: it processes the information and decides on the response. The leg muscles are the <b>effectors</b> that carry the response out." } },
       { type: "info", sim: { name: "senseMap", title: "Receptors and the two parts of the nervous system" } },
       { type: "info", flash: [
         { q: "What are the two parts of the central nervous system (CNS)?", a: "The brain and the spinal cord. The CNS is the coordinator: it processes information and decides on a response." },
@@ -950,13 +950,13 @@ window.REVISION_WEEKS = [
         prompt: "Which is the best definition of a <b>stimulus</b>?",
         options: ["A cell that detects a change in the environment", "A change in the environment that can be detected by a receptor", "The reaction of the body to a change", "An electrical message carried along a neurone"], answer: 1,
         explain: "A stimulus is the change itself (for example heat or light). The cell that detects it is a receptor, the reaction is the response, and the electrical message is a nerve impulse." },
-      { type: "info", exam: "<b>In criterion A this becomes:</b> questions A1 and A2. “<b>State</b>” needs short, precise answers. “<b>Outline</b>” needs a brief point for each mark: three jobs, three points." },
+      { type: "info", exam: "<b>In criterion A this becomes:</b> question A1. “<b>Identify</b> the student whose statement is correct” questions test exact definitions, so check every word of each option against what you know about the CNS and PNS." },
 
       /* ---------- Mission 2 ---------- */
-      { type: "info", mission: { n: 2, title: "Trace the pathway", lesson: "From stimulus to response",
-        story: "Every response in the body follows the same route. Build it, then race real situations through it, from a hot pan to a red light on Sheikh Zayed Road." } },
-      { type: "info", predict: { q: "You touch a hot pan and your hand pulls away <b>before</b> you feel any pain. Which part of the CNS coordinates this response?",
-        options: ["The brain", "The spinal cord", "The skin", "The arm muscle"], answer: 1,
+      { type: "info", mission: { n: 2, title: "Reaction lab", lesson: "From stimulus to response",
+        story: "Every response in the body follows the same route. Build it, then race real situations through it: a sharp shell on the beach, the start lights at Yas Marina and a driver who is too tired to be on the road." } },
+      { type: "info", predict: { q: "Walking barefoot on the beach, you step on a sharp shell and lift your foot <b>before</b> you feel any pain. Which part of the CNS coordinates this response?",
+        options: ["The brain", "The spinal cord", "The skin", "The leg muscle"], answer: 1,
         reveal: "The <b>spinal cord</b> coordinates it, through a relay neurone. The impulse does not have to travel to the brain and wait for a decision, so the pathway is shorter and the response is faster. You will study this in detail next lesson: the reflex arc." } },
       { type: "info", sim: { name: "pathwayBuilder", title: "Build the pathway and race the scenarios" } },
       { type: "info", flash: [
@@ -965,8 +965,8 @@ window.REVISION_WEEKS = [
         { q: "Sensory, relay and motor neurones: where does each carry impulses?", a: "Sensory: from a receptor to the CNS. Relay: inside the CNS, linking sensory and motor neurones. Motor: from the CNS to an effector." }
       ] },
       { id: "w5r4", type: "cloze", marks: 6,
-        prompt: "Complete the pathway for a driver who sees a red light and brakes.",
-        text: "The red light is the [[0]]. It is detected by light receptors in the [[1]] of the eye. Impulses travel along a [[2]] neurone to the [[3]], which processes the information and decides to stop. Impulses then travel along a [[4]] neurone to the leg muscle, which is the [[5]].",
+        prompt: "Complete the pathway for a racing driver at Yas Marina who sees the start lights go out and presses the accelerator.",
+        text: "The lights going out are the [[0]]. This change is detected by light receptors in the [[1]] of the eye. Impulses travel along a [[2]] neurone to the [[3]], which processes the information and decides to go. Impulses then travel along a [[4]] neurone to the leg muscle, which is the [[5]].",
         options: ["stimulus", "response", "retina", "cochlea", "sensory", "relay", "motor", "brain", "spinal cord", "effector", "receptor"],
         blanks: ["stimulus", "retina", "sensory", "brain", "motor", "effector"] },
       { id: "w5r5", type: "match", marks: 3,
@@ -979,14 +979,14 @@ window.REVISION_WEEKS = [
           { label: "Carries impulses from the CNS to a muscle or gland", answer: "Motor neurone" }
         ] },
       { id: "w5r6", type: "mcq", marks: 1,
-        prompt: "Why does a driver who is looking at their phone take longer to stop at a red light?",
-        options: ["The light receptors in the retina stop working.", "Their motor neurones carry impulses more slowly.", "Their attention is elsewhere, so the light is noticed later and the brain takes longer to process it and decide to brake.", "The leg muscle needs more energy to contract."], answer: 2,
-        explain: "Nothing is wrong with the receptors, neurones or muscles. Distraction delays the detection and processing of the stimulus, so reaction time increases and the car travels further before braking starts." },
-      { type: "info", exam: "<b>In criterion A this becomes:</b> questions A3 and A5. When you <b>describe</b> a pathway, name every stage in order and say what happens at the CNS. When you <b>explain</b>, link cause and effect with “so” and “because”." },
+        prompt: "A sprinter takes longer to react to the starting gun than to lift her foot off a sharp stone. Which statement explains why?",
+        options: ["Sound travels more slowly than pain.", "The response to the gun is coordinated by the brain, which must process the sound and decide to move, so the pathway is longer.", "Her leg muscles are already tired at the start of a race.", "Sensory neurones from the ear have no myelin sheath."], answer: 1,
+        explain: "Lifting the foot off the stone is coordinated by the spinal cord with no decision, so the pathway is short. Starting a race needs the brain to process the sound and decide, which takes longer." },
+      { type: "info", exam: "<b>In criterion A this becomes:</b> questions A2 to A5, all about one reaction test. Expect to <b>apply</b> the seven stages to a situation you have not seen before: find the stimulus, receptor and effector in the new context first." },
 
       /* ---------- Mission 3 ---------- */
       { type: "info", mission: { n: 3, title: "Neurone lab", lesson: "Structure and function of neurones",
-        story: "Your junior doctors will be operating near nerves that are over a metre long. Show them how a neurone's structure lets it carry impulses quickly." } },
+        story: "The academy's coach wants to know what makes some messages faster than others. Show how a neurone's structure lets it carry impulses quickly over distances of more than a metre." } },
       { type: "info", predict: { q: "Which feature makes a nerve impulse travel <b>faster</b> along an axon?",
         options: ["Having more dendrites", "A myelin sheath around the axon", "A bigger nucleus", "A shorter cell body"], answer: 1,
         reveal: "The <b>myelin sheath</b> is a fatty layer that insulates the axon. The impulse jumps along it, so it travels much faster than along an axon with no myelin." } },
@@ -1021,58 +1021,63 @@ window.REVISION_WEEKS = [
         prompt: "Which <b>pair</b> of features do <b>all three</b> types of neurone share?",
         options: ["A myelin sheath and a cell body at one end", "Dendrites and a cell body containing a nucleus", "A long axon and a connection to a muscle", "A position inside the CNS and no myelin sheath"], answer: 1,
         explain: "All neurones have dendrites, a cell body with a nucleus, and a fibre ending in branched terminals. Myelin, length and position differ between the three types." },
-      { type: "info", exam: "<b>In criterion A this becomes:</b> question A4. To <b>explain</b> structure and function, use the pattern “<i>it has … so that …</i>” for every feature. One feature with its reason earns one mark." }
+      { type: "info", exam: "<b>In criterion A this becomes:</b> questions A6 and A7. To <b>explain</b> structure and function, use the pattern “<i>it has … so that …</i>” for every feature. For <b>compare and contrast</b>, use “both” and “whereas”." }
     ]
   },
   {
     crit: "A", name: "Knowing and understanding",
     items: [
       { type: "info",
-        html: "<p>These questions are in the style of the MYP eAssessment. They test three strands: <b>(i)</b> explaining scientific knowledge, <b>(ii)</b> applying it to familiar and unfamiliar situations, and <b>(iii)</b> analysing and evaluating information to make a judgement.</p>" },
+        html: "<p>These questions are in the style of the MYP eAssessment. They test three strands: <b>(i)</b> explaining scientific knowledge, <b>(ii)</b> applying it to familiar and unfamiliar situations, and <b>(iii)</b> analysing and evaluating information to make a judgement.</p><p><b>Context: the reaction-time lab.</b> A sports academy in Dubai tests its athletes with a <b>light board</b>. When one of the lights on the board turns on, the athlete must hit it with their hand as fast as possible. The board records the reaction time in seconds.</p>" },
 
-      { id: "w5a1", type: "text", marks: 3, minWords: 15,
-        prompt: "<b>State</b> the two parts of the central nervous system, and <b>state</b> what makes up the peripheral nervous system.",
-        model: "The central nervous system is made of the brain (1) and the spinal cord (1). The peripheral nervous system is made of the nerves that connect the CNS to every part of the body (1).",
-        points: ["Brain", "Spinal cord", "PNS: the nerves connecting the CNS to the rest of the body"] },
+      { id: "w5a1", type: "mcq", marks: 1,
+        prompt: "Four students describe the nervous system. <b>Identify</b> the student whose statement is correct.",
+        options: ["Student A: The central nervous system is made of the brain and all the nerves in the body.", "Student B: The peripheral nervous system processes information and decides on a response.", "Student C: The spinal cord is part of the central nervous system, and the nerves in the arm are part of the peripheral nervous system.", "Student D: Relay neurones are found in the peripheral nervous system."], answer: 2,
+        explain: "The CNS is the brain and spinal cord only, and it is the CNS (not the PNS) that processes information. Relay neurones are inside the CNS. Nerves running to the arm are part of the PNS." },
 
-      { id: "w5a2", type: "text", marks: 3, minWords: 25,
-        prompt: "<b>Outline</b> the three jobs of the nervous system.",
-        model: "It detects changes (stimuli) inside and outside the body using receptors (1). It carries messages around the body as electrical nerve impulses (1). It coordinates a response, carried out by muscles or glands (effectors) (1).",
-        points: ["Detects stimuli / changes inside and outside the body", "Carries messages as electrical nerve impulses", "Coordinates a response by muscles or glands"] },
+      { id: "w5a2", type: "text", marks: 3, minWords: 12,
+        prompt: "In the light-board test, <b>state</b> the stimulus, the receptor and the effector.",
+        model: "Stimulus: the light turning on (1). Receptor: light receptors in the retina of the eye (1). Effector: the muscles of the arm (and hand) (1).",
+        points: ["Stimulus: the light turning on", "Receptor: retina / light receptors in the eye", "Effector: arm / hand muscles"] },
 
-      { id: "w5a3", type: "text", marks: 4, minWords: 40,
-        prompt: "A driver on Sheikh Zayed Road sees a traffic light turn red and presses the brake. <b>Describe</b> the pathway that produces this response.",
-        hint: "<b>Describe</b> means give a detailed account, in order. Name the receptor, each neurone, the coordinator and the effector.",
-        model: "The red light (stimulus) is detected by light receptors in the retina of the eye (1). An electrical impulse travels along a sensory neurone to the brain (CNS) (1). The brain processes the information and decides to stop, then sends impulses along a motor neurone (1) to the leg muscle (effector), which contracts so the foot presses the brake (response) (1).",
-        points: ["Light detected by receptors in the retina", "Impulse along a sensory neurone to the brain / CNS", "Brain processes and sends impulse along a motor neurone", "Leg muscle (effector) contracts: foot presses the brake"] },
+      { id: "w5a3", type: "mcq", marks: 1,
+        prompt: "<b>Select</b> the correct order in which the impulse travels in the light-board test.",
+        options: ["Retina → motor neurone → brain → sensory neurone → arm muscle", "Retina → sensory neurone → brain → motor neurone → arm muscle", "Arm muscle → motor neurone → brain → sensory neurone → retina", "Retina → sensory neurone → spinal cord → relay neurone → arm muscle"], answer: 1,
+        explain: "Receptor → sensory neurone → CNS (here the brain, because the athlete must decide which light to hit) → motor neurone → effector." },
 
-      { id: "w5a4", type: "text", marks: 4, minWords: 40,
-        prompt: "<b>Explain</b> how the structure of a motor neurone is suited to its function.",
-        hint: "For each feature use the pattern “<i>it has … so that …</i>”. Start by stating the function of a motor neurone.",
-        model: "A motor neurone carries impulses from the CNS to an effector such as a muscle (1). It has a long axon so that one cell can carry the impulse all the way from the spinal cord to a distant muscle (1). The axon is covered in a myelin sheath, which insulates it so that the impulse travels faster (1). It has dendrites to receive impulses from other neurones and branched axon terminals that release neurotransmitters onto many muscle fibres (1).",
-        points: ["Function: carries impulses from the CNS to an effector", "Long axon reaches distant muscles", "Myelin sheath insulates the axon, so the impulse is faster", "Dendrites receive impulses / axon terminals release neurotransmitters to the muscle"] },
+      { id: "w5a4", type: "text", marks: 3, minWords: 30,
+        prompt: "<b>Outline</b> the role of the brain in the light-board test.",
+        model: "The brain receives electrical impulses from sensory neurones coming from the retina (1). It processes this information, working out which light has turned on and deciding how to move (1). It then sends impulses along motor neurones to the arm muscles so the athlete hits the light (1).",
+        points: ["Receives impulses from sensory neurones", "Processes the information / decides on the response", "Sends impulses along motor neurones to the arm muscles (effectors)"] },
 
-      { id: "w5a5", type: "text", marks: 3, minWords: 30,
-        prompt: "Road-safety campaigns in the UAE warn drivers not to use their phones while driving. Using your knowledge of the nervous system, <b>explain</b> why a distracted driver takes longer to stop.",
-        model: "The driver's attention is on the phone, so the stimulus (for example a red light or the car in front braking) is detected and noticed later (1). The brain takes longer to process the information and decide to brake, so the reaction time increases (1). During this extra time the car keeps moving, so it travels further before it stops and is more likely to crash (1).",
-        points: ["Stimulus noticed later because attention is elsewhere", "Brain takes longer to process and decide: reaction time increases", "Car travels further before stopping: greater risk of a crash"] },
+      { id: "w5a5", type: "text", marks: 2, minWords: 20,
+        prompt: "After six weeks of daily light-board practice, an athlete's mean reaction time fell from 0.42 s to 0.31 s. <b>Suggest</b> why practice reduced the reaction time.",
+        hint: "<b>Suggest</b> means propose a sensible reason. Which stage of the pathway can change with practice: the receptor, the neurones or the processing in the brain?",
+        model: "With practice, the brain becomes faster at processing the familiar stimulus and deciding which movement to make (1), so less time passes between the light turning on and the impulse being sent to the arm muscles (1). The receptors and the speed of the impulse along the neurones stay the same.",
+        points: ["Brain processes the stimulus / makes the decision faster with practice", "So less time between stimulus and response (reaction time falls)"] },
 
-      { id: "w5a6", type: "text", marks: 4, minWords: 40,
-        prompt: "A goalkeeper sees a penalty kicked and dives to save it. Another person touches a hot pan and pulls their hand away. <b>Compare and contrast</b> these two responses.",
-        hint: "<b>Compare and contrast</b> means give similarities AND differences. Use “both” and “whereas”. Think about which part of the CNS coordinates each one, and which is faster.",
-        model: "Both responses follow the same pathway: a stimulus is detected by receptors, impulses travel along sensory neurones to the CNS and along motor neurones to muscles (effectors) (1). The hot pan response is coordinated by the spinal cord through a relay neurone, whereas the save is coordinated by the brain (1). The hot pan response is automatic, with no thinking, whereas the goalkeeper must process where the ball is going and decide how to move (1). So the hot pan response is faster, because its pathway is shorter and involves no decision (1).",
-        points: ["Similarity: both follow stimulus → receptor → sensory → CNS → motor → effector", "Coordinator: spinal cord (hot pan) vs brain (save)", "Automatic (no decision) vs conscious decision", "Hot pan faster: shorter pathway"] },
+      { id: "w5a6", type: "text", marks: 3, minWords: 30,
+        prompt: "In multiple sclerosis (MS), the immune system damages the <b>myelin sheath</b> around neurones. <b>Explain</b> why people with MS often have slower reactions and difficulty controlling their movements.",
+        model: "The myelin sheath insulates the axon and speeds up the nerve impulse (1). When the myelin is damaged, impulses travel more slowly along the neurones, or may not reach the end of the axon at all (1). So messages from the CNS reach the muscles late or not at all, and responses are slower and harder to control (1).",
+        points: ["Myelin insulates the axon / speeds up impulses", "Damaged myelin: impulses slower or blocked", "So muscles (effectors) receive impulses late or not at all: slow, poorly controlled movement"] },
 
-      { id: "w5a7", type: "text", marks: 3, minWords: 30,
-        prompt: "A patient has a spinal cord injury in the neck. The receptors in their hand and the muscles in their arm are <b>not</b> damaged, but they cannot feel or move their hand. Use the stimulus–response pathway to <b>explain</b> why.",
-        model: "The injury breaks the pathway in the CNS (1). Impulses from the receptors in the hand travel along sensory neurones but cannot pass the damaged spinal cord to reach the brain, so the patient feels nothing (1). Impulses from the brain cannot travel down the spinal cord to the motor neurones, so the arm muscles (effectors) receive no impulses and cannot contract (1).",
-        points: ["The injury breaks the pathway in the CNS / spinal cord", "Sensory impulses cannot reach the brain, so nothing is felt", "Impulses cannot reach the motor neurones, so the muscles cannot contract"] },
+      { id: "w5a7", type: "text", marks: 4, minWords: 40,
+        prompt: "<b>Compare and contrast</b> a sensory neurone and a motor neurone.",
+        hint: "<b>Compare and contrast</b> means give similarities AND differences, referring to both neurones in every point. Use “both” and “whereas”.",
+        model: "Both are specialised cells that carry electrical impulses and both have dendrites, a cell body with a nucleus and a long fibre covered in a myelin sheath (1). A sensory neurone carries impulses from a receptor to the CNS, whereas a motor neurone carries impulses from the CNS to an effector (1). In a sensory neurone the cell body is part-way along the fibre, whereas in a motor neurone it is at one end (1). A motor neurone's axon terminals end on a muscle or gland, whereas a sensory neurone's terminals connect to neurones inside the CNS (1).",
+        points: ["Similarity: both carry impulses / have dendrites, cell body, myelinated fibre", "Direction: receptor → CNS (sensory) vs CNS → effector (motor)", "Position of the cell body: part-way along vs at one end", "Where the terminals end: inside the CNS vs on a muscle or gland"] },
 
       { id: "w5a8", type: "text", marks: 3, minWords: 35,
-        prompt: "In 2023, researchers reported a brain–spine implant that picks up signals from the brain and sends them past a spinal cord injury, which allowed a paralysed man to walk again. A news headline said the implant “<i>repairs the nervous system</i>”. <b>Evaluate</b> this headline.",
-        hint: "<b>Evaluate</b> means weigh up the evidence for and against the headline, then give a clear judgement.",
-        model: "For the headline: the implant restores the link between the brain and the muscles, so the patient can move again, which is the job the damaged pathway used to do (1). Against: the implant does not regrow or heal the damaged neurones in the spinal cord; it carries the signal around the injury, so the injury is still there (1). Judgement: it is more accurate to say the implant replaces (bypasses) part of the pathway rather than repairs the nervous system (1).",
-        points: ["For: movement restored / brain-to-muscle link restored", "Against: damaged neurones are not regrown; the signal bypasses the injury", "Clear judgement, e.g. it replaces / bypasses rather than repairs"] }
+        prompt: "A student measured the mean light-board reaction time of four age groups: <b>15–20 years: 0.30 s</b>, <b>30–40 years: 0.33 s</b>, <b>50–60 years: 0.38 s</b>, <b>70–80 years: 0.47 s</b>. She claims: <i>“Every person over 70 reacts too slowly to drive safely.”</i> <b>Evaluate</b> this claim.",
+        hint: "<b>Evaluate</b> means weigh up what the data supports and what it does not, then make a judgement. Quote numbers from the data.",
+        model: "The data supports part of the claim: mean reaction time increases with age, from 0.30 s at 15–20 to 0.47 s at 70–80, so older people react more slowly on average (1). However, these are means: some people over 70 may react faster than the mean, and the test measures only one simple reaction, not real driving, where experience also matters (1). So the claim that every person over 70 is too slow is not justified; it would be fairer to test each driver individually (1).",
+        points: ["Data supports a trend: reaction time increases with age (quotes values)", "Limitation: means hide individual differences / one simple test is not real driving", "Judgement: claim about every person is not justified; test individuals"] },
+
+      { id: "w5a9", type: "text", marks: 2, minWords: 25,
+        prompt: "A company advertises a phone game that it says “<i>makes your nerve impulses travel faster</i>”. <b>Comment</b> on this claim.",
+        hint: "<b>Comment</b> means give a judgement based on what you know. What decides how fast an impulse travels along a neurone?",
+        model: "The speed of an impulse along a neurone depends on its structure, such as the myelin sheath and the axon, which a game cannot change, so the claim is not accurate (1). Practice may make reactions faster because the brain processes the stimulus and decides more quickly, not because impulses travel faster (1).",
+        points: ["Impulse speed depends on neurone structure (myelin), which a game cannot change", "Practice may speed up processing in the brain, not the impulse itself"] }
     ]
   }
   ]

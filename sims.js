@@ -676,10 +676,10 @@
     const st = api.store; st.ran = st.ran || {};
     const STAGES = ["Stimulus", "Receptor", "Sensory neurone", "Coordinator (CNS)", "Motor neurone", "Effector", "Response"];
     const SC = {
-      pan: { n: "Hot pan", t: 0.05, cells: ["Heat from the pan", "Temperature receptors in the skin", "Sensory neurone", "Spinal cord (relay neurone)", "Motor neurone", "Arm muscle", "Hand pulls away"], note: "The spinal cord coordinates this response, with no thinking involved. The pathway is short, so it is very fast: you pull away before the brain even registers pain." },
-      light: { n: "Red light", t: 0.75, cells: ["Red traffic light", "Light receptors in the retina", "Sensory neurone", "Brain", "Motor neurone", "Leg muscle", "Foot presses the brake"], note: "The brain has to process the information and decide to stop, so this takes much longer than the hot pan." },
-      phone: { n: "Red light + phone", t: 1.5, cells: ["Red traffic light", "Light receptors in the retina", "Sensory neurone", "Brain (distracted)", "Motor neurone", "Leg muscle", "Foot presses the brake"], note: "The driver's attention is on the phone, so the light is noticed later and the brain takes longer to decide. At 100 km/h a car travels about 28 m every second: about 21 m before braking starts when focused, but about 42 m when distracted." },
-      save: { n: "Penalty save", t: 0.4, cells: ["Moving ball (light)", "Light receptors in the retina", "Sensory neurones", "Brain", "Motor neurones", "Leg and arm muscles", "Keeper dives"], note: "The brain must work out where the ball is going and choose a movement. Practice makes it faster, but it is still slower than an automatic response coordinated by the spinal cord." }
+      shell: { n: "Sharp shell", t: 0.05, cells: ["Sharp shell under the foot", "Pain receptors in the skin of the foot", "Sensory neurone", "Spinal cord (relay neurone)", "Motor neurone", "Leg muscle", "Foot lifts off the shell"], note: "The spinal cord coordinates this response, with no decision needed. The pathway is short, so it is very fast: the foot lifts before the brain even registers pain." },
+      f1: { n: "F1 start lights", t: 0.2, cells: ["Start lights go out", "Light receptors in the retina", "Sensory neurone", "Brain", "Motor neurone", "Leg muscle", "Foot presses the accelerator"], note: "The brain must process the change and send the decision to move. Racing drivers practise this thousands of times, so it is fast for a brain-coordinated response, but still slower than a response coordinated by the spinal cord." },
+      sleepy: { n: "Sleepy driver", t: 1.2, cells: ["Car in front brakes", "Light receptors in the retina", "Sensory neurone", "Brain (tired)", "Motor neurone", "Leg muscle", "Foot presses the brake"], note: "A tired brain processes information more slowly, so the reaction time is longer. At 100 km/h a car travels about 28 m every second, so every extra second of reaction time means about 28 m more before braking even starts." },
+      alarm: { n: "Smoke alarm", t: 0.5, cells: ["Sound of the alarm", "Sound receptors in the cochlea", "Sensory neurone", "Brain", "Motor neurones", "Leg muscles", "Walks out of the room"], note: "Here the receptors are in the ear, not the eye. The pathway is the same seven stages: only the receptor, effector and response change." }
     };
     st.placed = st.placed || 0;
     const slots = h("ol", { class: "pslots" });
@@ -688,7 +688,7 @@
     const tabs = h("div", { class: "simtabs" });
     const timer = h("div", { class: "ptimer" });
     root.append(h("p", { class: "simhelp" }, "Step 1: tap the stages in the right order to build the pathway. Step 2: run real scenarios through it and compare how long they take."), slots, chips, msg, tabs, timer);
-    const mark = tasks(root, ["Build the pathway in the right order", "Run the hot pan", "Run the red light", "Run the red light with a distracted driver"]);
+    const mark = tasks(root, ["Build the pathway in the right order", "Run the sharp shell", "Run the F1 start lights", "Run the sleepy driver"]);
     STAGES.forEach((t, i) => slots.append(h("li", { class: "pslot" }, h("b", null, i < st.placed ? t : "?"), h("small", null, ""))));
     const order = shuffle(STAGES.map((t, i) => i));
     function drawChips() {
@@ -718,8 +718,8 @@
       tick();
     }
     function upd() {
-      mark(0, st.placed >= 7); mark(1, st.ran.pan); mark(2, st.ran.light); mark(3, st.ran.phone);
-      if (st.placed >= 7 && st.ran.pan && st.ran.light && st.ran.phone) api.done();
+      mark(0, st.placed >= 7); mark(1, st.ran.shell); mark(2, st.ran.f1); mark(3, st.ran.sleepy);
+      if (st.placed >= 7 && st.ran.shell && st.ran.f1 && st.ran.sleepy) api.done();
     }
     if (st.placed) [...slots.children].forEach((li, i) => { if (i < st.placed) li.classList.add("in"); });
     drawChips(); upd();
@@ -772,7 +772,7 @@
         d1.setAttribute("cx", nodes[Math.min(7, Math.floor(p1 * 7.999))]); d2.setAttribute("cx", 10 + 380 * p2);
         if (p2 < 1) requestAnimationFrame(f);
         else { go.disabled = false; st.raced = 1; api.save(); upd();
-          rmsg.innerHTML = "<b>The myelinated axon wins easily.</b> The myelin sheath insulates the axon, so the impulse jumps from gap to gap instead of travelling along every part of the membrane. In humans, impulses in myelinated neurones travel at up to about 100 m/s, compared with about 1 m/s in unmyelinated ones. That speed matters for survival: think of pulling away from a hot pan."; }
+          rmsg.innerHTML = "<b>The myelinated axon wins easily.</b> The myelin sheath insulates the axon, so the impulse jumps from gap to gap instead of travelling along every part of the membrane. In humans, impulses in myelinated neurones travel at up to about 100 m/s, compared with about 1 m/s in unmyelinated ones. That speed matters for survival: think of lifting your foot off something sharp."; }
       };
       requestAnimationFrame(f);
     };
