@@ -8,8 +8,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=JetBrains+Mono:wght@500&display=swap">
-<link rel="stylesheet" href="style.css?v=202611152200">
-<link rel="stylesheet" href="missions.css?v=202611152200">
+<link rel="stylesheet" href="style.css?v=202611152159">
+<link rel="stylesheet" href="missions.css?v=202611152159">
 <style>
   h1.big{font-size:clamp(30px,5.5vw,44px);font-weight:800;margin-top:6px}
   h2.mid{font-size:22px}
@@ -198,16 +198,19 @@
 <main class="wrap wider" id="app"></main>
 <div class="toast" id="toast" role="status" hidden></div>
 
-<script src="config.js?v=202611152200"></script>
-<script src="weeks.js?v=202611152200"></script>
-<script src="api.js?v=202611152200"></script>
-<script src="sims.js?v=202611152200"></script>
-<script src="terms.js?v=202611152200"></script>
+<script src="config.js?v=202611152159"></script>
+<script src="weeks.js?v=202611152159"></script>
+<script src="api.js?v=202611152159"></script>
+<script src="sims.js?v=202611152159"></script>
+<script src="terms.js?v=202611152159"></script>
 <script>
 (function(){
 const W = window.REVISION_WEEKS, API = window.RevisionAPI;
-const TEACHER = /[?&]teacher\b/.test(location.search); // teacher view: unlocks every step and shows answers
-const PREVIEW = TEACHER || /[?&]preview\b/.test(location.search);
+let TEACHER = /[?&]teacher\b/.test(location.search); // teacher view: unlocks every step and shows answers
+let PREVIEW = TEACHER || /[?&]preview\b/.test(location.search);
+const TEACHER_IDS = ["TEST1"]; // signing in with one of these IDs turns on the teacher view
+const URL_TEACHER = TEACHER, URL_PREVIEW = PREVIEW;
+const setTeacher = st => { const t = !!st && TEACHER_IDS.includes(String(st.id).toUpperCase()); TEACHER = URL_TEACHER || t; PREVIEW = URL_PREVIEW || t; };
 const app = document.getElementById("app"), who = document.getElementById("who"), stickyMount = document.getElementById("stickyMount");
 let S = { student:null, week:null, answers:{}, step:0, mode:"" };
 
@@ -357,7 +360,7 @@ function renderLogin(msg){
     const id = document.getElementById("sid").value.trim();
     if (!id) { document.getElementById("loginErr").textContent = "Type your student ID first."; return; }
     const b = document.getElementById("loginBtn"); b.disabled = true; b.textContent = "Checking…";
-    try { S.student = await API.verify(id); ls("y11rev_last_id", S.student.id); renderWeeks(); }
+    try { S.student = await API.verify(id); setTeacher(S.student); ls("y11rev_last_id", S.student.id); renderWeeks(); }
     catch(err){ document.getElementById("loginErr").textContent = err.message; b.disabled=false; b.textContent="Sign in"; }
   };
 }
@@ -966,7 +969,7 @@ app.addEventListener("change", onInput);
 
 (async () => {
   const last = ls("y11rev_last_id");
-  if (last) { try { S.student = await API.verify(last); return renderWeeks(); } catch(e){} }
+  if (last) { try { S.student = await API.verify(last); setTeacher(S.student); return renderWeeks(); } catch(e){} }
   renderLogin();
 })();
 })();
