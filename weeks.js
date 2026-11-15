@@ -1028,7 +1028,7 @@ window.REVISION_WEEKS = [
     crit: "A", name: "Knowing and understanding",
     items: [
       { type: "info",
-        html: "<p>These questions are in the style of the MYP eAssessment. They test three strands: <b>(i)</b> explaining scientific knowledge, <b>(ii)</b> applying it to familiar and unfamiliar situations, and <b>(iii)</b> analysing and evaluating information to make a judgement.</p><p><b>Context: the reaction-time lab.</b> A sports academy in Dubai tests its athletes with a <b>light board</b>. When one of the lights on the board turns on, the athlete must hit it with their hand as fast as possible. The board records the reaction time in seconds.</p>" },
+        html: "<p>These questions are in the style of the MYP eAssessment. They test three strands: <b>(i)</b> explaining scientific knowledge, <b>(ii)</b> applying it to familiar and unfamiliar situations, and <b>(iii)</b> analysing and evaluating information to make a judgement.</p><p><b>Context: the reaction-time lab.</b> A sports academy in Dubai tests its athletes with a <b>light board</b>. When one of the lights on the board turns on, the athlete must hit it with their hand as fast as possible. The board records the reaction time in seconds.</p><figure class='fig'><img src='images/w5-light-board.jpg' alt='An athlete reaches out and hits a light that has turned green on a black wall-mounted board with six round lights. A display above the board shows a reaction time of 0.246 seconds.' loading='lazy'><figcaption>Figure 1: An athlete using the light board. The display shows her reaction time.</figcaption></figure>" },
 
       { id: "w5a1", type: "mcq", marks: 1,
         prompt: "Four students describe the nervous system. <b>Identify</b> the student whose statement is correct.",
