@@ -321,3 +321,37 @@
 .gov[hidden]{display:none}
 .gbox{width:min(860px,100%);margin:20px 0;display:flex;flex-direction:column;gap:8px}
 .gclose{align-self:flex-end;border:0;background:var(--card);color:var(--ink);border-radius:999px;padding:6px 14px;font-weight:700;cursor:pointer}
+
+/* reflex arc + synapse sims (Pack 6) */
+.cellsvg .handle{fill:#9AA4AE;stroke:#5B6670;stroke-width:2}
+.cellsvg .cord{fill:#F4EEF8;stroke:#7D4FB0;stroke-width:2}
+.cellsvg .grey{fill:none;stroke:#A98BC9;stroke-width:9;stroke-linecap:round;opacity:.6}
+.cellsvg .canal2{fill:#fff;stroke:#7D4FB0}
+.cellsvg .sens{fill:none;stroke:#2F6FB3;stroke-width:3.5;stroke-linecap:round}
+.cellsvg .gang{fill:#CFE0F3;stroke:#2F6FB3;stroke-width:2}
+.cellsvg .relay{fill:none;stroke:#2E8B57;stroke-width:3.5;stroke-linecap:round}
+.cellsvg .mot{fill:none;stroke:#C9862F;stroke-width:3.5;stroke-linecap:round}
+.racesvg .rend{font:600 11px var(--f-body);fill:var(--muted)}
+.racesvg .node{fill:#A98BC9}
+.racesvg .rflag{font:800 12px var(--f-body);fill:var(--green)}
+.synsvg{width:100%;max-width:620px;display:block;margin:6px auto;background:var(--paper);border-radius:12px}
+.synsvg .pre{fill:#FBE3B6;stroke:#C9862F;stroke-width:2.5}
+.synsvg .post{fill:#E3ECF7;stroke:#2F6FB3;stroke-width:2.5;transition:fill .4s}
+.synsvg.fire .post{fill:#FBD3CC}
+.synsvg.rev .post{fill:#FBD3CC}
+.synsvg .slab{font:700 11px var(--f-body);fill:var(--muted)}
+.synsvg .rec{fill:#2F6FB3;transition:fill .3s}
+.synsvg .rec.bound{fill:#2E8B57}
+.synsvg .ves circle:first-child{fill:#fff;stroke:#C9862F;stroke-width:1.5}
+.synsvg .ntin,.synsvg .nt{fill:#7D4FB0}
+.synsvg .ves,.synsvg .nt,.synsvg .imp,.synsvg .drug{transition:transform .8s ease,opacity .4s}
+.synsvg .drug{fill:#E0702F;opacity:0}
+.synsvg .imp{fill:#E0402F;stroke:#fff;stroke-width:2}
+@media (prefers-reduced-motion:reduce){.synsvg *{transition:none!important}}
+.sslots{list-style:none;margin:8px 0;padding:0;display:grid;grid-template-columns:repeat(5,1fr);gap:6px;counter-reset:ps}
+@media (max-width:700px){.sslots{grid-template-columns:1fr}}
+.sstep{font-weight:600;font-size:13.5px;text-align:left}
+.smeter{display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-height:24px;font-size:14px}
+.smbar{width:200px;height:12px;border-radius:6px;background:var(--line);overflow:hidden}
+.smbar i{display:block;height:100%;background:var(--cr);transition:width .6s}
+.synsvg .ntin{transition:opacity .6s}

@@ -482,7 +482,7 @@
       for (let i = 0; i <= steps; i++) {
         const v = +(o.yMin + i * o.yMinor).toFixed(6), major = Math.abs(v / o.yMajor - Math.round(v / o.yMajor)) < 1e-6;
         svg.append(s("line", { x1: L, x2: W - Rr, y1: Y(v), y2: Y(v), class: v === 0 ? "pz" : major ? "pmaj" : "pmin" }));
-        if (major) svg.append(s("text", { x: L - 8, y: Y(v) + 4, "text-anchor": "end", class: "ptick" }, (v > 0 ? "+" + v : v < 0 ? "−" + Math.abs(v) : "0")));
+        if (major) svg.append(s("text", { x: L - 8, y: Y(v) + 4, "text-anchor": "end", class: "ptick" }, (v > 0 ? (o.yMin < 0 ? "+" : "") + v : v < 0 ? "−" + Math.abs(v) : "0")));
       }
       const xMinor = o.xMinor || (o.xs[1] - o.xs[0]) / 5;
       for (let v = xMin; v <= xMax + 1e-9; v += xMinor) svg.append(s("line", { x1: X(v), x2: X(v), y1: Y(o.yMax), y2: Y(o.yMin), class: "pmin" }));
@@ -777,6 +777,165 @@
       requestAnimationFrame(f);
     };
     upd();
+  };
+
+  /* =============== 10. Reflex arc =============== */
+  SIMS.reflexArc = (root, api) => {
+    const st = api.store; st.found = st.found || {};
+    const stage = h("div", { class: "cellstage" }), panel = h("div", { class: "simpanel", "aria-live": "polite" }), count = h("div", { class: "simcount" });
+    root.append(h("p", { class: "simhelp" }, "Part 1: a hand touches a car door handle that has been in the Dubai sun all afternoon. Tap each number and name the part of the reflex arc."), stage, panel, count);
+    const race = h("div", { class: "race" }), rmsg = h("div", { class: "simpanel", "aria-live": "polite" });
+    const go = h("button", { type: "button", class: "btn gold" }, "Touch the handle");
+    root.append(h("p", { class: "simhelp", style: "margin-top:14px" }, "Part 2: follow the two messages that leave the spinal cord. Which arrives first?"), race, h("div", { class: "row" }, go), rmsg);
+    const mark = tasks(root, ["Label all six parts of the reflex arc", "Follow both messages (Part 2)"]);
+    const cfg = {
+      label: "Reflex arc from the fingertip to the arm muscle", w: 400, h: 260, pad: 250,
+      pool: ["Receptor", "Sensory neurone", "Relay neurone", "Motor neurone", "Effector", "Spinal cord", "Brain", "Synapse"],
+      draw: g => {
+        g.append(s("rect", { x: 6, y: 228, width: 70, height: 16, rx: 6, class: "handle" }));
+        g.append(s("path", { d: "M30 230 C 24 200, 40 180, 70 170 L 120 150 L 175 120 L 200 128 L 140 172 L 84 200 C 70 212, 60 226, 54 232 Z", class: "skin" }));
+        g.append(s("ellipse", { cx: 140, cy: 150, rx: 40, ry: 13, class: "muscle", transform: "rotate(-30 140 150)" }));
+        g.append(s("ellipse", { cx: 320, cy: 100, rx: 62, ry: 50, class: "cord" }));
+        g.append(s("path", { d: "M300 70 C 312 86, 314 92, 320 100 C 326 92, 328 86, 340 70 M300 132 C 312 116, 314 108, 320 100 C 326 108, 328 116, 340 132", class: "grey" }));
+        g.append(s("circle", { cx: 320, cy: 100, r: 4, class: "canal2" }));
+        g.append(s("path", { d: "M44 222 C 70 150, 170 40, 302 72", class: "sens" }));
+        g.append(s("circle", { cx: 227, cy: 68, r: 7, class: "gang" }));
+        g.append(s("path", { d: "M304 74 L 326 112", class: "relay" }));
+        g.append(s("path", { d: "M326 114 C 300 190, 230 190, 166 150", class: "mot" }));
+        g.append([[44, 222], [302, 72], [326, 112], [166, 150]].map(([x, y]) => s("circle", { cx: x, cy: y, r: 3.5, class: "term" })));
+      },
+      spots: [
+        { x: 44, y: 222, n: "Receptor", info: "heat and pain receptors in the skin of the fingertip detect the stimulus" },
+        { x: 110, y: 120, n: "Sensory neurone", info: "carries the impulse from the receptor to the spinal cord" },
+        { x: 316, y: 94, n: "Relay neurone", info: "inside the spinal cord, passes the impulse from the sensory to the motor neurone" },
+        { x: 262, y: 172, n: "Motor neurone", info: "carries the impulse from the spinal cord to the effector" },
+        { x: 140, y: 150, n: "Effector", info: "the biceps muscle contracts and pulls the hand away" },
+        { x: 372, y: 110, n: "Spinal cord", info: "part of the CNS: it coordinates the reflex with no decision from the brain" }]
+    };
+    let nF = 0;
+    const upd = () => { mark(0, nF === 6); mark(1, st.raced); if (nF === 6 && st.raced) api.done(); };
+    labeller(stage, panel, st.found, cfg, (n, t) => { nF = n; count.textContent = `Labelled ${n} of ${t}`; api.save(); upd(); });
+    const rs = s("svg", { viewBox: "0 0 400 150", class: "racesvg", role: "img", "aria-label": "Two messages: one to the arm muscle, one to the brain" });
+    rs.append(
+      s("text", { x: 4, y: 18, class: "rlab" }, "Reflex arc: fingertip → spinal cord → arm muscle"),
+      s("path", { d: "M14 40 H 386", class: "axon" }),
+      s("text", { x: 4, y: 88, class: "rlab" }, "Message to the brain: fingertip → spinal cord → up to the brain"),
+      s("path", { d: "M14 110 H 386", class: "axon" }),
+      s("text", { x: 386, y: 62, class: "rend", "text-anchor": "end" }, "arm muscle"),
+      s("text", { x: 386, y: 132, class: "rend", "text-anchor": "end" }, "brain"),
+      s("text", { x: 150, y: 62, class: "rend", "text-anchor": "middle" }, "spinal cord"),
+      s("text", { x: 150, y: 132, class: "rend", "text-anchor": "middle" }, "spinal cord"),
+      s("circle", { cx: 150, cy: 40, r: 5, class: "node" }), s("circle", { cx: 150, cy: 110, r: 5, class: "node" }));
+    const d1 = s("circle", { cx: 14, cy: 40, r: 7, class: "imp" }), d2 = s("circle", { cx: 14, cy: 110, r: 7, class: "imp" });
+    const f1 = s("text", { x: 386, y: 30, class: "rflag", "text-anchor": "end" }, ""), f2 = s("text", { x: 386, y: 100, class: "rflag", "text-anchor": "end" }, "");
+    rs.append(d1, d2, f1, f2); race.append(rs);
+    go.onclick = () => {
+      go.disabled = true; f1.textContent = ""; f2.textContent = ""; rmsg.textContent = "Impulses travelling…";
+      const t0 = performance.now(), T1 = RM() ? 1 : 1000, T2 = RM() ? 1 : 3200;
+      const f = t => {
+        const e = t - t0, p1 = Math.min(1, e / T1), p2 = Math.min(1, e / T2);
+        d1.setAttribute("cx", 14 + 372 * p1); d2.setAttribute("cx", 14 + 372 * p2);
+        if (p1 >= 1 && !f1.textContent) f1.textContent = "✓ Hand pulls away";
+        if (p2 < 1) requestAnimationFrame(f);
+        else { f2.textContent = "“Ouch, that’s hot!”"; go.disabled = false; st.raced = 1; api.save(); upd();
+          rmsg.innerHTML = "<b>The hand moves first; the pain is felt afterwards.</b> In the spinal cord the sensory neurone passes the impulse to a relay neurone and then a motor neurone, so the arm muscle contracts without waiting for the brain. The same sensory neurone also passes impulses <b>up the spinal cord to the brain</b>. That pathway is longer, so you only become aware of the heat after your hand has already moved. A reflex is <b>automatic</b>, <b>rapid</b> and <b>protective</b>."; }
+      };
+      requestAnimationFrame(f);
+    };
+    upd();
+  };
+
+  /* =============== 11. Synapse lab =============== */
+  SIMS.synapseLab = (root, api) => {
+    const st = api.store; st.placed = st.placed || 0; st.drug = st.drug || {};
+    const STEPS = [
+      "An impulse arrives at the axon terminal of the first neurone.",
+      "Vesicles move to the membrane and release neurotransmitter into the gap.",
+      "The neurotransmitter diffuses across the synaptic gap.",
+      "The neurotransmitter binds to receptors on the next neurone.",
+      "A new impulse is started in the next neurone."];
+    const svg = s("svg", { viewBox: "0 0 400 220", class: "synsvg", role: "img", "aria-label": "A synapse between two neurones" });
+    svg.append(
+      s("path", { d: "M0 104 H 100 V 116 H 0 Z", class: "pre" }),
+      s("path", { d: "M96 70 C 110 34, 186 34, 192 54 L 192 166 C 186 186, 110 186, 96 150 Z", class: "pre" }),
+      s("path", { d: "M222 40 L 222 180 C 280 192, 340 184, 400 170 L 400 50 C 340 36, 280 28, 222 40 Z", class: "post" }),
+      s("text", { x: 207, y: 206, class: "slab", "text-anchor": "middle" }, "synaptic gap"),
+      s("text", { x: 120, y: 206, class: "slab", "text-anchor": "middle" }, "neurone 1"),
+      s("text", { x: 320, y: 206, class: "slab", "text-anchor": "middle" }, "neurone 2"));
+    const RY = [62, 90, 130, 158];
+    const recs = RY.map(y => { const r = s("path", { d: `M222 ${y - 8} h 9 v 4 h -5 v 8 h 5 v 4 h -9 Z`, class: "rec" }); svg.append(r); return r; });
+    const VES = [[140, 74], [162, 100], [138, 120], [166, 146], [118, 96]];
+    const ves = VES.map(([x, y]) => { const g = s("g", { class: "ves" }, s("circle", { cx: x, cy: y, r: 11 }), [[-4, -3], [4, -2], [0, 4]].map(([a, b]) => s("circle", { cx: x + a, cy: y + b, r: 2.6, class: "ntin" }))); svg.append(g); return g; });
+    const NT = [62, 76, 90, 104, 118, 130, 144, 158].map((y, i) => { const c = s("circle", { cx: 190, cy: y, r: 3.6, class: "nt" }); c.dataset.y = y; c.dataset.i = i; svg.append(c); return c; });
+    const DR = RY.map(y => { const d = s("rect", { x: 219, y: y - 5, width: 9, height: 10, rx: 2, class: "drug" }); svg.append(d); return d; });
+    const imp1 = s("circle", { cx: 6, cy: 110, r: 7, class: "imp" }), imp2 = s("circle", { cx: 240, cy: 110, r: 7, class: "imp" });
+    svg.append(imp1, imp2);
+    const tr = (el, x, y) => el.style.transform = `translate(${x}px, ${y}px)`;
+    function render(k, mode) {
+      mode = mode || "normal";
+      tr(imp1, k >= 1 ? 150 : 0, 0); imp1.style.opacity = k >= 1 && k < 2 ? 1 : k >= 2 ? 0 : 1;
+      ves.forEach((v, i) => { tr(v, k >= 2 ? Math.max(0, 178 - VES[i][0]) * (i < 4 ? 1 : 0.5) : 0, 0); v.querySelectorAll(".ntin").forEach(c => c.style.opacity = k >= 2 && i < 4 ? 0.15 : 1); });
+      const nShow = mode === "release" ? 8 : 5;
+      NT.forEach((c, i) => {
+        const y = +c.dataset.y, ry = RY[i % 4];
+        c.style.opacity = k >= 2 && i < nShow ? 1 : 0;
+        const bindable = mode === "normal" || mode === "release";
+        if (k >= 4 && bindable && i < 4) tr(c, 34, ry - y);
+        else if (k >= 3) tr(c, 18, 0); else tr(c, 0, 0);
+      });
+      DR.forEach(d => d.style.opacity = (mode === "block" || mode === "mimic") ? 1 : 0);
+      recs.forEach(r => r.classList.toggle("bound", k >= 4 && mode !== "block"));
+      const fire = k >= 5 && mode !== "block";
+      svg.classList.toggle("fire", fire);
+      tr(imp2, fire ? 140 : 0, 0); imp2.style.opacity = fire ? 1 : 0;
+    }
+    const slots = h("ol", { class: "sslots" }), chips = h("div", { class: "pchips" }), msg = h("div", { class: "simpanel", "aria-live": "polite" });
+    root.append(h("p", { class: "simhelp" }, "Part 1: tap the five steps in the right order. Each correct step plays on the synapse."), svg, slots, chips, msg);
+    const back = h("button", { type: "button", class: "btn" }, "Send an impulse the other way (neurone 2 → neurone 1)");
+    const bmsg = h("div", { class: "simpanel", "aria-live": "polite" });
+    root.append(h("p", { class: "simhelp", style: "margin-top:14px" }, "Part 2: can a synapse work backwards?"), h("div", { class: "row" }, back), bmsg);
+    const dtabs = h("div", { class: "simtabs" }), meter = h("div", { class: "smeter" }), dmsg = h("div", { class: "simpanel", "aria-live": "polite" });
+    root.append(h("p", { class: "simhelp", style: "margin-top:14px" }, "Part 3: drugs act at synapses. Test each drug and watch the impulses in neurone 2."), dtabs, meter, dmsg);
+    const mark = tasks(root, ["Put the five steps in order", "Try to send an impulse backwards", "Test all three drugs"]);
+    STEPS.forEach((t, i) => slots.append(h("li", { class: "pslot" + (i < st.placed ? " in" : "") }, h("small", null, i < st.placed ? t : "?"))));
+    const order = shuffle(STEPS.map((t, i) => i));
+    function drawChips() {
+      chips.innerHTML = "";
+      order.filter(i => i >= st.placed).forEach(i => chips.append(h("button", { type: "button", class: "simopt sstep", onclick: e => {
+        if (i === st.placed) {
+          slots.children[i].querySelector("small").textContent = STEPS[i]; slots.children[i].classList.add("in");
+          st.placed++; api.save(); render(st.placed);
+          msg.innerHTML = st.placed === 5 ? "<span class='good'>✓ All five steps.</span> The message crosses the gap as a <b>chemical</b>, then becomes electrical again in neurone 2. Afterwards the neurotransmitter is broken down or taken back up, so the signal stops." : `✓ Step ${i + 1}`;
+          drawChips(); upd();
+        } else { const b = e.currentTarget; b.classList.remove("no"); void b.offsetWidth; b.classList.add("no"); msg.textContent = st.placed ? "Not yet. What happens straight after the last step?" : "Not yet. Where does the message start?"; }
+      } }, STEPS[i])));
+    }
+    back.onclick = () => {
+      if (st.placed < 5) { bmsg.textContent = "Finish Part 1 first."; return; }
+      render(0); svg.classList.add("rev"); tr(imp2, 0, 0); imp2.style.opacity = 1;
+      setTimeout(() => { imp2.style.transform = "translate(-10px, 0)"; }, 30);
+      setTimeout(() => { svg.classList.remove("rev");
+        bmsg.innerHTML = "<span class='bad'>✗ Nothing crosses.</span> Synapses only work <b>one way</b>. Only the axon terminal of neurone 1 has <b>vesicles</b> of neurotransmitter, and only neurone 2 has <b>receptors</b> for it. So impulses always travel in one direction along a pathway.";
+        st.back = 1; api.save(); upd(); }, RM() ? 10 : 900);
+    };
+    const DRUGS = {
+      normal: { n: "No drug", rate: 40, t: "Normal: neurotransmitter binds to the receptors and neurone 2 fires about 40 impulses a second." },
+      block: { n: "Drug A: blocks receptors", rate: 4, t: "<b>Drug A blocks the receptors.</b> It sits in the receptors but does not activate them, so the neurotransmitter cannot bind. Neurone 2 fires far fewer impulses: the message is weakened or stopped." },
+      mimic: { n: "Drug B: mimics the neurotransmitter", rate: 75, t: "<b>Drug B has a similar shape to the neurotransmitter</b>, so it binds to the receptors and activates them, even with no impulse in neurone 1. Neurone 2 fires more impulses." },
+      release: { n: "Drug C: more is released", rate: 80, t: "<b>Drug C makes neurone 1 release more neurotransmitter.</b> More molecules bind to receptors, so neurone 2 fires more impulses." }
+    };
+    Object.entries(DRUGS).forEach(([k, v]) => dtabs.append(h("button", { type: "button", class: "simtab", "data-k": k, onclick: () => {
+      if (st.placed < 5) { dmsg.textContent = "Finish Part 1 first."; return; }
+      [...dtabs.children].forEach(b => b.setAttribute("aria-selected", b.dataset.k === k));
+      render(5, k);
+      meter.innerHTML = `<div class="smbar"><i style="width:${v.rate}%"></i></div><span>Impulses per second in neurone 2: <b>${v.rate}</b></span>`;
+      dmsg.innerHTML = v.t; if (k !== "normal") st.drug[k] = 1; api.save(); upd();
+    } }, v.n)));
+    function upd() {
+      mark(0, st.placed >= 5); mark(1, st.back); const nd = ["block", "mimic", "release"].filter(k => st.drug[k]).length; mark(2, nd === 3);
+      if (st.placed >= 5 && st.back && nd === 3) api.done();
+    }
+    render(st.placed); drawChips(); upd();
   };
 
   window.SIMS = SIMS;

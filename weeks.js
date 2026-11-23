@@ -1081,5 +1081,308 @@ window.REVISION_WEEKS = [
     ]
   }
   ]
+},
+{
+  id: "w6",
+  title: "Reflexes and synapses",
+  topic: "Nerves and Hormones",
+  lessons: "Unit 7 – Lessons 2 and 3",
+  opens: "2026-11-23T07:00:00+04:00",
+  due: "2026-11-29T23:59:00+04:00",
+  minutes: 55,
+  sections: [
+  {
+    crit: "R", name: "Recall missions",
+    items: [
+      /* ---------- Mission 1 ---------- */
+      { type: "info", mission: { n: 1, title: "Reflex lab", lesson: "The reflex arc",
+        story: "It is August in Dubai and a car has been parked in the sun all afternoon. Its door handle is at 60 °C. Track exactly what happens in the fraction of a second after a hand touches it." } },
+      { type: "info", predict: { q: "Your hand touches the burning hot door handle. Which happens <b>first</b>?",
+        options: ["You feel the pain, then you decide to pull your hand away", "Your hand pulls away, then you feel the pain", "Both happen at exactly the same moment", "Your brain decides to move before the receptors detect the heat"], answer: 1,
+        reveal: "Your hand moves <b>first</b>. The response is coordinated by the <b>spinal cord</b>, with no decision from the brain. The message to the brain travels a longer route, so you feel the pain a moment <b>after</b> your hand has moved." } },
+      { type: "info", sim: { name: "reflexArc", title: "Label the reflex arc and race the two messages" } },
+      { type: "info", flash: [
+        { q: "What is a reflex action?", a: "A rapid, automatic response to a stimulus that does not involve a conscious decision by the brain." },
+        { q: "What are the three features of a reflex?", a: "Automatic (no conscious thought), rapid (a short pathway) and protective (it stops damage to the body)." },
+        { q: "What are the five parts of a reflex arc, in order?", a: "Receptor → sensory neurone → relay neurone (in the spinal cord) → motor neurone → effector." },
+        { q: "Why is a reflex faster than a voluntary response?", a: "The impulse goes through the spinal cord (or a lower part of the brain) by the shortest route, so the brain does not have to process the information and make a decision." },
+        { q: "Name four reflexes.", a: "Pulling your hand away from something hot or sharp, blinking when something comes close to the eye, the pupil narrowing in bright light, coughing or sneezing, the knee-jerk reflex." }
+      ] },
+      { id: "w6r1", type: "match", marks: 6,
+        prompt: "<b>Classify</b> each response as a reflex or a voluntary action.",
+        head: ["Response", "Type of response"],
+        options: ["Reflex action", "Voluntary action"],
+        rows: [
+          { label: "Your pupils get smaller when you walk out into bright sunlight", answer: "Reflex action" },
+          { label: "You cough when a crumb goes down the wrong way", answer: "Reflex action" },
+          { label: "A goalkeeper dives to the left to save a penalty", answer: "Voluntary action" },
+          { label: "You blink when sand blows towards your eyes", answer: "Reflex action" },
+          { label: "You reply to a message on your phone", answer: "Voluntary action" },
+          { label: "Your leg kicks forward when a doctor taps just below your knee", answer: "Reflex action" }
+        ] },
+      { id: "w6r2", type: "cloze", marks: 6,
+        prompt: "A visitor at Dubai Miracle Garden brushes against a cactus spine and pulls her arm away. Complete the reflex arc.",
+        text: "The spine is the [[0]]. It is detected by pain [[1]] in the skin. An impulse travels along a [[2]] neurone to the [[3]], where it passes to a [[4]] neurone. The impulse then travels along a motor neurone to a muscle in the arm, which is the [[5]] and contracts.",
+        options: ["stimulus", "response", "receptors", "effectors", "sensory", "relay", "motor", "spinal cord", "brain", "effector", "receptor"],
+        blanks: ["stimulus", "receptors", "sensory", "spinal cord", "relay", "effector"] },
+      { id: "w6r3", type: "mcq", marks: 1,
+        prompt: "The visitor only feels the pain of the cactus spine <b>after</b> her arm has moved. Which statement explains why?",
+        options: ["Pain receptors are slower than touch receptors.", "The impulse to the brain travels further than the impulse in the reflex arc, so it arrives later.", "The relay neurone stops impulses reaching the brain.", "Motor neurones carry impulses faster than sensory neurones."], answer: 1,
+        explain: "Impulses also travel up the spinal cord to the brain, which is a longer route than the reflex arc through the spinal cord. The arm has already moved by the time the brain becomes aware of the pain." },
+      { id: "w6r4", type: "mcq", marks: 1,
+        prompt: "Which statement about reflex actions is <b>not</b> correct?",
+        options: ["They protect the body from harm.", "They happen without a conscious decision.", "They are coordinated by the brain making a decision.", "They are faster than voluntary actions."], answer: 2,
+        explain: "Reflexes are coordinated by the spinal cord or an unconscious part of the brain. No conscious decision is made, which is why they are so fast." },
+      { type: "info", exam: "<b>Use this in criterion B:</b> a reaction-time test measures a <b>voluntary</b> response (the brain must process the stimulus and decide to click). That is why it can be changed by tiredness, practice or substances such as caffeine." },
+
+      /* ---------- Mission 2 ---------- */
+      { type: "info", mission: { n: 2, title: "Synapse lab", lesson: "Synapses and drugs",
+        story: "A university e-sports team in Dubai says energy drinks make them react faster. Before you test that claim, find out what happens at the tiny gaps between neurones, because that is where caffeine acts." } },
+      { type: "info", predict: { q: "Two neurones are separated by a gap about 20–40 nm wide. How does the message cross the gap?",
+        options: ["The electrical impulse jumps across", "A chemical diffuses across", "The two neurones touch for a moment", "The blood carries it across"], answer: 1,
+        reveal: "The message crosses as a <b>chemical</b>, called a <b>neurotransmitter</b>. It diffuses across the gap and binds to receptors on the next neurone, which starts a new electrical impulse." } },
+      { type: "info", sim: { name: "synapseLab", title: "Build the synapse, try it backwards and test three drugs" } },
+      { type: "info", flash: [
+        { q: "What is a synapse?", a: "The junction between two neurones (or between a neurone and an effector), with a very small gap of about 20–40 nm." },
+        { q: "Why can impulses only cross a synapse in one direction?", a: "Only the first neurone has vesicles of neurotransmitter, and only the next neurone has receptors for it." },
+        { q: "What is the difference between an excitatory and an inhibitory neurotransmitter?", a: "Excitatory (for example glutamate) makes the next neurone more likely to start an impulse. Inhibitory (for example GABA) makes it less likely." },
+        { q: "What are three ways a drug can act at a synapse?", a: "1. Mimic the neurotransmitter by binding to its receptors. 2. Block the receptors so the neurotransmitter cannot bind. 3. Increase or decrease how much neurotransmitter is released." },
+        { q: "Why does a synapse have to stop the signal?", a: "The neurotransmitter is broken down or taken back into the first neurone, so the receptors are freed and the next neurone stops firing. Otherwise it would keep firing." }
+      ] },
+      { id: "w6r5", type: "match", marks: 5,
+        prompt: "<b>Select</b> the correct order of events at a synapse.",
+        head: ["Step", "What happens"],
+        options: ["An impulse arrives at the axon terminal", "Vesicles release neurotransmitter into the gap", "Neurotransmitter diffuses across the gap", "Neurotransmitter binds to receptors on the next neurone", "A new impulse starts in the next neurone"],
+        rows: [
+          { label: "Step 1", answer: "An impulse arrives at the axon terminal" },
+          { label: "Step 2", answer: "Vesicles release neurotransmitter into the gap" },
+          { label: "Step 3", answer: "Neurotransmitter diffuses across the gap" },
+          { label: "Step 4", answer: "Neurotransmitter binds to receptors on the next neurone" },
+          { label: "Step 5", answer: "A new impulse starts in the next neurone" }
+        ] },
+      { id: "w6r6", type: "match", marks: 5,
+        prompt: "<b>Predict</b> the effect of each drug on the <b>next</b> neurone.",
+        head: ["How the drug acts", "Effect on the next neurone"],
+        options: ["More impulses", "Fewer impulses"],
+        rows: [
+          { label: "It blocks the receptors for an excitatory neurotransmitter", answer: "Fewer impulses" },
+          { label: "It has the same shape as an excitatory neurotransmitter", answer: "More impulses" },
+          { label: "It makes the first neurone release more excitatory neurotransmitter", answer: "More impulses" },
+          { label: "It has the same shape as an inhibitory neurotransmitter", answer: "Fewer impulses" },
+          { label: "It blocks the receptors for an inhibitory neurotransmitter", answer: "More impulses" }
+        ] },
+      { id: "w6r7", type: "mcq", marks: 1,
+        prompt: "<b>Adenosine</b> is an inhibitory neurotransmitter. It builds up in the brain during the day and makes you feel sleepy. <b>Caffeine</b> has a similar shape and blocks adenosine receptors. Which is the best prediction?",
+        options: ["Caffeine makes a person sleepier, because it binds to the receptors.", "Caffeine makes a person more alert, because adenosine cannot bind and slow the neurones down.", "Caffeine has no effect, because it is not a neurotransmitter.", "Caffeine makes a person more alert, because it is an excitatory neurotransmitter."], answer: 1,
+        explain: "Caffeine sits in the adenosine receptors without activating them. Adenosine's inhibitory signal cannot get through, so the neurones are less slowed down and the person feels more alert. You will test whether this changes reaction time in criteria B and C." },
+      { type: "info", exam: "<b>Use this in criterion B:</b> the reasoning for your hypothesis comes straight from this mission: caffeine → blocks adenosine receptors → less inhibition at synapses → faster processing in the brain → shorter reaction time." },
+
+      /* ---------- Mission 3 ---------- */
+      { type: "info", mission: { n: 3, title: "Investigation check", lesson: "Skills for criteria B and C",
+        story: "Before you plan the e-sports investigation, warm up the skills from the Pack 4 workshop on a quick example." } },
+      { type: "info", learn: { h: "Remember the frames",
+        html: "<p><b>Research question:</b> How does <i>[independent variable + range]</i> affect <i>[dependent variable]</i>, measured using <i>[instrument]</i>?</p><p><b>Hypothesis:</b> If <i>[change]</i>, then <i>[prediction]</i>, because <i>[science]</i>.</p><p><b>Control variable:</b> I will keep <i>[variable]</i> the same by <i>[how]</i>, because <i>[why it would change the results]</i>.</p><p><b>Method:</b> bullet points, safety first, with amounts, times, instruments and repeats.</p>" } },
+      { id: "w6r8", type: "match", marks: 3,
+        prompt: "A student tests whether <b>background music volume</b> (0, 40, 60 and 80 dB) affects the time taken to catch a dropped ruler. <b>Identify</b> the variables.",
+        head: ["Variable", "In this investigation"],
+        options: ["music volume", "reaction time", "the hand used to catch", "the ruler", "the student's age"],
+        rows: [
+          { label: "Independent variable", answer: "music volume" },
+          { label: "Dependent variable", answer: "reaction time" },
+          { label: "A control variable", answer: "the hand used to catch" }
+        ] },
+      { id: "w6r9", type: "mcq", marks: 1,
+        prompt: "Which is the most <b>focused</b> research question for the same investigation?",
+        options: ["Does music affect people?", "How does music volume affect reaction time?", "How does the volume of background music (0, 40, 60 and 80 dB) affect reaction time, measured as the mean distance a ruler falls before it is caught?", "Is loud music bad for students?"], answer: 2,
+        explain: "It names the independent variable with its range, the dependent variable and how it is measured." },
+      { id: "w6r10", type: "mcq", marks: 1,
+        prompt: "Five reaction times in milliseconds are 254, 248, 261, 402 and 257. What should the student do with 402 ms?",
+        options: ["Include it, because every result counts", "Leave it out of the mean as an anomaly, and say why in the evaluation", "Replace it with 250 ms", "Use only the 402 ms result, because it is the largest"], answer: 1,
+        explain: "402 ms is far from the other four values. Leave it out of the mean, state that you did, and suggest a likely cause (for example, the person was distracted)." }
+    ]
+  },
+  {
+    crit: "B", name: "Inquiring and designing: energy drinks and e-sports",
+    tests: "Plan an investigation into whether caffeine changes reaction time: research question, hypothesis, variables, sufficient data, method, safety and ethics.",
+    tip: "Every answer must mention caffeine, reaction time and how it is measured. Use the frame in each hint.",
+    items: [
+      { type: "info",
+        html: "<p><b>The problem.</b> Players in a university e-sports team in Dubai drink energy drinks before tournaments. They say the caffeine makes them react faster. The team's coach is not sure and asks you, a sports scientist, to test the claim.</p><p>All the players are <b>adults aged 18–24</b>. The reaction time is measured with an <b>online reaction-time test</b>: the screen turns from red to green at a random moment and the player clicks the mouse as fast as possible. The test records the time in milliseconds (ms).</p><div class='tbl'><table><thead><tr><th>Equipment available</th></tr></thead><tbody><tr><td>one gaming laptop with a wired mouse · online reaction-time test (ms) · five drinks of 250 cm³ that look and taste the same, containing 0, 40, 80, 120 or 160 mg of caffeine · stopwatch · consent forms · health questionnaire · data sheet</td></tr></tbody></table></div><p><i>For comparison: a 250 cm³ can of energy drink contains about 80 mg of caffeine. Healthy adults are advised not to have more than 200 mg in one go.</i></p>" },
+      { type: "info", guide: {
+        title: "Your criterion B checklist",
+        intro: "Answer B1–B9 in order. The science for your hypothesis comes from Mission 2 (caffeine blocks adenosine receptors).",
+        steps: [
+          { h: "Research question and the problem", strand: "Strand i", what: "Independent variable + range, dependent variable, how it is measured. Then explain why it matters, using synapses.",
+            starters: ["How does … (0–160 mg) affect … measured using …?", "Caffeine blocks adenosine receptors, so…"] },
+          { h: "Hypothesis", strand: "Strand ii", what: "Predict the direction of the change and explain it with the synapse steps.",
+            starters: ["If the dose of caffeine increases, then…", "because caffeine blocks…"] },
+          { h: "Variables and sufficient data", strand: "Strand iii", what: "How you change the independent variable, how you measure the dependent variable, how you keep each control the same and why. How many doses and repeats.",
+            starters: ["I will keep … the same by …, because…", "Each player will do … clicks so that…"] },
+          { h: "Method, safety and ethics", strand: "Strand iv", what: "Bullet points, safety first, with volumes, doses, times, instruments and repeats. Then the ethical issues of testing people.",
+            starters: ["• Safety: check the health questionnaire because…", "• Ethics: every player signs a consent form…"] }
+        ],
+        ladder: [
+          { lv: "1–2", verb: "States", d: "a question, a prediction and the variables" },
+          { lv: "3–4", verb: "Outlines", d: "a question, a hypothesis with some science, and how variables are changed" },
+          { lv: "5–6", verb: "Describes", d: "the question, a hypothesis with reasoning, and how sufficient data are collected" },
+          { lv: "7–8", verb: "Explains", d: "the problem, a hypothesis with correct synapse reasoning, every variable, and a complete, safe and ethical method" }
+        ],
+        checklist: ["Units with every measurement (mg, cm³, ms, min)", "Synapse reasoning in the hypothesis", "What + how + why for each control variable", "Enough clicks and players, and a mean", "Safety AND ethics: people are the subjects"]
+      } },
+
+      { id: "w6b1", type: "text", marks: 2, minWords: 20,
+        prompt: "<b>Formulate</b> a focused research question for this investigation.",
+        hint: "How does <b>[independent variable + range]</b> affect the <b>[dependent variable]</b> of <b>[who]</b>, measured using <b>[instrument + unit]</b>?",
+        model: "How does the dose of caffeine in a drink (0, 40, 80, 120 and 160 mg) affect the mean reaction time of adult e-sports players, measured in milliseconds with an online reaction-time test?",
+        points: ["Independent variable with its range (caffeine dose 0–160 mg)", "Dependent variable and how it is measured (mean reaction time, ms, online test)"] },
+
+      { id: "w6b2", type: "text", marks: 3, minWords: 35,
+        prompt: "<b>Explain</b> why this question is worth investigating. Use scientific reasoning and the team's problem.",
+        hint: "A reaction-time test measures a … response, coordinated by the … . Caffeine acts at … by … . This matters to the team because … . It also matters for health because … .",
+        model: "Clicking when the screen turns green is a voluntary response, so the brain must process the stimulus and send impulses across many synapses before the hand moves (1). Caffeine blocks adenosine receptors at synapses, so it could reduce inhibition and speed up processing, which is what the players claim (1). In e-sports a few milliseconds can decide a game, but energy drinks also have health risks such as a fast heart rate and poor sleep, so the team needs evidence before relying on them (1).",
+        points: ["Reaction test = voluntary response through the brain and synapses", "Science: caffeine blocks adenosine (inhibitory) receptors → could speed up processing", "Real-world value: e-sports performance weighed against health effects"] },
+
+      { id: "w6b3", type: "text", marks: 4, minWords: 45,
+        prompt: "<b>Formulate</b> a testable hypothesis and <b>explain</b> it using scientific reasoning.",
+        hint: "If the dose of caffeine increases from … mg to … mg, then the mean reaction time will …, because caffeine has a similar shape to … and blocks … . Adenosine is an … neurotransmitter, so … . Impulses cross the synapses … , so the brain … .",
+        model: "If the dose of caffeine increases from 0 mg to 160 mg, then the mean reaction time will decrease (get faster) (1). This is because caffeine has a similar shape to adenosine, so it binds to adenosine receptors and blocks them (1). Adenosine is an inhibitory neurotransmitter that makes neurones less likely to fire, so when it cannot bind, there is less inhibition at the synapses (1). Impulses pass across the synapses in the brain more easily, so the brain processes the change on the screen and sends impulses to the hand muscles sooner. The effect may level off at high doses when most receptors are already blocked (1).",
+        points: ["Testable prediction with direction (more caffeine → shorter reaction time)", "Caffeine mimics the shape of adenosine and blocks its receptors", "Adenosine is inhibitory → less inhibition at synapses", "So faster processing in the brain → shorter reaction time (or levels off when receptors are blocked)"] },
+
+      { id: "w6b4", type: "match", marks: 3,
+        prompt: "<b>Identify</b> the variables and the measuring instrument.",
+        head: ["Part of the plan", "In this investigation"],
+        options: ["caffeine dose", "mean reaction time", "online reaction-time test", "volume of the drink", "stopwatch"],
+        rows: [
+          { label: "Independent variable", answer: "caffeine dose" },
+          { label: "Dependent variable", answer: "mean reaction time" },
+          { label: "Instrument used to measure the dependent variable", answer: "online reaction-time test" }
+        ] },
+
+      { id: "w6b5", type: "mcq", marks: 1,
+        prompt: "Players who <b>know</b> they have had caffeine may try harder. Which plan best stops this affecting the results?",
+        options: ["Tell every player which drink they had, so the test is honest", "Give the players drinks that look and taste the same, labelled only with a code, so they do not know the dose", "Only test players who say they do not like energy drinks", "Let each player choose the drink they prefer"], answer: 1,
+        explain: "If the players do not know the dose (a blind trial), their expectations cannot change their effort, so any difference is caused by the caffeine." },
+
+      { id: "w6b6", type: "text", marks: 3, minWords: 45,
+        prompt: "<b>State</b> three control variables. For each one, <b>explain</b> how you will keep it the same and why.",
+        hint: "Use this frame three times: I will keep <b>[control variable]</b> the same by <b>[exactly how]</b>, because <b>[how it would change the reaction time]</b>.",
+        model: "1. Time between drinking and testing: start the stopwatch when the drink is finished and test every player exactly 30 minutes later, because caffeine takes time to be absorbed and reach the brain (1). 2. Other caffeine: players have no coffee, tea or energy drinks on test days, checked with the questionnaire, because extra caffeine would add to the dose (1). 3. Equipment: use the same laptop, wired mouse and hand for every test, because a different mouse or screen can add or remove milliseconds. (Also accept: same time of day, similar sleep the night before, same quiet room, same number of practice clicks.) (1)",
+        points: ["Control 1 + how + why", "Control 2 + how + why", "Control 3 + how + why"] },
+
+      { id: "w6b7", type: "text", marks: 2, minWords: 20,
+        prompt: "<b>Explain</b> how you will collect <b>sufficient</b> data.",
+        hint: "I will test … doses. Each player will do … practice clicks and then … recorded clicks, so that … . I will use … players and repeat …",
+        model: "I will test five caffeine doses (0–160 mg), so I can see the trend and whether it levels off (1). At each dose every player does 3 practice clicks, then 5 recorded clicks, and the test is repeated with at least 10 players, so I can calculate a mean, spot anomalies and make the results more reliable (1).",
+        points: ["Five doses to show the trend", "Practice clicks, several recorded clicks, several players + a mean"] },
+
+      { id: "w6b8", type: "text", marks: 6, minWords: 80,
+        prompt: "<b>Design</b> a method that another scientist could follow. Write it as bullet points, with <b>safety first</b>.",
+        hint: "• Safety: … because … • Give the player … cm³ of drink … (coded) and start the stopwatch • Wait … minutes, sitting … • Do … practice clicks, then … recorded clicks on … • Record … and calculate … • Repeat on a different day with … • Test … players",
+        model: "• Safety: every player completes a health questionnaire; anyone with a heart condition, high blood pressure, caffeine sensitivity or who is pregnant does not take part, because caffeine raises heart rate. No player has more than 160 mg, below the 200 mg single-dose limit.\n• On each test day, at the same time (10:00), give the player 250 cm³ of one coded drink. The player does not know the dose.\n• Start the stopwatch when the drink is finished. The player sits quietly for 30 minutes.\n• The player sits at the same laptop with the same wired mouse, using their dominant hand, in a quiet room.\n• Do 3 practice clicks on the online test, then 5 recorded clicks. Record each time in ms.\n• Calculate the mean of the 5 clicks, leaving out any anomaly.\n• Repeat on four more days, one dose per day in a random order, with no other caffeine on test days.\n• Repeat with at least 10 players and calculate the mean reaction time for each dose.",
+        points: ["Safety first: health screening + dose limit, with reasons", "Bullet points in a logical order", "Dose and volume of drink, blind coding", "Time controlled: 30 minutes after drinking, same time of day", "Measurement: practice clicks + 5 recorded clicks in ms, same equipment", "Repeats: one dose per day, several players, means calculated"] },
+
+      { id: "w6b9", type: "text", marks: 2, minWords: 25,
+        prompt: "This investigation uses people. <b>Outline</b> two ethical issues and how your plan deals with them.",
+        hint: "1. … : I will … . 2. … : I will … .",
+        model: "1. Consent: every player is an adult, reads what the drinks contain and signs a consent form, and can withdraw at any time without giving a reason (1). 2. Privacy: results are stored with a code instead of names and are only shared as group means, so no player is embarrassed by a slow time. (Also accept: health risk managed by screening and a dose limit.) (1)",
+        points: ["Informed consent / right to withdraw", "Confidentiality of results OR health risk managed"] }
+    ]
+  },
+  {
+    crit: "C", name: "Processing and evaluating: the e-sports results",
+    tests: "Process and plot the e-sports results, explain them using synapses, judge the hypothesis, and evaluate the method.",
+    tip: "Reaction times are in milliseconds (ms). A shorter time means a faster reaction. Quote numbers with units in your written answers.",
+    items: [
+      { type: "info",
+        html: "<p>A sports scientist tested <b>three players</b> from the team, on five different days. Each player did the test once at each caffeine dose, and the test recorded the mean of 5 clicks.</p><p><b>Scientist's notes:</b> the players tested at different times of day, whenever they were free. Two players had coffee at breakfast on some test days. The drinks with more caffeine tasted more bitter. Player 3's phone rang during the 120 mg test.</p>"
+          + "<p><b>Raw data: player 2 at 80 mg</b></p><div class='tbl'><table><thead><tr><th>Click</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr></thead><tbody><tr><td>Reaction time (ms)</td><td>276</td><td>285</td><td>270</td><td>288</td><td>276</td></tr></tbody></table></div>"
+          + "<p><b>Table 1: Mean reaction time of e-sports players after drinks with different doses of caffeine</b></p><div class='tbl'><table><thead><tr><th>Caffeine dose (mg)</th><th>Player 1 (ms)</th><th>Player 2 (ms)</th><th>Player 3 (ms)</th></tr></thead><tbody><tr><td>0</td><td>312</td><td>305</td><td>318</td></tr><tr><td>40</td><td>298</td><td>301</td><td>294</td></tr><tr><td>80</td><td>284</td><td>X = ?</td><td>287</td></tr><tr><td>120</td><td>276</td><td>281</td><td>342</td></tr><tr><td>160</td><td>274</td><td>279</td><td>277</td></tr></tbody></table></div>" },
+      { type: "info", guide: {
+        title: "Your criterion C checklist",
+        intro: "Answer C1–C10 in order. Remember: a shorter reaction time = a faster reaction.",
+        steps: [
+          { h: "Process and present", strand: "Strand i", what: "Calculate the missing value, leave the anomaly out of the mean, then plot accurately on an even scale.",
+            starters: ["Mean = (… + … + …) ÷ 3", "% decrease = (start − end) ÷ start × 100"] },
+          { h: "Describe and explain", strand: "Strand ii", what: "Describe the trend with numbers from both ends and where it levels off. Explain it with adenosine, receptors and synapses.",
+            starters: ["As the caffeine dose increased from 0 mg to 160 mg, …", "Caffeine blocks adenosine receptors, so…"] },
+          { h: "Judge the hypothesis", strand: "Strand iii", what: "Supported, partly supported or not supported, quoting data.",
+            starters: ["The hypothesis is partly supported because…", "However, between 120 and 160 mg …"] },
+          { h: "Evaluate and improve", strand: "Strands iv–v", what: "Limitation → effect on the results → specific improvement. Then an extension.",
+            starters: ["One limitation was … This made the reaction time …", "To improve this, I would…"] }
+        ],
+        ladder: [
+          { lv: "1–2", verb: "States", d: "some values, a simple trend and a limitation" },
+          { lv: "3–4", verb: "Outlines", d: "correct calculations, a trend with some science, and a basic improvement" },
+          { lv: "5–6", verb: "Describes", d: "accurate data and graph, a trend with numbers, and limitations with improvements" },
+          { lv: "7–8", verb: "Explains", d: "the results with correct synapse reasoning, judges the hypothesis with data, and explains how each limitation affected the results" }
+        ],
+        checklist: ["Units (ms, mg) with every number", "Anomaly left out of the mean", "Numbers from both ends of the trend", "Limitation → effect → improvement for each point"]
+      } },
+
+      { id: "w6c1", type: "num", marks: 1, min: 279, max: 279, unit: "ms",
+        prompt: "<b>Calculate</b> X, the mean reaction time of player 2 at 80 mg, from the raw data.",
+        explain: "(276 + 285 + 270 + 288 + 276) ÷ 5 = 1395 ÷ 5 = 279 ms." },
+
+      { id: "w6c2", type: "mcq", marks: 1,
+        prompt: "<b>Identify</b> the anomalous result in Table 1.",
+        options: ["0 mg, player 3 (318 ms)", "40 mg, player 2 (301 ms)", "120 mg, player 3 (342 ms)", "160 mg, player 1 (274 ms)"], answer: 2,
+        explain: "342 ms is much slower than the other two players at 120 mg (276 and 281 ms) and does not fit the trend. The notes explain it: player 3's phone rang during the test." },
+
+      { id: "w6c3", type: "numtable", marks: 5,
+        prompt: "<b>Calculate</b> the mean reaction time at each dose (1 d.p.). Use your value of X, and leave out the anomaly.",
+        howto: "Type the number to 1 decimal place.",
+        head: ["Caffeine dose (mg)", "Mean reaction time (ms)"],
+        rows: [
+          { label: "0", answer: 311.7, tol: 0.05 },
+          { label: "40", answer: 297.7, tol: 0.05 },
+          { label: "80", answer: 283.3, tol: 0.05, hint: "(284 + 279 + 287) ÷ 3" },
+          { label: "120", answer: 278.5, tol: 0.05, hint: "Leave out 342: (276 + 281) ÷ 2" },
+          { label: "160", answer: 276.7, tol: 0.05 }
+        ] },
+
+      { id: "w6c4", type: "num", marks: 2, min: 11.1, max: 11.3, unit: "%",
+        prompt: "<b>Calculate</b> the percentage decrease in mean reaction time from 0 mg to 160 mg (1 d.p.).",
+        explain: "(311.7 − 276.7) ÷ 311.7 × 100 = 35.0 ÷ 311.7 × 100 = 11.2%." },
+
+      { id: "w6c5", type: "plot", marks: 5, tol: 1.1,
+        prompt: "<b>Plot</b> your five means on the graph. Each small square on the y-axis is 2 ms.",
+        howto: "Click on the graph to place a cross (×) for each value. Click again to move it. Use ▲ ▼ to nudge the selected cross. The y-axis starts at 260 ms, not zero, so read the scale carefully.",
+        title: "Mean reaction time against caffeine dose",
+        xTitle: "Caffeine dose (mg)", yTitle: "Mean reaction time (ms)", xMin: 0, xMax: 160,
+        yMin: 260, yMax: 320, yMajor: 10, yMinor: 2,
+        points: [ { x: 0, y: 311.7, label: "0" }, { x: 40, y: 297.7, label: "40" }, { x: 80, y: 283.3, label: "80" }, { x: 120, y: 278.5, label: "120" }, { x: 160, y: 276.7, label: "160" } ] },
+
+      { id: "w6c6", type: "text", marks: 3, minWords: 30,
+        prompt: "<b>Describe</b> the trend shown by your graph. Use numbers from your means.",
+        hint: "As the caffeine dose increased from … mg to … mg, the mean reaction time … from … ms to … ms. The biggest change was between … . Between … and … mg the line … .",
+        model: "As the caffeine dose increased from 0 mg to 160 mg, the mean reaction time decreased from 311.7 ms to 276.7 ms, so the players reacted faster (1). The decrease was steepest from 0 to 80 mg, about 14 ms for each 40 mg (311.7 → 297.7 → 283.3 ms) (1). Above 80 mg the line levels off: between 120 mg and 160 mg the mean only fell by 1.8 ms (278.5 → 276.7 ms) (1).",
+        points: ["Negative trend with values from both ends (311.7 → 276.7 ms)", "Steepest decrease from 0 to 80 mg (with data)", "Levels off above 80–120 mg (with data)"] },
+
+      { id: "w6c7", type: "text", marks: 4, minWords: 50,
+        prompt: "<b>Explain</b> the trend using your knowledge of synapses.",
+        hint: "Caffeine has a similar shape to … , so it … . Adenosine is … , so when it cannot bind … . This means impulses … in the brain, so … . At high doses the line levels off because … .",
+        model: "Caffeine has a similar shape to adenosine, so it binds to adenosine receptors on neurones in the brain and blocks them (1). Adenosine is an inhibitory neurotransmitter, so when it cannot bind there is less inhibition and the neurones are more likely to fire (1). Impulses pass across synapses more easily, so the brain processes the green screen and sends impulses along motor neurones to the hand muscles sooner, giving a shorter reaction time (1). At high doses most adenosine receptors are already blocked, so extra caffeine has little extra effect and the line levels off (1).",
+        points: ["Caffeine has a similar shape and blocks adenosine receptors", "Adenosine is inhibitory → less inhibition, neurones fire more easily", "Faster transmission/processing in the brain → shorter reaction time", "Levelling off: receptors already blocked at high doses"] },
+
+      { id: "w6c8", type: "text", marks: 3, minWords: 30,
+        prompt: "The players' hypothesis was: <i>“The more caffeine we drink, the faster we react.”</i> <b>Discuss</b> whether the data supports this hypothesis.",
+        hint: "The hypothesis is partly supported because … (quote data). However, … (quote data). So … .",
+        model: "The hypothesis is partly supported: from 0 mg to 80 mg the mean reaction time fell from 311.7 ms to 283.3 ms, so more caffeine did give faster reactions (1). However, from 120 mg to 160 mg it only fell by 1.8 ms (278.5 → 276.7 ms), which is smaller than the differences between players at the same dose, so extra caffeine made almost no difference (1). So “the more, the faster” is not supported at high doses; and with only three players, the conclusion is not reliable enough to justify drinking more (1).",
+        points: ["Supported part with data (0–80 mg)", "Not supported part with data (120–160 mg, tiny change)", "Clear judgement, with a comment on the small sample"] },
+
+      { id: "w6c9", type: "text", marks: 4, minWords: 50,
+        prompt: "Use the scientist's notes. <b>Evaluate</b> the method: describe <b>two</b> limitations, explain how each affected the results, and suggest a specific improvement for each.",
+        hint: "Limitation 1: … . This affected the results because … . Improvement: … . Limitation 2: … .",
+        model: "1. The drinks with more caffeine tasted more bitter, so players may have guessed their dose and tried harder, making their reaction times shorter than the caffeine alone would (1). Improvement: mask the taste with the same flavouring in every drink, so the trial is truly blind (1). 2. Two players had coffee at breakfast on some days, so their real caffeine dose was higher than recorded, which could make their times too short at low doses (1). Improvement: ban all caffeine for 24 hours before each test and check with a questionnaire. (Also accept: different times of day → test everyone at 10:00; only three players → test at least 10.) (1)",
+        points: ["Limitation 1 + effect on reaction time", "Specific improvement for limitation 1", "Limitation 2 + effect on reaction time", "Specific improvement for limitation 2"] },
+
+      { id: "w6c10", type: "text", marks: 2, minWords: 25,
+        prompt: "<b>Suggest</b> one extension to this investigation that would help the coach decide whether players should use energy drinks, and explain what data you would collect.",
+        hint: "To find out whether …, I would … and measure … .",
+        model: "Test whether the effect lasts through a match by measuring reaction time every 30 minutes for 3 hours after an 80 mg drink, with at least 10 players (1). This shows whether the benefit lasts long enough to matter in a tournament. (Also accept: measuring heart rate or sleep quality alongside reaction time, to weigh the benefit against health effects; testing a more complex choice-reaction task like a real game.) (1)",
+        points: ["A sensible new investigation linked to the coach's decision", "Data to be collected and why it helps"] }
+    ]
+  }
+  ]
 }
 ];
