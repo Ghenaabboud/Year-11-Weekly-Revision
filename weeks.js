@@ -1218,8 +1218,8 @@ window.REVISION_WEEKS = [
             starters: ["If the dose of caffeine increases, then…", "because caffeine blocks…"] },
           { h: "Variables and sufficient data", strand: "Strand iii", what: "How you change the independent variable, how you measure the dependent variable, how you keep each control the same and why. How many doses and repeats.",
             starters: ["I will keep … the same by …, because…", "Each player will do … clicks so that…"] },
-          { h: "Method, safety and ethics", strand: "Strand iv", what: "Bullet points, safety first, with volumes, doses, times, instruments and repeats. Then the ethical issues of testing people.",
-            starters: ["• Safety: check the health questionnaire because…", "• Ethics: every player signs a consent form…"] }
+          { h: "Method, safety and ethics", strand: "Strand iv", what: "Put the method steps in a logical order: safety first, then what must happen before each step. Then the ethical issues of testing people.",
+            starters: ["Safety comes first because…", "• Ethics: every player signs a consent form…"] }
         ],
         ladder: [
           { lv: "1–2", verb: "States", d: "a question, a prediction and the variables" },
@@ -1227,7 +1227,7 @@ window.REVISION_WEEKS = [
           { lv: "5–6", verb: "Describes", d: "the question, a hypothesis with reasoning, and how sufficient data are collected" },
           { lv: "7–8", verb: "Explains", d: "the problem, a hypothesis with correct synapse reasoning, every variable, and a complete, safe and ethical method" }
         ],
-        checklist: ["Units with every measurement (mg, cm³, ms, min)", "Synapse reasoning in the hypothesis", "What + how + why for each control variable", "Enough clicks and players, and a mean", "Safety AND ethics: people are the subjects"]
+        checklist: ["Units with every measurement (mg, cm³, ms, min)", "Synapse reasoning in the hypothesis", "What + how + why for each control variable", "Enough clicks and players, and a mean", "Method order: safety first, measure before you calculate, repeats last", "Ethics: people are the subjects"]
       } },
 
       { id: "w6b1", type: "text", marks: 2, minWords: 20,
@@ -1275,11 +1275,21 @@ window.REVISION_WEEKS = [
         model: "I will test five caffeine doses (0–160 mg), so I can see the trend and whether it levels off (1). At each dose every player does 3 practice clicks, then 5 recorded clicks, and the test is repeated with at least 10 players, so I can calculate a mean, spot anomalies and make the results more reliable (1).",
         points: ["Five doses to show the trend", "Practice clicks, several recorded clicks, several players + a mean"] },
 
-      { id: "w6b8", type: "text", marks: 6, minWords: 80,
-        prompt: "<b>Design</b> a method that another scientist could follow. Write it as bullet points, with <b>safety first</b>.",
-        hint: "• Safety: … because … • Give the player … cm³ of drink … (coded) and start the stopwatch • Wait … minutes, sitting … • Do … practice clicks, then … recorded clicks on … • Record … and calculate … • Repeat on a different day with … • Test … players",
-        model: "• Safety: every player completes a health questionnaire; anyone with a heart condition, high blood pressure, caffeine sensitivity or who is pregnant does not take part, because caffeine raises heart rate. No player has more than 160 mg, below the 200 mg single-dose limit.\n• On each test day, at the same time (10:00), give the player 250 cm³ of one coded drink. The player does not know the dose.\n• Start the stopwatch when the drink is finished. The player sits quietly for 30 minutes.\n• The player sits at the same laptop with the same wired mouse, using their dominant hand, in a quiet room.\n• Do 3 practice clicks on the online test, then 5 recorded clicks. Record each time in ms.\n• Calculate the mean of the 5 clicks, leaving out any anomaly.\n• Repeat on four more days, one dose per day in a random order, with no other caffeine on test days.\n• Repeat with at least 10 players and calculate the mean reaction time for each dose.",
-        points: ["Safety first: health screening + dose limit, with reasons", "Bullet points in a logical order", "Dose and volume of drink, blind coding", "Time controlled: 30 minutes after drinking, same time of day", "Measurement: practice clicks + 5 recorded clicks in ms, same equipment", "Repeats: one dose per day, several players, means calculated"] },
+      { id: "w6b8o", type: "match", marks: 8, fixed: true,
+        prompt: "Here is a method for the investigation, but the steps are mixed up. <b>Select</b> the correct order so that another scientist could follow it. Safety comes first.<ul class='mlist'><li><b>A.</b> Calculate the mean of the 5 clicks, leaving out any anomaly.</li><li><b>B.</b> Start the stopwatch when the drink is finished, and let the player sit quietly for 30 minutes.</li><li><b>C.</b> Repeat with at least 10 players and calculate the mean reaction time for each dose.</li><li><b>D.</b> Safety: every player completes a health questionnaire, and anyone with a heart condition or caffeine sensitivity does not take part.</li><li><b>E.</b> At 10:00, give the player 250 cm³ of one coded drink, without telling them the dose.</li><li><b>F.</b> Repeat on four more days, one dose per day in a random order, with no other caffeine on test days.</li><li><b>G.</b> Do 3 practice clicks on the online test, then 5 recorded clicks, and record each time in ms.</li><li><b>H.</b> Seat the player at the same laptop with the wired mouse, using their dominant hand.</li></ul>",
+        howto: "Choose the letter of the step that goes in each position. Use each letter once. Think about what must happen before each step can be done.",
+        head: ["Step", "Letter"],
+        options: ["A", "B", "C", "D", "E", "F", "G", "H"],
+        rows: [
+          { label: "Step 1", answer: "D" },
+          { label: "Step 2", answer: "E" },
+          { label: "Step 3", answer: "B" },
+          { label: "Step 4", answer: "H" },
+          { label: "Step 5", answer: "G" },
+          { label: "Step 6", answer: "A" },
+          { label: "Step 7", answer: "F" },
+          { label: "Step 8", answer: "C" }
+        ] },
 
       { id: "w6b9", type: "text", marks: 2, minWords: 25,
         prompt: "This investigation uses people. <b>Outline</b> two ethical issues and how your plan deals with them.",
